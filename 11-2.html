@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS3 3D动画</title>
+    <style>
+        :root {
+            --ink: #172b3a;
+            --muted: #607584;
+            --paper: #f5f7f2;
+            --teal: #087f78;
+            --teal-dark: #075b59;
+            --yellow: #f4c95d;
+            --coral: #e87561;
+            --line: #dce6df;
+            --shadow: 0 18px 45px rgba(23, 43, 58, 0.10);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            color: var(--ink);
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background:
+                radial-gradient(circle at 8% 12%, rgba(244, 201, 93, 0.28), transparent 24rem),
+                radial-gradient(circle at 92% 22%, rgba(8, 127, 120, 0.16), transparent 28rem),
+                var(--paper);
+            line-height: 1.7;
+            padding: 60px 20px;
+            min-height: 100vh;
+        }
+
+        .wang_container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: Georgia, "Noto Serif SC", serif;
+            font-size: 2.4rem;
+            color: var(--teal-dark);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .wang_subtitle {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 48px;
+            font-size: 1.05rem;
+        }
+
+        .wang_demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+
+        .wang_demo-card {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 32px 24px;
+            box-shadow: 0 4px 16px rgba(23, 43, 58, 0.06);
+            text-align: center;
+        }
+
+        .wang_demo-card h3 {
+            font-size: 1.15rem;
+            color: var(--teal-dark);
+            margin-bottom: 20px;
+        }
+
+        .wang_stage {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 800px;
+            margin-bottom: 16px;
+        }
+
+        .wang_desc {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .wang_code {
+            background: var(--paper);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-family: "Courier New", monospace;
+            font-size: 0.8rem;
+            color: var(--teal);
+            border: 1px dashed var(--line);
+            margin-top: 12px;
+            text-align: left;
+        }
+
+        .wang_cube {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: wang_rotateCube 4s linear infinite;
+        }
+
+        .wang_cube-face {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 2px solid var(--teal);
+            background: rgba(8, 127, 120, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.75rem;
+            color: var(--teal-dark);
+            backface-visibility: visible;
+        }
+
+        .wang_cube-front  { transform: rotateY(0deg) translateZ(40px); }
+        .wang_cube-back   { transform: rotateY(180deg) translateZ(40px); }
+        .wang_cube-right  { transform: rotateY(90deg) translateZ(40px); }
+        .wang_cube-left   { transform: rotateY(-90deg) translateZ(40px); }
+        .wang_cube-top    { transform: rotateX(90deg) translateZ(40px); }
+        .wang_cube-bottom { transform: rotateX(-90deg) translateZ(40px); }
+
+        @keyframes wang_rotateCube {
+            0%   { transform: rotateX(-20deg) rotateY(0deg); }
+            100% { transform: rotateX(-20deg) rotateY(360deg); }
+        }
+
+        .wang_flip-card {
+            width: 140px;
+            height: 90px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: wang_flip 3s ease-in-out infinite;
+        }
+
+        .wang_flip-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            backface-visibility: hidden;
+            box-shadow: 0 4px 12px rgba(23, 43, 58, 0.12);
+        }
+
+        .wang_flip-front {
+            background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+            color: white;
+        }
+
+        .wang_flip-back {
+            background: linear-gradient(135deg, var(--coral), #c95a47);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        @keyframes wang_flip {
+            0%, 30%   { transform: rotateY(0deg); }
+            50%, 80%  { transform: rotateY(180deg); }
+            100%      { transform: rotateY(360deg); }
+        }
+
+        .wang_ring {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: wang_spinRing 3s linear infinite;
+        }
+
+        .wang_ring-face {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 6px solid transparent;
+        }
+
+        .wang_ring-face:nth-child(1) {
+            border-top-color: var(--teal);
+            transform: rotateX(70deg);
+        }
+        .wang_ring-face:nth-child(2) {
+            border-top-color: var(--coral);
+            transform: rotateX(70deg) rotateZ(120deg);
+        }
+        .wang_ring-face:nth-child(3) {
+            border-top-color: var(--yellow);
+            transform: rotateX(70deg) rotateZ(240deg);
+        }
+
+        @keyframes wang_spinRing {
+            0%   { transform: rotateX(-70deg) rotateZ(0deg); }
+            100% { transform: rotateX(-70deg) rotateZ(360deg); }
+        }
+
+        .wang_pendulum {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: wang_swing 2s ease-in-out infinite alternate;
+            transform-origin: top center;
+        }
+
+        .wang_pendulum::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 3px;
+            height: 70px;
+            background: var(--muted);
+            transform: translateX(-50%);
+        }
+
+        .wang_pendulum-ball {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, var(--coral), #c95a47);
+            transform: translateX(-50%);
+            box-shadow: 0 4px 12px rgba(23, 43, 58, 0.2);
+        }
+
+        @keyframes wang_swing {
+            0%   { transform: rotateZ(-35deg); }
+            100% { transform: rotateZ(35deg); }
+        }
+
+        .wang_carousel {
+            width: 120px;
+            height: 80px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: wang_carouselSpin 6s linear infinite;
+        }
+
+        .wang_carousel-item {
+            position: absolute;
+            width: 120px;
+            height: 80px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(23, 43, 58, 0.15);
+        }
+
+        .wang_carousel-item:nth-child(1) { background: var(--teal);    transform: rotateY(0deg)   translateZ(140px); }
+        .wang_carousel-item:nth-child(2) { background: var(--coral);   transform: rotateY(90deg)  translateZ(140px); }
+        .wang_carousel-item:nth-child(3) { background: var(--teal-dark); transform: rotateY(180deg) translateZ(140px); }
+        .wang_carousel-item:nth-child(4) { background: var(--yellow);  transform: rotateY(270deg) translateZ(140px); color: var(--ink); }
+
+        @keyframes wang_carouselSpin {
+            0%   { transform: rotateY(0deg)   rotateX(-10deg); }
+            100% { transform: rotateY(360deg) rotateX(-10deg); }
+        }
+
+        .wang_note {
+            padding: 20px 24px;
+            background: rgba(244, 201, 93, 0.15);
+            border-left: 4px solid var(--yellow);
+            border-radius: 0 8px 8px 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .wang_note strong {
+            color: var(--ink);
+        }
+
+        .wang_section-title {
+            font-size: 1.3rem;
+            color: var(--teal);
+            border-left: 4px solid var(--yellow);
+            padding-left: 14px;
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wang_container">
+        <h1>CSS3 3D 动画</h1>
+        <p class="wang_subtitle">perspective · transform-style · rotateX / rotateY / rotateZ · @keyframes</p>
+
+        <div class="wang_demo-grid">
+            <div class="wang_demo-card">
+                <h3>旋转立方体</h3>
+                <div class="wang_stage">
+                    <div class="wang_cube">
+                        <div class="wang_cube-face wang_cube-front">前</div>
+                        <div class="wang_cube-face wang_cube-back">后</div>
+                        <div class="wang_cube-face wang_cube-right">右</div>
+                        <div class="wang_cube-face wang_cube-left">左</div>
+                        <div class="wang_cube-face wang_cube-top">顶</div>
+                        <div class="wang_cube-face wang_cube-bottom">底</div>
+                    </div>
+                </div>
+                <p class="wang_desc">六个面组成立方体，绕 Y 轴持续旋转</p>
+                <div class="wang_code">transform-style: preserve-3d;<br>animation: rotateCube 4s linear infinite;</div>
+            </div>
+
+            <div class="wang_demo-card">
+                <h3>3D 翻转卡片</h3>
+                <div class="wang_stage">
+                    <div class="wang_flip-card">
+                        <div class="wang_flip-face wang_flip-front">正面</div>
+                        <div class="wang_flip-face wang_flip-back">背面</div>
+                    </div>
+                </div>
+                <p class="wang_desc">绕 Y 轴 180° 翻转，正反面交替显示</p>
+                <div class="wang_code">backface-visibility: hidden;<br>animation: flip 3s ease-in-out infinite;</div>
+            </div>
+
+            <div class="wang_demo-card">
+                <h3>3D 旋转圆环</h3>
+                <div class="wang_stage">
+                    <div class="wang_ring">
+                        <div class="wang_ring-face"></div>
+                        <div class="wang_ring-face"></div>
+                        <div class="wang_ring-face"></div>
+                    </div>
+                </div>
+                <p class="wang_desc">三个彩色圆弧构成 3D 轨道环绕效果</p>
+                <div class="wang_code">rotateX(70deg) + rotateZ()<br>animation: spinRing 3s linear infinite;</div>
+            </div>
+
+            <div class="wang_demo-card">
+                <h3>3D 摆锤</h3>
+                <div class="wang_stage">
+                    <div class="wang_pendulum">
+                        <div class="wang_pendulum-ball"></div>
+                    </div>
+                </div>
+                <p class="wang_desc">以顶端为轴心，来回摆动</p>
+                <div class="wang-code">transform-origin: top center;<br>animation: swing 2s ease-in-out infinite alternate;</div>
+            </div>
+
+            <div class="wang_demo-card">
+                <h3>3D 旋转木马</h3>
+                <div class="wang_stage">
+                    <div class="wang_carousel">
+                        <div class="wang_carousel-item">A</div>
+                        <div class="wang_carousel-item">B</div>
+                        <div class="wang_carousel-item">C</div>
+                        <div class="wang_carousel-item">D</div>
+                    </div>
+                </div>
+                <p class="wang_desc">四块面板围成一圈，绕 Y 轴公转</p>
+                <div class="wang-code">rotateY() + translateZ(140px)<br>animation: carouselSpin 6s linear infinite;</div>
+            </div>
+        </div>
+
+        <div class="wang_note">
+            <strong>核心要点：</strong>父容器设置 <strong>perspective</strong> 产生透视深度；3D 子元素设置 <strong>transform-style: preserve-3d</strong> 保留 3D 空间；使用 <strong>rotateX / rotateY / rotateZ</strong> 控制旋转轴；通过 <strong>@keyframes</strong> 定义动画轨迹。
+        </div>
+    </div>
+</body>
+</html>

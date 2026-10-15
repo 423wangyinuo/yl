@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>媒体查询 - 全屏盒子</title>
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		:root {
+			font-size: 125%;
+		}
+
+		html,
+		body {
+			width: 100%;
+			min-height: 100%;
+			margin: 0;
+		}
+
+		.full-screen-box {
+			min-height: 100vh;
+			min-height: 100dvh;
+			display: grid;
+			place-items: center;
+			background-color: #258b78;
+			color: #fff;
+			font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+			font-size: 3rem;
+			font-weight: 700;
+			transition: background-color 0.3s ease, font-size 0.3s ease;
+		}
+
+		.full-screen-box::after {
+			position: fixed;
+			bottom: 1.5rem;
+			content: "当前区间：超宽屏（1401px 及以上）";
+			font-size: 0.875rem;
+			font-weight: 400;
+		}
+
+		@media (max-width: 600px) {
+			:root {
+				font-size: 87.5%;
+			}
+
+			.full-screen-box {
+				background-color: #df7656;
+			}
+
+			.full-screen-box::after {
+				content: "当前区间：窄屏（600px 及以下）";
+			}
+		}
+
+		@media (min-width: 601px) and (max-width: 1000px) {
+			:root {
+				font-size: 100%;
+			}
+
+			.full-screen-box {
+				background-color: #d4a52f;
+			}
+
+			.full-screen-box::after {
+				content: "当前区间：中屏（601-1000px）";
+			}
+		}
+
+		@media (min-width: 1001px) and (max-width: 1400px) {
+			:root {
+				font-size: 112.5%;
+			}
+
+			.full-screen-box {
+				background-color: #3978b5;
+			}
+
+			.full-screen-box::after {
+				content: "当前区间：宽屏（1001-1400px）";
+			}
+		}
+
+		@media (min-width: 1401px) {
+			.full-screen-box {
+				background-color: #258b78;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="full-screen-box">王一诺</div>
+</body>
+</html>

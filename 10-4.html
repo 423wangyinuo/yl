@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>媒体查询 - 响应式盒子</title>
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		html,
+		body {
+			min-width: 320px;
+			min-height: 100%;
+			margin: 0;
+		}
+
+		body {
+			background: #f4f3ed;
+			color: #203331;
+			font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+		}
+
+		main {
+			width: min(100% - 40px, 1320px);
+			margin: 0 auto;
+			padding: 56px 0 64px;
+		}
+
+		header {
+			margin-bottom: 32px;
+			border-bottom: 1px solid #c9d2ca;
+			padding-bottom: 24px;
+		}
+
+		.eyebrow {
+			margin: 0 0 10px;
+			color: #a35d42;
+			font-size: 0.8rem;
+			font-weight: 700;
+			letter-spacing: 0.12em;
+		}
+
+		h1 {
+			margin: 0;
+			font-size: clamp(1.8rem, 4vw, 3rem);
+			line-height: 1.2;
+		}
+
+		.description {
+			margin: 12px 0 0;
+			color: #61716a;
+			font-size: 1rem;
+		}
+
+		.box-grid {
+			display: grid;
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+			gap: 14px;
+		}
+
+		.box {
+			min-height: 150px;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			padding: 18px;
+			border: 1px solid rgb(32 51 49 / 12%);
+			border-radius: 6px;
+			background: #fffefa;
+			box-shadow: 0 5px 14px rgb(32 51 49 / 5%);
+			transition: transform 180ms ease, box-shadow 180ms ease;
+		}
+
+		.box:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 10px 20px rgb(32 51 49 / 10%);
+		}
+
+		.box:nth-child(3n + 1) {
+			background: #dce9df;
+		}
+
+		.box:nth-child(3n + 2) {
+			background: #f1e2d4;
+		}
+
+		.box:nth-child(3n) {
+			background: #e5e9d7;
+		}
+
+		.box-number {
+			color: #61716a;
+			font-size: 0.8rem;
+			font-weight: 700;
+		}
+
+		.box-label {
+			font-size: 1.25rem;
+			font-weight: 700;
+		}
+
+		@media (max-width: 640px) {
+			.box-grid {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
+		}
+
+		@media (min-width: 641px) and (max-width: 1439px) {
+			main {
+				width: min(100% - 64px, 1320px);
+				padding-top: 72px;
+			}
+
+			.box-grid {
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+				gap: 18px;
+			}
+
+			.box {
+				min-height: 180px;
+				padding: 22px;
+			}
+		}
+
+		@media (min-width: 1440px) {
+			main {
+				width: min(100% - 64px, 1320px);
+				padding-top: 72px;
+			}
+
+			.box-grid {
+				grid-template-columns: repeat(8, minmax(0, 1fr));
+				gap: 18px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<header>
+			<p class="eyebrow">MEDIA QUERY / RESPONSIVE GRID</p>
+			<h1>王一诺</h1>
+			<p class="description">视口宽度变化时，每行盒子数量随之调整。</p>
+		</header>
+		<section class="box-grid" aria-label="八个响应式盒子">
+			<div class="box"><span class="box-number">01</span><span class="box-label">盒子一</span></div>
+			<div class="box"><span class="box-number">02</span><span class="box-label">盒子二</span></div>
+			<div class="box"><span class="box-number">03</span><span class="box-label">盒子三</span></div>
+			<div class="box"><span class="box-number">04</span><span class="box-label">盒子四</span></div>
+			<div class="box"><span class="box-number">05</span><span class="box-label">盒子五</span></div>
+			<div class="box"><span class="box-number">06</span><span class="box-label">盒子六</span></div>
+			<div class="box"><span class="box-number">07</span><span class="box-label">盒子七</span></div>
+			<div class="box"><span class="box-number">08</span><span class="box-label">盒子八</span></div>
+		</section>
+	</main>
+</body>
+</html>

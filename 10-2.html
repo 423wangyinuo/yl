@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>CSS Animation 幻灯片 - 王一诺</title>
+	<style>
+		:root {
+			color-scheme: light;
+			--ink: #183238;
+			--muted: #627579;
+			--teal: #087f78;
+			--coral: #e87561;
+			--paper: #f3f5f2;
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			min-height: 100vh;
+			margin: 0;
+			display: grid;
+			place-items: center;
+			padding: 32px 20px;
+			color: var(--ink);
+			font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+			background:
+				radial-gradient(ellipse at 12% 18%, rgba(232, 117, 97, 0.14), transparent 26rem),
+				radial-gradient(ellipse at 90% 82%, rgba(8, 127, 120, 0.13), transparent 30rem),
+				var(--paper);
+		}
+
+		main {
+			width: min(900px, 100%);
+		}
+
+		header {
+			margin-bottom: 24px;
+			padding-left: 18px;
+			border-left: 4px solid var(--coral);
+		}
+
+		.eyebrow {
+			margin: 0 0 5px;
+			color: var(--teal);
+			font-size: 12px;
+			font-weight: 700;
+			letter-spacing: 0.12em;
+		}
+
+		h1 {
+			margin: 0;
+			font-family: Georgia, "Noto Serif SC", serif;
+			font-size: clamp(25px, 5vw, 38px);
+			line-height: 1.25;
+		}
+
+		.slideshow {
+			position: relative;
+			width: 100%;
+			height: clamp(360px, 62vw, 580px);
+			overflow: hidden;
+			background: #dce6e2;
+			box-shadow: 0 24px 60px rgba(24, 50, 56, 0.16);
+		}
+
+		.slide {
+			position: absolute;
+			inset: 0;
+			transform: translateX(100%);
+			animation: slideshow 9s linear infinite both;
+		}
+
+		.slide:nth-child(2) { animation-delay: 3s; }
+		.slide:nth-child(3) { animation-delay: 6s; }
+
+		.slide img {
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		.caption {
+			position: absolute;
+			inset: auto 0 0;
+			min-height: 82px;
+			padding: 14px 22px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			color: #fff;
+			background: rgba(0, 0, 0, 0.58);
+		}
+
+		.caption h2 {
+			margin: 0;
+			font-size: 20px;
+			line-height: 1.35;
+		}
+
+		.caption p {
+			margin: 0;
+			color: rgba(255, 255, 255, 0.82);
+			font-size: 13px;
+			white-space: nowrap;
+		}
+
+		@keyframes slideshow {
+			0% { transform: translateX(100%); }
+			5.56%, 33.33% { transform: translateX(0); }
+			38.89%, 100% { transform: translateX(-100%); }
+		}
+
+		@media (max-width: 520px) {
+			body { padding: 24px 16px; }
+			.slideshow { height: min(112vw, 480px); min-height: 340px; }
+			.caption { min-height: 74px; padding: 12px 15px; }
+			.caption h2 { font-size: 17px; }
+			.caption p { font-size: 11px; }
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.slide { animation: none; }
+			.slide:first-child { transform: translateX(0); }
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<header>
+			<p class="eyebrow">CSS ANIMATION · 01 / 03</p>
+			<h1>影像幻灯片</h1>
+		</header>
+		<section class="slideshow" aria-label="王一诺的图片幻灯片">
+			<article class="slide">
+				<img src="./img/3.jpg" alt="海面上的船只与天空中的彩虹">
+				<div class="caption">
+					<h2>海上彩虹</h2>
+					<p>王一诺 · 01</p>
+				</div>
+			</article>
+			<article class="slide">
+				<img src="./img/4.jpg" alt="中埃两国领导人握手">
+				<div class="caption">
+					<h2>友好会晤</h2>
+					<p>王一诺 · 02</p>
+				</div>
+			</article>
+			<article class="slide">
+				<img src="./img/10.jpg" alt="电影场景">
+				<div class="caption">
+					<h2>电影瞬间</h2>
+					<p>王一诺 · 03</p>
+				</div>
+			</article>
+		</section>
+	</main>
+</body>
+</html>

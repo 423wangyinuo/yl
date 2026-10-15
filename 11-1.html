@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web前端长度单位</title>
+    <style>
+        :root {
+            --ink: #172b3a;
+            --muted: #607584;
+            --paper: #f5f7f2;
+            --teal: #087f78;
+            --teal-dark: #075b59;
+            --yellow: #f4c95d;
+            --coral: #e87561;
+            --line: #dce6df;
+            --shadow: 0 18px 45px rgba(23, 43, 58, 0.10);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            color: var(--ink);
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background:
+                radial-gradient(circle at 8% 12%, rgba(244, 201, 93, 0.28), transparent 24rem),
+                radial-gradient(circle at 92% 22%, rgba(8, 127, 120, 0.16), transparent 28rem),
+                var(--paper);
+            line-height: 1.7;
+            padding: 60px 20px;
+        }
+
+        .wang_container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: Georgia, "Noto Serif SC", serif;
+            font-size: 2.4rem;
+            color: var(--teal-dark);
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .wang_subtitle {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 48px;
+            font-size: 1.05rem;
+        }
+
+        .wang_section {
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: var(--teal);
+            border-left: 4px solid var(--yellow);
+            padding-left: 14px;
+            margin-bottom: 20px;
+        }
+
+        .wang_unit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .wang_unit-card {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 20px 24px;
+            box-shadow: 0 4px 16px rgba(23, 43, 58, 0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .wang_unit-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .wang_unit-name {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--teal-dark);
+            font-family: "Courier New", monospace;
+            margin-bottom: 6px;
+        }
+
+        .wang_unit-desc {
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .wang_unit-example {
+            background: var(--paper);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-family: "Courier New", monospace;
+            font-size: 0.85rem;
+            color: var(--teal);
+            border: 1px dashed var(--line);
+        }
+
+        .wang_demo-section {
+            margin-top: 48px;
+            padding: 32px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            border: 1px solid var(--line);
+        }
+
+        .wang_demo-section h2 {
+            margin-bottom: 24px;
+        }
+
+        .wang_demo-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .wang_demo-label {
+            min-width: 100px;
+            font-weight: 700;
+            color: var(--teal-dark);
+            font-family: "Courier New", monospace;
+        }
+
+        .wang_demo-box {
+            height: 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .wang_demo-px { width: 200px; background: var(--teal); }
+        .wang_demo-em { width: 10em; background: var(--coral); font-size: 16px; }
+        .wang_demo-rem { width: 10rem; background: var(--teal-dark); }
+        .wang_demo-vw { width: 20vw; background: #5b7fa6; min-width: 120px; }
+        .wang_demo-percent { width: 50%; background: #8b6fa6; min-width: 120px; }
+
+        .wang_note {
+            margin-top: 32px;
+            padding: 18px 22px;
+            background: rgba(244, 201, 93, 0.15);
+            border-left: 4px solid var(--yellow);
+            border-radius: 0 8px 8px 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .wang_note strong {
+            color: var(--ink);
+        }
+    </style>
+</head>
+<body>
+    <div class="wang_container">
+        <h1>Web 前端长度单位</h1>
+        <p class="wang_subtitle">CSS 中的绝对单位与相对单位</p>
+
+        <div class="wang_section">
+            <h2>绝对长度单位</h2>
+            <div class="wang_unit-grid">
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">px</div>
+                    <div class="wang_unit-desc">像素，最常用的屏幕单位。1px 对应屏幕上的一个物理像素点（CSS 像素）。</div>
+                    <div class="wang_unit-example">width: 200px;</div>
+                </div>
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">pt</div>
+                    <div class="wang_unit-desc">点（Point），印刷单位。1pt = 1/72 英寸，常用于打印样式。</div>
+                    <div class="wang_unit-example">font-size: 12pt;</div>
+                </div>
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">pc</div>
+                    <div class="wang_unit-desc">派卡（Pica），印刷单位。1pc = 12pt = 1/6 英寸。</div>
+                    <div class="wang_unit-example">margin: 1pc;</div>
+                </div>
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">in</div>
+                    <div class="wang_unit-desc">英寸（Inch）。1in = 96px = 2.54cm，常用于打印。</div>
+                    <div class="wang_unit-example">width: 2in;</div>
+                </div>
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">cm</div>
+                    <div class="wang_unit-desc">厘米。1cm = 37.8px，常用于打印样式表。</div>
+                    <div class="wang_unit-example">height: 5cm;</div>
+                </div>
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">mm</div>
+                    <div class="wang_unit-desc">毫米。1mm = 1/10 cm，常用于打印样式表。</div>
+                    <div class="wang_unit-example">padding: 10mm;</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="wang_section">
+            <h2>相对长度单位</h2>
+            <div class="wang_unit-grid">
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">em</div>
+                    <div class="wang_unit-desc">相对于当前元素的 font-size。若自身未设定，则继承父元素。</div>
+                    <div class="wang_unit-example">font-size: 1.5em;</div>
+                </div>
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">rem</div>
+                    <div class="wang_unit-desc">相对于根元素（html）的 font-size，避免嵌套影响。</div>
+                    <div class="wang_unit-example">font-size: 1.2rem;</div>
+                </div>
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">%</div>
+                    <div class="wang_unit-desc">相对于父元素对应属性的百分比。</div>
+                    <div class="wang_unit-example">width: 80%;</div>
+                </div>
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">vw</div>
+                    <div class="wang_unit-desc">视口宽度的 1%。100vw = 视口总宽度。</div>
+                    <div class="wang_unit-example">width: 50vw;</div>
+                </div>
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">vh</div>
+                    <div class="wang_unit-desc">视口高度的 1%。100vh = 视口总高度。</div>
+                    <div class="wang_unit-example">height: 100vh;</div>
+                </div>
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">vmin</div>
+                    <div class="wang_unit-desc">视口宽度和高度中较小值的 1%。</div>
+                    <div class="wang_unit-example">font-size: 4vmin;</div>
+                </div>
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">vmax</div>
+                    <div class="wang_unit-desc">视口宽度和高度中较大值的 1%。</div>
+                    <div class="wang_unit-example">font-size: 4vmax;</div>
+                </div>
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">ch</div>
+                    <div class="wang_unit-desc">当前字体中 "0" 字符的宽度，常用于限制文本列宽。</div>
+                    <div class="wang_unit-example">max-width: 70ch;</div>
+                </div>
+                <div class="wang_unit-card">
+                    <div class="wang_unit-name">ex</div>
+                    <div class="wang_unit-desc">当前字体中 "x" 字符的高度，较少使用。</div>
+                    <div class="wang_unit-example">height: 5ex;</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="wang_demo-section">
+            <h2>直观对比演示</h2>
+            <div class="wang_demo-row">
+                <span class="wang_demo-label">200px</span>
+                <div class="wang_demo-box wang_demo-px">固定 200px</div>
+            </div>
+            <div class="wang_demo-row">
+                <span class="wang_demo-label">10em</span>
+                <div class="wang_demo-box wang_demo-em">10em（基于16px）</div>
+            </div>
+            <div class="wang_demo-row">
+                <span class="wang_demo-label">10rem</span>
+                <div class="wang_demo-box wang_demo-rem">10rem（基于根元素）</div>
+            </div>
+            <div class="wang_demo-row">
+                <span class="wang_demo-label">20vw</span>
+                <div class="wang_demo-box wang_demo-vw">20vw（视口20%）</div>
+            </div>
+            <div class="wang_demo-row">
+                <span class="wang_demo-label">50%</span>
+                <div class="wang_demo-box wang_demo-percent">50%（父元素一半）</div>
+            </div>
+        </div>
+
+        <div class="wang_note">
+            <strong>使用建议：</strong>屏幕显示优先使用 <strong>px</strong>、<strong>rem</strong>、<strong>vw/vh</strong>；打印样式使用 <strong>pt</strong>、<strong>cm</strong>、<strong>mm</strong>、<strong>in</strong>。响应式布局中推荐使用 <strong>rem</strong> 和 <strong>vw/vh</strong> 替代固定 px，以获得更好的可访问性和适配性。
+        </div>
+    </div>
+</body>
+</html>

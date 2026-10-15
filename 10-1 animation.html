@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>CSS Animation - 背景颜色变化</title>
+	<style>
+		* { box-sizing: border-box; }
+
+		body {
+			min-height: 100vh;
+			margin: 0;
+			display: grid;
+			place-items: center;
+			background: #f3f5f2;
+			color: #20323a;
+			font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+		}
+
+		main {
+			width: min(560px, calc(100% - 40px));
+			padding: 36px 24px;
+			text-align: center;
+			border-top: 3px solid #16877d;
+			background: #fff;
+		}
+
+		h1 {
+			margin: 0 0 8px;
+			font-size: 26px;
+		}
+
+		p {
+			margin: 0;
+			color: #66777b;
+			font-size: 14px;
+		}
+
+		.stage {
+			position: relative;
+			width: min(100%, 420px);
+			height: 320px;
+			margin: 24px auto;
+			border: 1px dashed #c9d5d0;
+			background: #f8faf8;
+		}
+
+		.color-box {
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			width: 140px;
+			height: 120px;
+			display: grid;
+			place-items: center;
+			border: 8px solid rgba(255, 255, 255, 0.72);
+			color: #fff;
+			font-size: 20px;
+			font-weight: 700;
+			transform: translate(-50%, -50%);
+			animation: box-motion 8s ease-in-out infinite;
+		}
+
+		@keyframes box-motion {
+			0%, 100% {
+				left: 50%;
+				top: 50%;
+				width: 140px;
+				height: 120px;
+				background-color: #e6534b;
+				transform: translate(-50%, -50%) rotate(0deg);
+			}
+			25% {
+				left: 38%;
+				top: 35%;
+				width: 180px;
+				height: 150px;
+				background-color: #e5ad35;
+				transform: translate(-50%, -50%) rotate(8deg);
+			}
+			50% {
+				left: 62%;
+				top: 65%;
+				width: 140px;
+				height: 180px;
+				background-color: #22977b;
+				transform: translate(-50%, -50%) rotate(-8deg);
+			}
+			75% {
+				left: 50%;
+				top: 35%;
+				width: 180px;
+				height: 140px;
+				background-color: #397cc2;
+				transform: translate(-50%, -50%) rotate(5deg);
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.color-box {
+				animation: none;
+				background-color: #e6534b;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<h1>背景颜色变化</h1>
+		<p>纯 CSS animation · 颜色、宽高、位置与角度同步变化</p>
+		<div class="stage">
+			<div class="color-box">COLOR</div>
+		</div>
+		<p>红 → 黄 → 绿 → 蓝 · 8 秒循环</p>
+	</main>
+</body>
+</html>
