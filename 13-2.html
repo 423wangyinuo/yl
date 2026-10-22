@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Lucide 图标实践：通过 JavaScript 将占位元素替换为内联 SVG 图标">
+    <title>13-2 · Lucide SVG 图标</title>
+    <style>
+        :root {
+            --ink: #172b3a;
+            --muted: #607584;
+            --paper: #f5f7f2;
+            --surface: rgba(255, 255, 255, 0.9);
+            --line: #dce6df;
+            --teal: #087f78;
+            --teal-dark: #075b59;
+            --yellow: #f4c95d;
+            --coral: #e87561;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background:
+                radial-gradient(circle at 12% 10%, rgba(232, 117, 97, 0.14), transparent 22rem),
+                radial-gradient(circle at 88% 18%, rgba(8, 127, 120, 0.15), transparent 26rem),
+                var(--paper);
+            line-height: 1.7;
+        }
+
+        .wang_shell {
+            width: min(1100px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 44px 0 70px;
+        }
+
+        .wang_topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .wang_brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--teal-dark);
+            text-decoration: none;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+        }
+
+        .wang_brand-mark {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px 10px 10px 2px;
+            color: #fff;
+            background: var(--teal);
+            box-shadow: 5px 5px 0 var(--yellow);
+            font-size: 1rem;
+        }
+
+        .wang_back {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.92rem;
+            border-bottom: 1px solid var(--muted);
+            padding-bottom: 2px;
+        }
+
+        .wang_back:hover { color: var(--teal-dark); border-color: var(--teal); }
+
+        .wang_hero { margin: 56px 0 40px; }
+
+        .wang_eyebrow {
+            color: var(--coral);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .wang_hero h1 {
+            margin: 14px 0 16px;
+            font-family: Georgia, "Noto Serif SC", serif;
+            font-size: clamp(2rem, 5vw, 3.4rem);
+            line-height: 1.15;
+        }
+
+        .wang_hero h1 em { color: var(--teal); font-style: normal; }
+
+        .wang_hero p {
+            max-width: 640px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 1.05rem;
+        }
+
+        .wang_method-note {
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+            margin: 26px 0 44px;
+            padding: 22px 26px;
+            border-left: 4px solid var(--teal);
+            background: rgba(255, 255, 255, 0.62);
+            box-shadow: 0 18px 45px rgba(23, 43, 58, 0.10);
+        }
+
+        .wang_method-note svg { color: var(--coral); flex-shrink: 0; margin-top: 2px; }
+
+        .wang_method-note strong { display: block; margin-bottom: 4px; color: var(--teal-dark); }
+        .wang_method-note p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+        .wang_method-note code {
+            padding: 1px 7px;
+            border-radius: 4px;
+            background: rgba(8, 127, 120, 0.1);
+            color: var(--teal-dark);
+            font-size: 0.88rem;
+        }
+
+        .wang_section-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .wang_section-title h2 {
+            margin: 0;
+            font-family: Georgia, "Noto Serif SC", serif;
+            font-size: 1.7rem;
+        }
+
+        .wang_section-title span { color: var(--muted); font-size: 0.88rem; }
+
+        .wang_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 14px;
+            margin-bottom: 46px;
+        }
+
+        .wang_icon-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 24px 12px 18px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--surface);
+            transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+        }
+
+        .wang_icon-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--teal);
+            box-shadow: 0 14px 28px rgba(23, 43, 58, 0.12);
+        }
+
+        .wang_icon-card svg {
+            width: 30px;
+            height: 30px;
+            stroke: var(--teal);
+            transition: transform 220ms ease, stroke 220ms ease;
+        }
+
+        .wang_icon-card:nth-child(3n) svg { stroke: var(--coral); }
+        .wang_icon-card:nth-child(4n) svg { stroke: #b8860b; }
+
+        .wang_icon-card:hover svg { transform: scale(1.18) rotate(-6deg); }
+
+        .wang_icon-card small {
+            color: var(--muted);
+            font-size: 0.8rem;
+            letter-spacing: 0.04em;
+        }
+
+        .wang_demo-banner {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 14px;
+            padding: 22px 26px;
+            border-radius: 12px;
+            color: #fff;
+            background: linear-gradient(120deg, #075b59, #0a938c);
+            box-shadow: 0 18px 40px rgba(8, 127, 120, 0.28);
+        }
+
+        .wang_demo-banner svg { width: 26px; height: 26px; stroke: var(--yellow); flex-shrink: 0; }
+        .wang_demo-banner strong { font-size: 1.05rem; }
+        .wang_demo-banner p { margin: 0; font-size: 0.9rem; opacity: 0.85; }
+
+        footer {
+            margin-top: 56px;
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            .wang_grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+            footer { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wang_shell">
+        <div class="wang_topbar">
+            <a class="wang_brand" href="index.html">
+                <span class="wang_brand-mark">王</span>
+                <span>WANG YINUO / 0423</span>
+            </a>
+            <a class="wang_back" href="index.html">← 返回导航页</a>
+        </div>
+
+        <div class="wang_hero">
+            <div class="wang_eyebrow">Exercise 13-2 · Inline SVG</div>
+            <h1>Lucide<br><em>SVG 图标</em>实践</h1>
+            <p>用 <code>data-lucide</code> 属性声明图标名称，页面加载后由 lucide.min.js 把每个占位元素替换为真正的内联 SVG，可以直接用 CSS 的 width、height、stroke 等属性控制。</p>
+        </div>
+
+        <div class="wang_method-note">
+            <i data-lucide="circle-info"></i>
+            <div>
+                <strong>实现方式：内联 SVG（Inline SVG）</strong>
+                <p>本页面引用本地 <code>cdn/lucide/lucide.min.js</code>，占位写法为 <code>&lt;i data-lucide="star"&gt;&lt;/i&gt;</code>，运行时由 <code>lucide.createIcons()</code> 注入 SVG 节点。</p>
+            </div>
+        </div>
+
+        <div class="wang_section-title">
+            <h2>常用图标</h2>
+            <span>data-lucide 名称 · 运行时注入 SVG</span>
+        </div>
+        <div class="wang_grid">
+            <div class="wang_icon-card"><i data-lucide="star"></i><small>star</small></div>
+            <div class="wang_icon-card"><i data-lucide="heart"></i><small>heart</small></div>
+            <div class="wang_icon-card"><i data-lucide="home"></i><small>home</small></div>
+            <div class="wang_icon-card"><i data-lucide="user"></i><small>user</small></div>
+            <div class="wang_icon-card"><i data-lucide="search"></i><small>search</small></div>
+            <div class="wang_icon-card"><i data-lucide="bell"></i><small>bell</small></div>
+            <div class="wang_icon-card"><i data-lucide="settings"></i><small>settings</small></div>
+            <div class="wang_icon-card"><i data-lucide="camera"></i><small>camera</small></div>
+            <div class="wang_icon-card"><i data-lucide="music"></i><small>music</small></div>
+            <div class="wang_icon-card"><i data-lucide="book-open"></i><small>book-open</small></div>
+            <div class="wang_icon-card"><i data-lucide="pen"></i><small>pen</small></div>
+            <div class="wang_icon-card"><i data-lucide="map-pin"></i><small>map-pin</small></div>
+        </div>
+
+        <div class="wang_section-title">
+            <h2>箭头与符号</h2>
+            <span>stroke 描边 · CSS 可控颜色与线宽</span>
+        </div>
+        <div class="wang_grid">
+            <div class="wang_icon-card"><i data-lucide="arrow-right"></i><small>arrow-right</small></div>
+            <div class="wang_icon-card"><i data-lucide="arrow-left"></i><small>arrow-left</small></div>
+            <div class="wang_icon-card"><i data-lucide="check"></i><small>check</small></div>
+            <div class="wang_icon-card"><i data-lucide="x"></i><small>x</small></div>
+            <div class="wang_icon-card"><i data-lucide="plus"></i><small>plus</small></div>
+            <div class="wang_icon-card"><i data-lucide="minus"></i><small>minus</small></div>
+            <div class="wang_icon-card"><i data-lucide="chevron-up"></i><small>chevron-up</small></div>
+            <div class="wang_icon-card"><i data-lucide="chevron-down"></i><small>chevron-down</small></div>
+            <div class="wang_icon-card"><i data-lucide="trash-2"></i><small>trash-2</small></div>
+            <div class="wang_icon-card"><i data-lucide="download"></i><small>download</small></div>
+            <div class="wang_icon-card"><i data-lucide="upload"></i><small>upload</small></div>
+            <div class="wang_icon-card"><i data-lucide="sun"></i><small>sun</small></div>
+        </div>
+
+        <div class="wang_demo-banner">
+            <i data-lucide="sparkles"></i>
+            <div>
+                <strong>SVG 图标的优势</strong>
+                <p>每个图标都是真实 DOM 节点，可用 CSS 精确控制尺寸、描边、颜色与动画，利于无障碍访问。</p>
+            </div>
+        </div>
+
+        <footer>
+            <span>王一诺 · 《高级网页设计》课堂实践 13-2</span>
+            <span>Lucide 0.453.0 · 内联 SVG 方式</span>
+        </footer>
+    </div>
+
+    <script src="cdn/lucide/lucide.min.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

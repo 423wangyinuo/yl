@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Font Awesome 字体图标实践：通过 woff2 字体与 CSS 类名显示图标">
+    <title>13-1 · Font Awesome 字体图标</title>
+    <link rel="stylesheet" href="cdn/fontawesome/css/all.min.css">
+    <style>
+        :root {
+            --ink: #172b3a;
+            --muted: #607584;
+            --paper: #f5f7f2;
+            --surface: rgba(255, 255, 255, 0.9);
+            --line: #dce6df;
+            --teal: #087f78;
+            --teal-dark: #075b59;
+            --yellow: #f4c95d;
+            --coral: #e87561;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background:
+                radial-gradient(circle at 10% 8%, rgba(244, 201, 93, 0.25), transparent 22rem),
+                radial-gradient(circle at 90% 20%, rgba(8, 127, 120, 0.14), transparent 26rem),
+                var(--paper);
+            line-height: 1.7;
+        }
+
+        .wang_shell {
+            width: min(1100px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 44px 0 70px;
+        }
+
+        .wang_topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .wang_brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--teal-dark);
+            text-decoration: none;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+        }
+
+        .wang_brand-mark {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px 10px 10px 2px;
+            color: #fff;
+            background: var(--teal);
+            box-shadow: 5px 5px 0 var(--yellow);
+            font-size: 1rem;
+        }
+
+        .wang_back {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.92rem;
+            border-bottom: 1px solid var(--muted);
+            padding-bottom: 2px;
+        }
+
+        .wang_back:hover { color: var(--teal-dark); border-color: var(--teal); }
+
+        .wang_hero { margin: 56px 0 40px; }
+
+        .wang_eyebrow {
+            color: var(--coral);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .wang_hero h1 {
+            margin: 14px 0 16px;
+            font-family: Georgia, "Noto Serif SC", serif;
+            font-size: clamp(2rem, 5vw, 3.4rem);
+            line-height: 1.15;
+        }
+
+        .wang_hero h1 em { color: var(--teal); font-style: normal; }
+
+        .wang_hero p {
+            max-width: 640px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 1.05rem;
+        }
+
+        .wang_method-note {
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+            margin: 26px 0 44px;
+            padding: 22px 26px;
+            border-left: 4px solid var(--yellow);
+            background: rgba(255, 255, 255, 0.62);
+            box-shadow: 0 18px 45px rgba(23, 43, 58, 0.10);
+        }
+
+        .wang_method-note .fa-solid { color: var(--teal); font-size: 1.3rem; margin-top: 4px; }
+
+        .wang_method-note strong { display: block; margin-bottom: 4px; color: var(--teal-dark); }
+        .wang_method-note p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+        .wang_method-note code {
+            padding: 1px 7px;
+            border-radius: 4px;
+            background: rgba(8, 127, 120, 0.1);
+            color: var(--teal-dark);
+            font-size: 0.88rem;
+        }
+
+        .wang_section-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .wang_section-title h2 {
+            margin: 0;
+            font-family: Georgia, "Noto Serif SC", serif;
+            font-size: 1.7rem;
+        }
+
+        .wang_section-title span { color: var(--muted); font-size: 0.88rem; }
+
+        .wang_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 14px;
+            margin-bottom: 46px;
+        }
+
+        .wang_icon-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 24px 12px 18px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--surface);
+            transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+        }
+
+        .wang_icon-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--teal);
+            box-shadow: 0 14px 28px rgba(23, 43, 58, 0.12);
+        }
+
+        .wang_icon-card .fa-solid,
+        .wang_icon-card .fa-regular,
+        .wang_icon-card .fa-brands {
+            font-size: 1.9rem;
+            color: var(--teal);
+            transition: transform 220ms ease, color 220ms ease;
+        }
+
+        .wang_icon-card:nth-child(3n) .fa-solid,
+        .wang_icon-card:nth-child(3n) .fa-regular,
+        .wang_icon-card:nth-child(3n) .fa-brands { color: var(--coral); }
+
+        .wang_icon-card:nth-child(4n) .fa-solid,
+        .wang_icon-card:nth-child(4n) .fa-regular,
+        .wang_icon-card:nth-child(4n) .fa-brands { color: #b8860b; }
+
+        .wang_icon-card:hover .fa-solid,
+        .wang_icon-card:hover .fa-regular,
+        .wang_icon-card:hover .fa-brands { transform: scale(1.18) rotate(-6deg); }
+
+        .wang_icon-card small {
+            color: var(--muted);
+            font-size: 0.8rem;
+            letter-spacing: 0.04em;
+        }
+
+        .wang_demo-banner {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 14px;
+            padding: 22px 26px;
+            border-radius: 12px;
+            color: #fff;
+            background: linear-gradient(120deg, var(--teal-dark), var(--teal));
+            box-shadow: 0 18px 40px rgba(8, 127, 120, 0.28);
+        }
+
+        .wang_demo-banner .fa-solid { font-size: 1.6rem; color: var(--yellow); }
+        .wang_demo-banner strong { font-size: 1.05rem; }
+        .wang_demo-banner p { margin: 0; font-size: 0.9rem; opacity: 0.85; }
+
+        .wang_demo-banner .fa-brands { font-size: 1.3rem; margin-left: auto; }
+
+        footer {
+            margin-top: 56px;
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            .wang_grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+            footer { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wang_shell">
+        <div class="wang_topbar">
+            <a class="wang_brand" href="index.html">
+                <span class="wang_brand-mark">王</span>
+                <span>WANG YINUO / 0423</span>
+            </a>
+            <a class="wang_back" href="index.html">← 返回导航页</a>
+        </div>
+
+        <div class="wang_hero">
+            <div class="wang_eyebrow">Exercise 13-1 · Icon Font</div>
+            <h1>Font Awesome<br><em>字体图标</em>实践</h1>
+            <p>将图标当作"字符"来使用：引入 woff2 字体文件，通过 CSS 类名（如 <code>fa-solid fa-star</code>）让浏览器从字形中渲染出矢量图标，可随意用 font-size、color 控制大小与颜色。</p>
+        </div>
+
+        <div class="wang_method-note">
+            <i class="fa-solid fa-circle-info"></i>
+            <div>
+                <strong>实现方式：字体图标（Icon Font）</strong>
+                <p>本页面引用本地 <code>cdn/fontawesome/css/all.min.css</code> 及 <code>webfonts/*.woff2</code> 字体，所有图标均由 <code>&lt;i class="fa-*"&gt;</code> 元素加类名生成。</p>
+            </div>
+        </div>
+
+        <div class="wang_section-title">
+            <h2>实心图标 · Solid</h2>
+            <span>fa-solid 字重 · woff2 字体渲染</span>
+        </div>
+        <div class="wang_grid">
+            <div class="wang_icon-card"><i class="fa-solid fa-star"></i><small>fa-star</small></div>
+            <div class="wang_icon-card"><i class="fa-solid fa-heart"></i><small>fa-heart</small></div>
+            <div class="wang_icon-card"><i class="fa-solid fa-house"></i><small>fa-house</small></div>
+            <div class="wang_icon-card"><i class="fa-solid fa-user"></i><small>fa-user</small></div>
+            <div class="wang_icon-card"><i class="fa-solid fa-magnifying-glass"></i><small>fa-magnifying-glass</small></div>
+            <div class="wang_icon-card"><i class="fa-solid fa-bell"></i><small>fa-bell</small></div>
+            <div class="wang_icon-card"><i class="fa-solid fa-gear"></i><small>fa-gear</small></div>
+            <div class="wang_icon-card"><i class="fa-solid fa-camera"></i><small>fa-camera</small></div>
+            <div class="wang_icon-card"><i class="fa-solid fa-music"></i><small>fa-music</small></div>
+            <div class="wang_icon-card"><i class="fa-solid fa-book-open"></i><small>fa-book-open</small></div>
+            <div class="wang_icon-card"><i class="fa-solid fa-pen"></i><small>fa-pen</small></div>
+            <div class="wang_icon-card"><i class="fa-solid fa-location-dot"></i><small>fa-location-dot</small></div>
+        </div>
+
+        <div class="wang_section-title">
+            <h2>线性图标 · Regular</h2>
+            <span>fa-regular 字重 · 描边风格</span>
+        </div>
+        <div class="wang_grid">
+            <div class="wang_icon-card"><i class="fa-regular fa-star"></i><small>fa-regular fa-star</small></div>
+            <div class="wang_icon-card"><i class="fa-regular fa-heart"></i><small>fa-regular fa-heart</small></div>
+            <div class="wang_icon-card"><i class="fa-regular fa-bell"></i><small>fa-regular fa-bell</small></div>
+            <div class="wang_icon-card"><i class="fa-regular fa-folder"></i><small>fa-regular fa-folder</small></div>
+            <div class="wang_icon-card"><i class="fa-regular fa-image"></i><small>fa-regular fa-image</small></div>
+            <div class="wang_icon-card"><i class="fa-regular fa-file-lines"></i><small>fa-regular fa-file-lines</small></div>
+        </div>
+
+        <div class="wang_section-title">
+            <h2>品牌图标 · Brands</h2>
+            <span>fa-brands 字重 · 品牌标识</span>
+        </div>
+        <div class="wang_grid">
+            <div class="wang_icon-card"><i class="fa-brands fa-github"></i><small>fa-github</small></div>
+            <div class="wang_icon-card"><i class="fa-brands fa-weixin"></i><small>fa-weixin</small></div>
+            <div class="wang_icon-card"><i class="fa-brands fa-weibo"></i><small>fa-weibo</small></div>
+            <div class="wang_icon-card"><i class="fa-brands fa-qq"></i><small>fa-qq</small></div>
+            <div class="wang_icon-card"><i class="fa-brands fa-bilibili"></i><small>fa-bilibili</small></div>
+            <div class="wang_icon-card"><i class="fa-brands fa-x-twitter"></i><small>fa-x-twitter</small></div>
+        </div>
+
+        <div class="wang_demo-banner">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <div>
+                <strong>字体图标的优势</strong>
+                <p>一次加载字体文件，全站复用；字号、颜色、阴影全部可用 CSS 直接控制。</p>
+            </div>
+            <i class="fa-brands fa-font-awesome"></i>
+        </div>
+
+        <footer>
+            <span>王一诺 · 《高级网页设计》课堂实践 13-1</span>
+            <span>Font Awesome 6.5.2 · 字体图标方式</span>
+        </footer>
+    </div>
+</body>
+</html>
