@@ -13,6 +13,13 @@ Every new HTML page must include an author comment inside `<head>`, placed **abo
 <!-- 姓名：王一诺 | 日期：YYYY-MM-DD | 功能名称：xxx -->
 ```
 
+## Technology Stack (new files)
+- Use **native HTML + CSS + JavaScript** only. No frameworks (Vue/React/Bootstrap/etc).
+- **No third-party libraries or CDN links** (no external `<script src="http...">` or `<link href="http...">`).
+- **Icons must use local `font/` directory iconfont**: include `font/iconfont.css` and use `<i class="iconfont icon-xxx">`.
+- For server-side data: use native `fetch()`. Note: `fetch()` requires HTTP(S) — cannot work with `file://` protocol.
+- Existing files under `cdn/` (fontawesome, lucide) are legacy — **new files must not use them**.
+
 ## Prompt Logging
 Before executing any task, append the prompt details to `wang_prompt.md` (append-only, never overwrite). Each entry must include:
 - **实践** (practice/exercise description)

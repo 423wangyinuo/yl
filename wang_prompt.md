@@ -71,6 +71,13 @@
 - 每个新 HTML 页面必须在 `<head>` 内、`<title>` 上方加入作者注释：
   `<!-- 姓名：王一诺 | 日期：YYYY-MM-DD | 功能名称：xxx -->`
 
+**技术栈规则（仅新文件）：**
+- 仅使用**原生 HTML + CSS + JavaScript**，不使用任何框架（Vue/React/Bootstrap 等）
+- **禁止第三方库和 CDN 外链**（不得出现 `<script src="http...">` 或 `<link href="http...">`）
+- **图标必须使用本地 `font/` 目录的 iconfont**：引入 `font/iconfont.css`，用 `<i class="iconfont icon-xxx">`
+- 获取服务器端数据：使用原生 `fetch()`（注意：fetch 需要 HTTP 协议，file:// 下无法工作）
+- 现有 `cdn/` 下的 fontawesome/lucide 为旧版遗留，新文件禁止使用
+
 ---
 
 ## 2026-10-15
@@ -176,5 +183,27 @@
 
 **提示词内容：**
 > 提交项目
+
+---
+
+## 2026-10-22（第七次实践）
+
+**实践：** 设置项目规则 —— 原生 HTML/CSS/JS + 本地 iconfont 图标 + fetch 获取服务器数据
+
+**使用的模型：** Trae 专有模型
+
+**提示词内容：**
+> 设置项目规则：使用原生的html和css和javascript实现，图标使用font目录下的iconfont图标，不使用第三方库和cdn，使用fetch获取服务器端数据
+
+---
+
+## 2026-10-22（第八次实践）
+
+**实践：** 提交项目 —— git add, commit, push 到 Gitee
+
+**使用的模型：** Trae 专有模型
+
+**提示词内容：**
+> 好的，提交项目
 
 ---

@@ -1,6 +1,6 @@
 ---
 name: "web-design-coursework"
-description: "Covers conventions for this Chinese web design coursework site. Use when creating or editing exercise HTML files: yl_ prefix for new files (wang_ for existing), required HTML author comment, append prompt logging, and Gitee publishing workflow."
+description: "Covers conventions for this Chinese web design coursework site. Use when creating or editing exercise HTML files: native HTML/CSS/JS only, local iconfont icons, yl_ prefix for new files, HTML author comment, fetch for server data, append prompt logging, and Gitee publishing."
 ---
 
 # Web Design Coursework Site
@@ -18,6 +18,14 @@ Every new HTML page must include an author comment inside `<head>`, placed **abo
 ```html
 <!-- 姓名：王一诺 | 日期：YYYY-MM-DD | 功能名称：xxx -->
 ```
+
+## Technology Stack (new files)
+
+- Use **native HTML + CSS + JavaScript** only. No frameworks (Vue/React/Bootstrap/etc).
+- **No third-party libraries or CDN links** (no external `<script src="http...">` or `<link href="http...">`).
+- **Icons must use local `font/` directory iconfont**: include `font/iconfont.css` and use `<i class="iconfont icon-xxx">`.
+- For server-side data: use native `fetch()`. Note: `fetch()` requires HTTP(S) — cannot work with `file://` protocol.
+- Existing files under `cdn/` (fontawesome, lucide) are legacy — **new files must not use them**.
 
 ## Prompt Logging
 
