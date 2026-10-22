@@ -1,6 +1,6 @@
 ---
 name: "web-design-coursework"
-description: "Covers conventions for this Chinese web design coursework site. Use when creating or editing exercise HTML files: wang_ prefix naming, append prompt logging, and Gitee publishing workflow."
+description: "Covers conventions for this Chinese web design coursework site. Use when creating or editing exercise HTML files: yl_ prefix for new files (wang_ for existing), required HTML author comment, append prompt logging, and Gitee publishing workflow."
 ---
 
 # Web Design Coursework Site
@@ -9,7 +9,15 @@ Static coursework site for a web design class. Pure HTML/CSS — no build toolin
 
 ## Naming Convention
 
-All CSS class names, id names, and JS variables must start with `wang_`.
+- Existing files: CSS class names, id names, and JS variables start with `wang_`.
+- **New files (from 2026-10-22 onward)**: All CSS class names, id names, and JS variables must start with `yl_`.
+
+## HTML Comment Rule
+
+Every new HTML page must include an author comment inside `<head>`, placed **above** the `<title>` tag:
+```html
+<!-- 姓名：王一诺 | 日期：YYYY-MM-DD | 功能名称：xxx -->
+```
 
 ## Prompt Logging
 

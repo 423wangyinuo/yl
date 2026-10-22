@@ -4,7 +4,14 @@
 Static coursework site for a web design class (Chinese-language). Pure HTML/CSS — no build tooling, no package manager, no tests.
 
 ## Naming Convention
-All CSS class names, id names, and JS variables must start with `wang_`.
+- Existing files: CSS class names, id names, and JS variables start with `wang_`.
+- **New files (from 2026-10-22 onward)**: All CSS class names, id names, and JS variables must start with `yl_`.
+
+## HTML Comment Rule
+Every new HTML page must include an author comment inside `<head>`, placed **above** the `<title>` tag:
+```html
+<!-- 姓名：王一诺 | 日期：YYYY-MM-DD | 功能名称：xxx -->
+```
 
 ## Prompt Logging
 Before executing any task, append the prompt details to `wang_prompt.md` (append-only, never overwrite). Each entry must include:
