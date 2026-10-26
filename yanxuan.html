@@ -2,166 +2,247 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>网页元素设计四级项目‑24001010423 王一诺</title>
+    <title>网页元素设计四级项目-24001010423 王一诺</title>
     <style>
-        /* 全局公共CSS */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: "Microsoft Yahei",sans-serif;
+            font-family: "Microsoft Yahei", "PingFang SC", Arial, sans-serif;
             background: #f7f7f7;
-        }
-        ul {
-            list-style: none;
-        }
-        a {
-            text-decoration: none;
-            color:#333;
-        }
-        img {
-            width:100%;
-            display:block;
-        }
-        .wrap {
-            width:1200px;
-            margin: 0 auto;
+            color: #333;
         }
 
-        /* ==========模块1：上图‑下文商品卡片（人气推荐）========== */
-        .goods-area {
-            background:#ffffff;
-            padding:30px 0 40px;
-            margin-top:20px;
+        .page {
+            width: 1200px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 20px 24px 28px;
+            border: 1px solid #eee;
         }
-        .area-title {
-            font-size:22px;
-            padding-left:10px;
-            border-left:4px solid #c81623;
-            margin-bottom:24px;
+
+        /* 标题区：人气推荐 + 右侧更多推荐 */
+        .title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
         }
+
+        .main-title {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #222;
+        }
+
+        .red-bar {
+            width: 4px;
+            height: 22px;
+            background: #d81e06;
+            margin-right: 10px;
+        }
+
+        .sub-nav {
+            display: flex;
+            gap: 12px;
+            margin-left: 18px;
+        }
+
+        .sub-nav span {
+            font-size: 14px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .sub-nav span.active {
+            color: #333;
+        }
+
+        .more {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .more:hover {
+            color: #d81e06;
+        }
+
+        /* 商品列表：flex-wrap:wrap 实现换行，3个一行，共两排 */
         .goods-list {
-            display:flex;
-            gap:18px;
+            display: flex;
+            flex-wrap: wrap;
+            border-top: 1px solid #eee;
+            border-left: 1px solid #eee;
         }
-        /* 单个卡片：上图下文 */
-        .goods-card {
-            width:184px;
-            border:1px solid #eeeeee;
-            background:#fff;
+
+        .goods-item {
+            width: 33.333%;
+            border-right: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            padding: 22px 18px 24px;
+            display: flex;
+            flex-direction: column;
         }
-        /* 上面：图片 */
-        .card-img-box {
-            width:100%;
-            height:170px;
+
+        /* 商品图片区域 */
+        .goods-img {
+            width: 100%;
+            height: 190px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            background: #fff;
         }
-        .card-img-box img {
-            width:100%;
-            height:100%;
-            object-fit:contain;
+
+        .goods-img img {
+            max-width: 92%;
+            max-height: 92%;
+            object-fit: contain;
         }
-        /* 下面：文字信息 */
-        .card-text-box {
-            padding:12px 10px;
+
+        /* 商品文字信息 */
+        .goods-info {
+            padding: 0 4px;
         }
+
         .goods-name {
-            font-size:14px;
-            line-height:1.4;
-            height:40px;
-            overflow:hidden;
-            margin-bottom:8px;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+            margin-bottom: 14px;
+            height: 42px;
+            overflow: hidden;
         }
+
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
         .price-now {
-            font-size:16px;
-            color:#c81623;
-            font-weight:bold;
+            font-size: 20px;
+            color: #d81e06;
+            font-weight: bold;
         }
+
         .price-old {
-            font-size:12px;
-            color:#999;
-            text-decoration:line-through;
-            margin-left:6px;
+            font-size: 13px;
+            color: #999;
+            text-decoration: line-through;
         }
     </style>
 </head>
 <body>
-<!-- 24001010423 王一诺 四级项目 -->
 
-<div class="wrap">
-    <!-- 模块1：上图下文商品卡片 【实验要求：上图下文，本地图片】 -->
-    <div class="goods-area">
-        <h2 class="area-title">人气推荐</h2>
-        <div class="goods-list">
+<div class="page">
 
-            <div class="goods-card">
-                <div class="card-img-box">
-                    <img src="./img/41.png" alt="纽仕兰牛奶">
-                </div>
-                <div class="card-text-box">
-                    <p class="goods-name">纽仕兰新西兰4.0g蛋白低脂纯牛奶</p>
+    <!-- 标题区域 -->
+    <div class="title-row">
+        <div style="display:flex; align-items:center;">
+            <h1 class="main-title">
+                <span class="red-bar"></span>
+                人气推荐
+            </h1>
+            <div class="sub-nav">
+                <span class="active">编辑推荐</span>
+                <span>热销榜</span>
+            </div>
+        </div>
+        <a href="#" class="more">更多推荐 &gt;</a>
+    </div>
+
+    <!-- 商品列表区域：两排，每排3个 -->
+    <div class="goods-list">
+
+        <!-- 商品1：牛奶 -->
+        <div class="goods-item">
+            <div class="goods-img">
+                <img src="./img/41.png" alt="纽仕兰牛奶">
+            </div>
+            <div class="goods-info">
+                <p class="goods-name">【新老包装随机发货】纽仕兰新西兰4.0g蛋白低脂纯牛奶</p>
+                <div class="price-row">
                     <span class="price-now">¥99</span>
                     <span class="price-old">¥109</span>
                 </div>
             </div>
+        </div>
 
-            <div class="goods-card">
-                <div class="card-img-box">
-                    <img src="./img/42.png" alt="香薰">
-                </div>
-                <div class="card-text-box">
-                    <p class="goods-name">浴室香薰空气清新香氛</p>
+        <!-- 商品2：香薰 -->
+        <div class="goods-item">
+            <div class="goods-img">
+                <img src="./img/42.png" alt="浴室香薰">
+            </div>
+            <div class="goods-info">
+                <p class="goods-name">【大瓶超值装】植物提取浴室香氛空气清新剂</p>
+                <div class="price-row">
                     <span class="price-now">¥14.9</span>
                     <span class="price-old">¥19.9</span>
                 </div>
             </div>
+        </div>
 
-            <div class="goods-card">
-                <div class="card-img-box">
-                    <img src="./img/43.png" alt="吐司面包">
-                </div>
-                <div class="card-text-box">
-                    <p class="goods-name">绵绵云朵牛奶吐司面包</p>
-                    <span class="price-now">¥18.9</span>
-                    <span class="price-old">¥22</span>
+        <!-- 商品3：吐司面包 -->
+        <div class="goods-item">
+            <div class="goods-img">
+                <img src="./img/43.png" alt="云朵吐司">
+            </div>
+            <div class="goods-info">
+                <p class="goods-name">网易严选牛奶云朵吐司面包</p>
+                <div class="price-row">
+                    <span class="price-now">¥9</span>
                 </div>
             </div>
+        </div>
 
-            <div class="goods-card">
-                <div class="card-img-box">
-                    <img src="./img/44.png" alt="洗衣液">
-                </div>
-                <div class="card-text-box">
-                    <p class="goods-name">英国梨香酵素除菌除螨洗衣液</p>
-                    <span class="price-now">¥16.8</span>
+        <!-- 商品4：洗衣液 -->
+        <div class="goods-item">
+            <div class="goods-img">
+                <img src="./img/44.png" alt="洗衣液">
+            </div>
+            <div class="goods-info">
+                <p class="goods-name">英国梨香型 经典酵素除菌洗衣液</p>
+                <div class="price-row">
+                    <span class="price-now">¥16.9</span>
                     <span class="price-old">¥17.9</span>
                 </div>
             </div>
+        </div>
 
-            <div class="goods-card">
-                <div class="card-img-box">
-                    <img src="./img/45.png" alt="婴儿湿巾">
-                </div>
-                <div class="card-text-box">
-                    <p class="goods-name">网易严选婴儿保湿柔湿巾</p>
+        <!-- 商品5：湿巾 -->
+        <div class="goods-item">
+            <div class="goods-img">
+                <img src="./img/45.png" alt="婴儿湿巾">
+            </div>
+            <div class="goods-info">
+                <p class="goods-name">网易严选 婴儿柔湿巾</p>
+                <div class="price-row">
                     <span class="price-now">¥29.9</span>
-                    <span class="price-old">¥35</span>
                 </div>
             </div>
+        </div>
 
-            <div class="goods-card">
-                <div class="card-img-box">
-                    <img src="./img/46.png" alt="卫生巾">
-                </div>
-                <div class="card-text-box">
-                    <p class="goods-name">婴儿棉柔系列Airfree卫生巾</p>
+        <!-- 商品6：卫生巾 -->
+        <div class="goods-item">
+            <div class="goods-img">
+                <img src="./img/46.png" alt="卫生巾">
+            </div>
+            <div class="goods-info">
+                <p class="goods-name">婴儿棉柔系列Airfree卫生巾</p>
+                <div class="price-row">
                     <span class="price-now">¥9.9</span>
                     <span class="price-old">¥52.9</span>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 

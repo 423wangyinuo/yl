@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-10-26 | 使用模型：Trae 专有模型 | 功能名称：JavaScript 程序结构——循环与条件 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15-2 JavaScript 程序结构</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f7f2;
+            min-height: 100vh;
+            padding: 30px 20px;
+            color: #172b3a;
+        }
+        .yl_container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+        .yl_header {
+            background: linear-gradient(135deg, #087f78, #075b59);
+            color: #fff;
+            padding: 24px 32px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        .yl_header h1 { font-size: 22px; margin-bottom: 6px; }
+        .yl_header p { opacity: 0.85; font-size: 13px; }
+        .yl_back {
+            display: inline-block;
+            margin-top: 10px;
+            color: #f4c95d;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .yl_section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(23,43,58,0.06);
+        }
+        .yl_section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dce6df;
+        }
+        .yl_section-title .yl_badge {
+            background: #087f78;
+            color: #fff;
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+        .yl_section-title .yl_badge.cond { background: #e87561; }
+        .yl_demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 640px) {
+            .yl_demo { grid-template-columns: 1fr; }
+        }
+        .yl_code-box {
+            background: #172b3a;
+            color: #f5f7f2;
+            padding: 14px 16px;
+            border-radius: 8px;
+            font-family: "Consolas", "Courier New", monospace;
+            font-size: 12.5px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .yl_code-box .yl_comment { color: #607584; }
+        .yl_code-box .yl_keyword { color: #f4c95d; }
+        .yl_code-box .yl_string { color: #087f78; }
+        .yl_code-box .yl_number { color: #e87561; }
+
+        .yl_result-box {
+            background: #f4faf9;
+            border: 1px solid #c9e4e2;
+            border-radius: 8px;
+            padding: 14px 16px;
+        }
+        .yl_result-box h4 {
+            color: #075b59;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        .yl_output {
+            font-family: "Consolas", monospace;
+            font-size: 12.5px;
+            color: #172b3a;
+            line-height: 1.6;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px dashed #c9e4e2;
+            border-radius: 4px;
+            padding: 8px 10px;
+        }
+        .yl_output .yl_item {
+            display: inline-block;
+            padding: 2px 6px;
+            margin: 2px;
+            border-radius: 4px;
+            background: #e0ecea;
+        }
+        .yl_output .yl_even { background: #f4c95d; color: #172b3a; }
+        .yl_output .yl_odd { background: #e87561; color: #fff; }
+
+        .yl_note {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #fef9ec;
+            border-left: 3px solid #f4c95d;
+            font-size: 12px;
+            color: #607584;
+            line-height: 1.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_container">
+        <header class="yl_header">
+            <h1>📚 JavaScript 程序结构</h1>
+            <p>循环结构（for / while / do-while）与条件结构（if-else / switch）</p>
+            <a class="yl_back" href="index.html">← 返回首页</a>
+        </header>
+
+        <!-- ===== 第一部分：循环结构 ===== -->
+        <section class="yl_section">
+            <div class="yl_section-title">
+                <span class="yl_badge loop">LOOP</span>
+                循环结构 —— 让代码重复执行
+            </div>
+
+            <!-- for 循环 -->
+            <div class="yl_demo">
+                <div class="yl_code-box"><span class="yl_comment">// for 循环：已知循环次数</span>
+<span class="yl_keyword">for</span> (var yl_i = <span class="yl_number">1</span>; yl_i <= <span class="yl_number">5</span>; yl_i++) {
+    console.<span class="yl_keyword">log</span>(<span class="yl_string">"for: "</span> + yl_i);
+}</div>
+                <div class="yl_result-box">
+                    <h4>运行结果 ↓</h4>
+                    <div class="yl_output" id="yl_for"></div>
+                </div>
+            </div>
+
+            <!-- while 循环 -->
+            <div class="yl_demo" style="margin-top:16px;">
+                <div class="yl_code-box"><span class="yl_comment">// while 循环：条件满足就执行</span>
+var yl_count = <span class="yl_number">3</span>;
+<span class="yl_keyword">while</span> (yl_count > <span class="yl_number">0</span>) {
+    console.<span class="yl_keyword">log</span>(<span class="yl_string">"while: "</span> + yl_count);
+    yl_count--;
+}</div>
+                <div class="yl_result-box">
+                    <h4>运行结果 ↓</h4>
+                    <div class="yl_output" id="yl_while"></div>
+                </div>
+            </div>
+
+            <!-- do-while 循环 -->
+            <div class="yl_demo" style="margin-top:16px;">
+                <div class="yl_code-box"><span class="yl_comment">// do-while：先执行一次再判断</span>
+var yl_n = <span class="yl_number">5</span>;
+<span class="yl_keyword">do</span> {
+    console.<span class="yl_keyword">log</span>(<span class="yl_string">"do-while: "</span> + yl_n);
+    yl_n--;
+} <span class="yl_keyword">while</span> (yl_n > <span class="yl_number">2</span>);</div>
+                <div class="yl_result-box">
+                    <h4>运行结果 ↓</h4>
+                    <div class="yl_output" id="yl_dowhile"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 第二部分：条件结构 ===== -->
+        <section class="yl_section">
+            <div class="yl_section-title">
+                <span class="yl_badge cond">COND</span>
+                条件结构 —— 让代码有选择地执行
+            </div>
+
+            <!-- if-else -->
+            <div class="yl_demo">
+                <div class="yl_code-box"><span class="yl_comment">// if - else if - else</span>
+var yl_score = <span class="yl_number">85</span>;
+<span class="yl_keyword">if</span> (yl_score >= <span class="yl_number">90</span>) {
+    console.<span class="yl_keyword">log</span>(<span class="yl_string">"优秀 A"</span>);
+} <span class="yl_keyword">else if</span> (yl_score >= <span class="yl_number">75</span>) {
+    console.<span class="yl_keyword">log</span>(<span class="yl_string">"良好 B"</span>);
+} <span class="yl_keyword">else if</span> (yl_score >= <span class="yl_number">60</span>) {
+    console.<span class="yl_keyword">log</span>(<span class="yl_string">"及格 C"</span>);
+} <span class="yl_keyword">else</span> {
+    console.<span class="yl_keyword">log</span>(<span class="yl_string">"不及格 D"</span>);
+}</div>
+                <div class="yl_result-box">
+                    <h4>运行结果 ↓</h4>
+                    <div class="yl_output" id="yl_ifelse"></div>
+                </div>
+            </div>
+
+            <!-- switch -->
+            <div class="yl_demo" style="margin-top:16px;">
+                <div class="yl_code-box"><span class="yl_comment">// switch：多条件等值判断</span>
+var yl_day = <span class="yl_number">3</span>;
+<span class="yl_keyword">switch</span> (yl_day) {
+    <span class="yl_keyword">case</span> <span class="yl_number">1</span>: console.<span class="yl_keyword">log</span>(<span class="yl_string">"周一"</span>); <span class="yl_keyword">break</span>;
+    <span class="yl_keyword">case</span> <span class="yl_number">2</span>: console.<span class="yl_keyword">log</span>(<span class="yl_string">"周二"</span>); <span class="yl_keyword">break</span>;
+    <span class="yl_keyword">case</span> <span class="yl_number">3</span>: console.<span class="yl_keyword">log</span>(<span class="yl_string">"周三"</span>); <span class="yl_keyword">break</span>;
+    <span class="yl_keyword">default</span>: console.<span class="yl_keyword">log</span>(<span class="yl_string">"其他"</span>);
+}</div>
+                <div class="yl_result-box">
+                    <h4>运行结果 ↓</h4>
+                    <div class="yl_output" id="yl_switch"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 综合演示 ===== -->
+        <section class="yl_section">
+            <div class="yl_section-title">
+                <span class="yl_badge loop">MIX</span>
+                综合：循环 + 条件 —— 1~15 偶数高亮
+            </div>
+            <div class="yl_code-box" style="margin-bottom:16px;"><span class="yl_comment">// for 循环 + if 判断：高亮偶数</span>
+<span class="yl_keyword">for</span> (var yl_i = <span class="yl_number">1</span>; yl_i <= <span class="yl_number">15</span>; yl_i++) {
+    <span class="yl_keyword">if</span> (yl_i % <span class="yl_number">2</span> === <span class="yl_number">0</span>) {
+        console.<span class="yl_keyword">log</span>(<span class="yl_string">"偶数: "</span> + yl_i);
+    } <span class="yl_keyword">else</span> {
+        console.<span class="yl_keyword">log</span>(<span class="yl_string">"奇数: "</span> + yl_i);
+    }
+}</div>
+            <div class="yl_result-box">
+                <h4>运行结果 ↓（黄色=偶数，红色=奇数）</h4>
+                <div class="yl_output" id="yl_mix"></div>
+            </div>
+            <div class="yl_note">
+                💡 提示：<code>for</code> 适合已知次数，<code>while</code> 适合不确定次数；<br>
+                多分支条件用 <code>switch</code> 比多个 <code>if-else if</code> 更清晰。
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // ========== for 循环 ==========
+        var yl_for = document.getElementById("yl_for");
+        for (var yl_i = 1; yl_i <= 5; yl_i++) {
+            var yl_span = document.createElement("span");
+            yl_span.className = "yl_item";
+            yl_span.textContent = yl_i;
+            yl_for.appendChild(yl_span);
+            console.log("for:", yl_i);
+        }
+
+        // ========== while 循环 ==========
+        var yl_while = document.getElementById("yl_while");
+        var yl_count = 3;
+        while (yl_count > 0) {
+            var yl_ws = document.createElement("span");
+            yl_ws.className = "yl_item";
+            yl_ws.textContent = yl_count;
+            yl_while.appendChild(yl_ws);
+            console.log("while:", yl_count);
+            yl_count--;
+        }
+
+        // ========== do-while 循环 ==========
+        var yl_dowhile = document.getElementById("yl_dowhile");
+        var yl_n = 5;
+        do {
+            var yl_ds = document.createElement("span");
+            yl_ds.className = "yl_item";
+            yl_ds.textContent = yl_n;
+            yl_dowhile.appendChild(yl_ds);
+            console.log("do-while:", yl_n);
+            yl_n--;
+        } while (yl_n > 2);
+
+        // ========== if - else if - else ==========
+        var yl_ifelse = document.getElementById("yl_ifelse");
+        var yl_score = 85;
+        var yl_grade;
+        if (yl_score >= 90) {
+            yl_grade = "优秀 A";
+            console.log("优秀 A");
+        } else if (yl_score >= 75) {
+            yl_grade = "良好 B";
+            console.log("良好 B");
+        } else if (yl_score >= 60) {
+            yl_grade = "及格 C";
+            console.log("及格 C");
+        } else {
+            yl_grade = "不及格 D";
+            console.log("不及格 D");
+        }
+        yl_ifelse.textContent = "分数 85 → " + yl_grade;
+
+        // ========== switch ==========
+        var yl_switch = document.getElementById("yl_switch");
+        var yl_day = 3;
+        var yl_dayName;
+        switch (yl_day) {
+            case 1: yl_dayName = "周一"; console.log("周一"); break;
+            case 2: yl_dayName = "周二"; console.log("周二"); break;
+            case 3: yl_dayName = "周三"; console.log("周三"); break;
+            case 4: yl_dayName = "周四"; console.log("周四"); break;
+            case 5: yl_dayName = "周五"; console.log("周五"); break;
+            default: yl_dayName = "其他"; console.log("其他");
+        }
+        yl_switch.textContent = "day = 3 → " + yl_dayName;
+
+        // ========== 综合：循环 + 条件 ==========
+        var yl_mix = document.getElementById("yl_mix");
+        for (var yl_j = 1; yl_j <= 15; yl_j++) {
+            var yl_ms = document.createElement("span");
+            yl_ms.className = "yl_item" + (yl_j % 2 === 0 ? " yl_even" : " yl_odd");
+            yl_ms.textContent = yl_j;
+            yl_mix.appendChild(yl_ms);
+        }
+    </script>
+</body>
+</html>
