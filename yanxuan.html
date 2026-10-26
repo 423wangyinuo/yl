@@ -72,7 +72,7 @@
             color: #d81e06;
         }
 
-        /* 商品列表：flex-wrap:wrap 实现换行，3个一行，共两排 */
+        /* 商品列表：flex-wrap:wrap 实现换行，3个一行 */
         .goods-list {
             display: flex;
             flex-wrap: wrap;
@@ -137,13 +137,136 @@
             color: #999;
             text-decoration: line-through;
         }
+
+
+        /* ==========模块2 左图右文 ========== */
+        .detail-page {
+            width: 1200px;
+            margin: 40px auto;
+            background: #fff;
+            border: 1px solid #eee;
+            padding: 24px;
+        }
+        .detail-container {
+            display: flex;
+            gap: 40px;
+        }
+        .detail-left {
+            width: 45%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .detail-left img {
+            width: 100%;
+            max-width: 420px;
+            object-fit: contain;
+        }
+        .detail-right {
+            flex: 1;
+            padding-top:10px;
+        }
+        .brand {
+            font-size:14px;
+            color:#999;
+            margin-bottom:8px;
+        }
+        .product-title {
+            font-size:22px;
+            color:#222;
+            margin-bottom:18px;
+            line-height:1.4;
+        }
+        .price-box {
+            background:#fef4f4;
+            padding:16px;
+            margin-bottom:20px;
+        }
+        .price-now-big {
+            font-size:28px;
+            color:#c81623;
+            font-weight:bold;
+        }
+        .price-old-big {
+            font-size:14px;
+            color:#999;
+            text-decoration:line-through;
+        }
+        .price-old-row {
+            display:flex;
+            align-items:center;
+            gap:12px;
+            margin:6px 0 10px;
+        }
+        .discount {
+            font-size:14px;
+            color:#c81e06;
+        }
+        .promise {
+            font-size:13px;
+            color:#666;
+            margin-top:4px;
+        }
+        .info-row {
+            display:flex;
+            padding:12px 0;
+            border-bottom:1px dashed #eee;
+        }
+        .label {
+            width:100px;
+            color:#999;
+            font-size:14px;
+        }
+        .value {
+            flex:1;
+            color:#333;
+            font-size:14px;
+        }
+        .notice {
+            margin-top:16px;
+            background:#fafafa;
+            padding:12px;
+        }
+        .notice p {
+            font-size:13px;
+            color:#666;
+            line-height:1.6;
+        }
+
+        /* ==========模块3：通栏Banner【修改后，铺满效果】 ========== */
+        .banner-page {
+            width: 1200px;
+            margin: 40px auto 30px;
+            background: #fff;
+            border: 1px solid #eee;
+            padding: 24px;
+        }
+
+        .banner-title {
+            font-size: 22px;
+            padding-left: 10px;
+            border-left: 4px solid #c81623;
+            margin-bottom: 18px;
+        }
+
+        .banner-box {
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+        }
+
+        .banner-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
+<!--24001010423 王一诺 四级项目-->
 
+<!-- ==========模块1：上图下文商品卡片 ========== -->
 <div class="page">
-
-    <!-- 标题区域 -->
     <div class="title-row">
         <div style="display:flex; align-items:center;">
             <h1 class="main-title">
@@ -158,9 +281,7 @@
         <a href="#" class="more">更多推荐 &gt;</a>
     </div>
 
-    <!-- 商品列表区域：两排，每排3个 -->
     <div class="goods-list">
-
         <!-- 商品1：牛奶 -->
         <div class="goods-item">
             <div class="goods-img">
@@ -174,7 +295,6 @@
                 </div>
             </div>
         </div>
-
         <!-- 商品2：香薰 -->
         <div class="goods-item">
             <div class="goods-img">
@@ -188,7 +308,6 @@
                 </div>
             </div>
         </div>
-
         <!-- 商品3：吐司面包 -->
         <div class="goods-item">
             <div class="goods-img">
@@ -201,7 +320,6 @@
                 </div>
             </div>
         </div>
-
         <!-- 商品4：洗衣液 -->
         <div class="goods-item">
             <div class="goods-img">
@@ -215,7 +333,6 @@
                 </div>
             </div>
         </div>
-
         <!-- 商品5：湿巾 -->
         <div class="goods-item">
             <div class="goods-img">
@@ -228,7 +345,6 @@
                 </div>
             </div>
         </div>
-
         <!-- 商品6：卫生巾 -->
         <div class="goods-item">
             <div class="goods-img">
@@ -242,7 +358,57 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
+<!-- ==========模块2：左图右文商品详情 ========== -->
+<div class="detail-page">
+    <div class="detail-container">
+        <div class="detail-left">
+            <img src="./img/48.png" alt="针织四件套">
+        </div>
+        <div class="detail-right">
+            <p class="brand">网易严选</p>
+            <h1 class="product-title">裸睡亲肤 经典A类针织四件套</h1>
+            <div class="price-box">
+                <div class="price-now-row">
+                    <span class="price-now-big">¥197</span>
+                </div>
+                <div class="price-old-row">
+                    <span class="price-old-big">¥312</span>
+                    <span class="discount">79.6%</span>
+                </div>
+                <p class="promise">全场满199减15，26日20:00‑23:59</p>
+                <p class="promise">满699减80，27日0:00‑20:00</p>
+            </div>
+            <div class="info-row">
+                <span class="label">定金</span>
+                <span class="value">¥10.00 / 可抵¥12</span>
+            </div>
+            <div class="info-row">
+                <span class="label">预售价</span>
+                <span class="value">¥197</span>
+            </div>
+            <div class="info-row">
+                <span class="label">定金支付</span>
+                <span class="value">10.26 20:00‑10.26 23:59</span>
+            </div>
+            <div class="info-row">
+                <span class="label">尾款支付</span>
+                <span class="value">10.27 0:00‑10.27 23:59</span>
+            </div>
+            <div class="notice">
+                <p>预售说明：本商品为预售商品，支付定金后请于规定时间内支付尾款，未按时支付定金不予退还。</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========模块3：通栏Banner ========== -->
+<div class="banner-page">
+    <h2 class="banner-title">客户端下载</h2>
+    <div class="banner-box">
+        <img src="./img/49.png" alt="网易严选App下载">
     </div>
 </div>
 
