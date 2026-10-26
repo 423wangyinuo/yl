@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 姓名：王一诺 | 日期：2026-10-26 | 功能名称：数7游戏——一百个盒子按规则隐藏数字 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15-1 数7游戏</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #f5f7f2 0%, #dce6df 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+        .yl_container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 16px 40px rgba(23, 43, 58, 0.12);
+            overflow: hidden;
+        }
+        .yl_header {
+            background: linear-gradient(135deg, #087f78 0%, #075b59 100%);
+            color: #fff;
+            padding: 24px 32px;
+        }
+        .yl_header h1 { font-size: 22px; margin-bottom: 6px; }
+        .yl_header p { opacity: 0.85; font-size: 13px; }
+        .yl_back {
+            display: inline-block;
+            margin-top: 10px;
+            color: #f4c95d;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .yl_back:hover { text-decoration: underline; }
+        .yl_rule {
+            padding: 16px 32px;
+            background: #f4faf9;
+            border-bottom: 1px solid #e0ecea;
+            font-size: 13px;
+            color: #075b59;
+            line-height: 1.8;
+        }
+        .yl_rule strong { color: #e87561; }
+        .yl_grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+            padding: 24px 32px;
+        }
+        .yl_box {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: transform 0.15s;
+            cursor: default;
+        }
+        .yl_box:hover { transform: scale(1.05); }
+
+        /* 显示数字的盒子 */
+        .yl_box.number {
+            background: #f5f7f2;
+            color: #172b3a;
+            border: 2px solid #dce6df;
+        }
+
+        /* 空盒子（数7命中） */
+        .yl_box.empty {
+            background: repeating-linear-gradient(
+                45deg,
+                #e87561,
+                #e87561 4px,
+                #f3a99c 4px,
+                #f3a99c 8px
+            );
+            color: transparent;
+            border: 2px solid #e87561;
+            cursor: help;
+        }
+        .yl_box.empty::after {
+            content: "×";
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            opacity: 0.7;
+        }
+        .yl_box.empty:hover::after {
+            color: #fff;
+            font-size: 12px;
+            font-weight: normal;
+            content: attr(data-hint);
+            opacity: 1;
+        }
+
+        .yl_footer {
+            padding: 12px 32px;
+            text-align: center;
+            font-size: 12px;
+            color: #607584;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_container">
+        <header class="yl_header">
+            <h1>🎯 数7游戏</h1>
+            <p>1~100 的一百个盒子，逢 7 必空</p>
+            <a class="yl_back" href="index.html">← 返回首页</a>
+        </header>
+
+        <div class="yl_rule">
+            <strong>规则：</strong>数字是 7 的倍数（7、14、21、28…）
+            <strong>或</strong>个位数为 7（7、17、27、37…）的盒子显示为空，其余显示数字。
+        </div>
+
+        <div class="yl_grid" id="yl_grid"></div>
+
+        <div class="yl_footer">
+            鼠标悬停在空盒子上查看提示
+        </div>
+    </div>
+
+    <script>
+        var yl_grid = document.getElementById("yl_grid");
+
+        for (var i = 1; i <= 100; i++) {
+            var yl_box = document.createElement("div");
+
+            // 判断是否命中"数7"规则
+            // 条件：7 的倍数 || 个位数为 7
+            var yl_hit7 = (i % 7 === 0) || (i % 10 === 7);
+
+            if (yl_hit7) {
+                yl_box.className = "yl_box empty";
+                yl_box.setAttribute("data-hint", "命中7规则: " + i);
+            } else {
+                yl_box.className = "yl_box number";
+                yl_box.textContent = i;
+            }
+
+            yl_grid.appendChild(yl_box);
+        }
+
+        console.log("[数7游戏] 已生成 100 个盒子，命中规则的显示为空");
+    </script>
+</body>
+</html>

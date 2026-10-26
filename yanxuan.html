@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>网易严选复刻 | 24001010423 王一诺</title>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei",sans-serif;
+        }
+        ul{list-style: none;}
+        a{text-decoration: none;color:#333;}
+
+        /* 模块1：头部导航 + Banner */
+        .header{
+            width:1200px;
+            margin:0 auto;
+            display:flex;
+            align-items:center;
+            padding:15px 0;
+            gap:40px;
+        }
+        .logo{
+            font-size:32px;
+            font-weight:bold;
+        }
+        .nav-list{
+            display:flex;
+            gap:28px;
+        }
+        .nav-list a.active{
+            color:#c81623;
+        }
+        .search-box{
+            display:flex;
+            margin-left:auto;
+        }
+        .search-box input{
+            width:260px;
+            padding:8px 12px;
+            border:1px solid #ccc;
+            border-right:none;
+            border-radius: 4px 0 0 4px;
+        }
+        .search-box button{
+            padding:8px 18px;
+            background:#d4a066;
+            color:#fff;
+            border:none;
+            border-radius:0 4px 4px 0;
+            cursor:pointer;
+        }
+        .banner{
+            background:#f54242;
+            height:320px;
+            color:#fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:48px;
+            margin-bottom:40px;
+        }
+
+        /* 模块2：人气推荐商品卡片 */
+        .container{
+            width:1200px;
+            margin:0 auto 60px;
+        }
+        .title{
+            font-size:24px;
+            margin-bottom:20px;
+            border-left:4px solid #c81623;
+            padding-left:10px;
+        }
+        .goods-wrap{
+            display:flex;
+            flex-wrap:wrap;
+            gap:20px;
+        }
+        .goods-item{
+            width:186px;
+            border:1px solid #eee;
+            padding:10px;
+        }
+        .goods-item img{
+            width:100%;
+            height:160px;
+            object-fit:cover;
+            background:#f7f7f7;
+        }
+        .goods-name{
+            font-size:14px;
+            margin:8px 0;
+            height:40px;
+            overflow:hidden;
+        }
+        .price-now{
+            color:#c81623;
+            font-weight:bold;
+        }
+        .price-old{
+            color:#999;
+            text-decoration:line-through;
+            font-size:12px;
+            margin-left:6px;
+        }
+
+        /* 模块3：商品详情 左图右文 */
+        .detail-wrap{
+            width:1200px;
+            margin:0 auto 80px;
+            display:flex;
+            gap:40px;
+        }
+        .detail-left{
+            width:480px;
+            height:420px;
+            background:#f7f7f7;
+        }
+        .detail-right{
+            flex:1;
+        }
+        .detail-right h2{
+            font-size:22px;
+            margin-bottom:16px;
+        }
+        .detail-price{
+            background:#fff2f2;
+            padding:12px;
+            margin-bottom:20px;
+        }
+        .detail-price .now{
+            font-size:28px;
+            color:#c81623;
+            font-weight:bold;
+        }
+        .detail-price .old{
+            color:#999;
+            text-decoration:line-through;
+            margin-left:10px;
+        }
+        .spec-item{
+            margin:12px 0;
+        }
+        .spec-item span{
+            display:inline-block;
+            width:70px;
+            color:#666;
+        }
+        .spec-btn{
+            display:inline-block;
+            border:1px solid #ccc;
+            padding:6px 12px;
+            margin:4px;
+            font-size:14px;
+        }
+        .num-box{
+            display:flex;
+            align-items:center;
+            margin:12px 0;
+        }
+        .num-box button{
+            width:30px;
+            height:30px;
+            border:1px solid #ccc;
+            background:#fff;
+            cursor:pointer;
+        }
+        .num-box input{
+            width:40px;
+            height:30px;
+            text-align:center;
+            border-top:1px solid #ccc;
+            border-bottom:1px solid #ccc;
+            border-left:none;
+            border-right:none;
+        }
+        .buy-btn{
+            margin-top:20px;
+        }
+        .buy-btn button{
+            padding:12px 30px;
+            border:none;
+            cursor:pointer;
+            font-size:16px;
+        }
+        .buy-now{
+            background:#c81623;
+            color:#fff;
+            margin-right:10px;
+        }
+        .buy-cart{
+            background:#ffd166;
+            color:#222;
+        }
+    </style>
+</head>
+<body>
+    <!-- 模块1：导航 + Banner -->
+    <div class="header">
+        <div class="logo">网易严选</div>
+        <ul class="nav-list">
+            <li><a href="#" class="active">首页</a></li>
+            <li><a href="#">居家生活</a></li>
+            <li><a href="#">宠物生活</a></li>
+            <li><a href="#">服饰鞋包</a></li>
+            <li><a href="#">美食酒水</a></li>
+            <li><a href="#">个护清洁</a></li>
+            <li><a href="#">数码家电</a></li>
+        </ul>
+        <div class="search-box">
+            <input type="text" placeholder="大牌居家49.9选5">
+            <button>搜索</button>
+        </div>
+    </div>
+    <div class="banner">
+        下载网易严选App 扫码领取新人礼
+    </div>
+
+    <!-- 模块2：人气推荐商品列表 -->
+    <div class="container">
+        <div class="title">人气推荐</div>
+        <div class="goods-wrap">
+            <div class="goods-item">
+                <img src="" alt="商品图">
+                <div class="goods-name">纽仕兰新西兰4.0g蛋白低脂纯牛奶</div>
+                <div>
+                    <span class="price-now">¥99</span>
+                    <span class="price-old">¥109</span>
+                </div>
+            </div>
+            <div class="goods-item">
+                <img src="" alt="商品图">
+                <div class="goods-name">脆皮肉肠原味250g袋装</div>
+                <div>
+                    <span class="price-now">¥24.9</span>
+                    <span class="price-old">¥39</span>
+                </div>
+            </div>
+            <div class="goods-item">
+                <img src="" alt="商品图">
+                <div class="goods-name">浴室香薰空气清新香氛</div>
+                <div>
+                    <span class="price-now">¥14.9</span>
+                    <span class="price-old">¥19.9</span>
+                </div>
+            </div>
+            <div class="goods-item">
+                <img src="" alt="商品图">
+                <div class="goods-name">绵绵云朵牛奶吐司面包</div>
+                <div>
+                    <span class="price-now">¥18.9</span>
+                    <span class="price-old">¥22</span>
+                </div>
+            </div>
+            <div class="goods-item">
+                <img src="" alt="商品图">
+                <div class="goods-name">酵素除菌洗衣液</div>
+                <div>
+                    <span class="price-now">¥16.8</span>
+                    <span class="price-old">¥17.9</span>
+                </div>
+            </div>
+            <div class="goods-item">
+                <img src="" alt="商品图">
+                <div class="goods-name">婴儿保湿柔湿巾</div>
+                <div>
+                    <span class="price-now">¥29.9</span>
+                    <span class="price-old">¥35</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模块3：商品详情页 -->
+    <div class="detail-wrap">
+        <div class="detail-left">
+            <!-- 洗衣液大图位置 -->
+        </div>
+        <div class="detail-right">
+            <h2>英国梨香 酵素除菌除螨洗衣液</h2>
+            <div class="detail-price">
+                <span class="now">¥16.8</span>
+                <span class="old">¥17.9</span>
+            </div>
+            <div class="spec-item">
+                <span>规格：</span>
+                <span class="spec-btn">2kg</span>
+                <span class="spec-btn">1kg</span>
+                <span class="spec-btn">6kg套装</span>
+            </div>
+            <div class="num-box">
+                <span>数量：</span>
+                <button>-</button>
+                <input value="1">
+                <button>+</button>
+            </div>
+            <div class="buy-btn">
+                <button class="buy-now">立即购买</button>
+                <button class="buy-cart">加入购物车</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

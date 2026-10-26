@@ -10,7 +10,7 @@ Static coursework site for a web design class (Chinese-language). Pure HTML/CSS 
 ## HTML Comment Rule
 Every new HTML page must include an author comment inside `<head>`, placed **above** the `<title>` tag:
 ```html
-<!-- 姓名：王一诺 | 日期：YYYY-MM-DD | 功能名称：xxx -->
+<!-- 作者：王一诺 | 建立时间：YYYY-MM-DD | 使用模型：xxx | 功能名称：xxx -->
 ```
 
 ## Technology Stack (new files)
