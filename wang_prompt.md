@@ -268,4 +268,12 @@
 **提示词内容：**
 > 完成15-2.html，展示javascript程序结构：循环，条件,然后提交到github
 
+**执行说明：**
+- 新建 `15-2.html`，遵循 yl_ 前缀 + 新四字段注释模板 + 原生 HTML/CSS/JS
+- 演示内容：for/while/do-while 三种循环、if-else 多分支、switch 多条件、循环+条件综合示例
+- 代码框使用高亮配色（keyword 黄色、string 绿色、number 红色）
+- 运行结果区域用 DOM 动态渲染，综合演示区偶数高亮黄色、奇数红色
+- `index.html` 新增 23 号卡片入口
+- commit `190bdd5`，Gitee 推送成功；GitHub SSH port 22 仍被防火墙拦截
+
 ---
