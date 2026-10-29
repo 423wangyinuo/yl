@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-10-29 | 使用模型：Copilot SDK（VS Code） | 功能名称：JavaScript 数组主要方法演示 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-1 JavaScript 数组方法实验室</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --yl_ink: #172b3a;
+            --yl_muted: #647987;
+            --yl_paper: #f5f7f2;
+            --yl_teal: #087f78;
+            --yl_teal-dark: #075b59;
+            --yl_coral: #e87561;
+            --yl_yellow: #f4c95d;
+            --yl_line: #dce6df;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--yl_ink);
+            background:
+                radial-gradient(circle at 8% 8%, rgba(244, 201, 93, 0.22), transparent 25rem),
+                radial-gradient(circle at 95% 35%, rgba(8, 127, 120, 0.12), transparent 28rem),
+                var(--yl_paper);
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            line-height: 1.65;
+        }
+
+        button, input { font: inherit; }
+        button { cursor: pointer; }
+
+        .yl_shell {
+            width: min(1120px, calc(100% - 36px));
+            margin: 0 auto;
+            padding: 28px 0 56px;
+        }
+
+        .yl_hero {
+            position: relative;
+            overflow: hidden;
+            padding: clamp(25px, 5vw, 48px);
+            border-radius: 24px;
+            color: #fff;
+            background: linear-gradient(125deg, #123b49, #087f78 68%, #39a18a);
+            box-shadow: 0 20px 50px rgba(23, 43, 58, 0.17);
+        }
+
+        .yl_hero::after {
+            content: "[ ]";
+            position: absolute;
+            right: 4%;
+            bottom: -62px;
+            color: rgba(255, 255, 255, 0.09);
+            font: 900 clamp(150px, 28vw, 310px)/1 Georgia, serif;
+            transform: rotate(-12deg);
+            pointer-events: none;
+        }
+
+        .yl_hero-content { position: relative; z-index: 1; max-width: 700px; }
+        .yl_kicker { color: #f4c95d; font-size: 12px; font-weight: 800; letter-spacing: 0.2em; }
+        .yl_hero h1 { margin: 9px 0 8px; font-size: clamp(30px, 5vw, 48px); line-height: 1.2; }
+        .yl_hero p { margin: 0; color: rgba(255, 255, 255, 0.82); }
+        .yl_back { display: inline-block; margin-top: 20px; color: #f4c95d; font-size: 14px; text-decoration: none; }
+        .yl_back:hover { text-decoration: underline; }
+
+        .yl_section { margin-top: 28px; }
+        .yl_section-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
+        .yl_section-heading h2 { margin: 0; font-size: 22px; }
+        .yl_section-heading p { margin: 0; color: var(--yl_muted); font-size: 13px; }
+
+        .yl_board, .yl_method-card, .yl_console {
+            border: 1px solid rgba(220, 230, 223, 0.95);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 24px rgba(23, 43, 58, 0.06);
+        }
+
+        .yl_board { overflow: hidden; }
+        .yl_board-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 22px; border-bottom: 1px solid var(--yl_line); }
+        .yl_array-name { font: 700 14px "Consolas", monospace; color: var(--yl_teal-dark); }
+        .yl_length { padding: 4px 10px; border-radius: 999px; color: #725510; background: #fff4cb; font-size: 12px; font-weight: 700; }
+        .yl_array-track { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; min-height: 126px; padding: 22px; }
+        .yl_item {
+            position: relative;
+            display: grid;
+            place-items: center;
+            min-width: 104px;
+            min-height: 76px;
+            padding: 12px 16px;
+            border: 1px solid #d5e7df;
+            border-radius: 14px;
+            color: #075b59;
+            background: linear-gradient(145deg, #f3fbf7, #e1f3ea);
+            font-size: 15px;
+            font-weight: 800;
+            box-shadow: 0 4px 0 #c4dfd4;
+            animation: yl_pop-in 240ms ease both;
+        }
+        .yl_item::before { content: attr(data-index); position: absolute; top: 4px; left: 8px; color: #7d9690; font: 10px "Consolas", monospace; }
+        .yl_item:nth-child(3n + 2) { border-color: #f0dfab; color: #765714; background: linear-gradient(145deg, #fffaf0, #fff0c8); box-shadow: 0 4px 0 #eddda9; }
+        .yl_item:nth-child(3n) { border-color: #f1cec5; color: #9c4a3c; background: linear-gradient(145deg, #fff7f4, #ffe2d9); box-shadow: 0 4px 0 #efc7bd; }
+        .yl_empty { align-self: center; color: #92a19d; font-size: 14px; }
+        @keyframes yl_pop-in { from { opacity: 0; transform: translateY(8px) scale(0.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        .yl_controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 22px 20px; }
+        .yl_control-btn {
+            min-height: 42px;
+            border: 1px solid var(--yl_line);
+            border-radius: 10px;
+            color: var(--yl_ink);
+            background: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+        }
+        .yl_control-btn:hover { transform: translateY(-2px); border-color: var(--yl_teal); background: #f1faf7; }
+        .yl_control-btn.yl_accent { border-color: var(--yl_teal); color: #fff; background: var(--yl_teal); }
+        .yl_control-btn.yl_accent:hover { background: var(--yl_teal-dark); }
+        .yl_add-row { display: flex; gap: 8px; padding: 0 22px 20px; }
+        .yl_add-row input { min-width: 0; flex: 1; padding: 9px 12px; border: 1px solid var(--yl_line); border-radius: 10px; color: var(--yl_ink); background: #fff; }
+        .yl_add-row input:focus { outline: 2px solid rgba(8, 127, 120, 0.2); border-color: var(--yl_teal); }
+
+        .yl_status {
+            min-height: 46px;
+            padding: 12px 18px;
+            border-top: 1px dashed var(--yl_line);
+            color: var(--yl_muted);
+            background: #fbfcfa;
+            font: 12px/1.7 "Consolas", "Microsoft YaHei", monospace;
+            overflow-wrap: anywhere;
+        }
+        .yl_status strong { color: var(--yl_teal-dark); }
+
+        .yl_methods { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+        .yl_method-card { padding: 18px; }
+        .yl_method-card h3 { margin: 0 0 7px; color: var(--yl_teal-dark); font-size: 17px; }
+        .yl_method-card p { min-height: 42px; margin: 0 0 12px; color: var(--yl_muted); font-size: 12px; }
+        .yl_method-code { display: block; min-height: 45px; padding: 10px; border-radius: 9px; color: #e5f3ed; background: #172b3a; font: 12px/1.5 "Consolas", monospace; overflow-wrap: anywhere; }
+        .yl_method-btn { margin-top: 10px; padding: 6px 11px; border: 0; border-radius: 8px; color: #075b59; background: #e0f1eb; font-size: 12px; font-weight: 800; }
+        .yl_method-btn:hover { background: #cce8dc; }
+
+        .yl_console { margin-top: 14px; padding: 16px 18px; }
+        .yl_console-title { margin-bottom: 8px; color: var(--yl_coral); font-size: 12px; font-weight: 800; letter-spacing: 0.08em; }
+        .yl_output { min-height: 26px; color: var(--yl_ink); font: 13px/1.7 "Consolas", "Microsoft YaHei", monospace; overflow-wrap: anywhere; }
+        .yl_tip { margin-top: 16px; padding: 12px 15px; border-left: 4px solid var(--yl_yellow); border-radius: 0 10px 10px 0; color: #695b36; background: #fff9e8; font-size: 13px; }
+        .yl_footer { padding: 24px 0 0; color: var(--yl_muted); text-align: center; font-size: 12px; }
+
+        @media (max-width: 760px) {
+            .yl_methods { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 520px) {
+            .yl_shell { width: min(100% - 24px, 1120px); padding-top: 12px; }
+            .yl_section-heading { align-items: start; flex-direction: column; }
+            .yl_controls { grid-template-columns: repeat(2, 1fr); padding-right: 14px; padding-left: 14px; }
+            .yl_board-top { padding-right: 14px; padding-left: 14px; }
+            .yl_array-track { padding: 16px 14px; }
+            .yl_add-row { padding-right: 14px; padding-left: 14px; }
+            .yl_methods { grid-template-columns: 1fr; }
+            .yl_method-card p { min-height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <main class="yl_shell">
+        <header class="yl_hero">
+            <div class="yl_hero-content">
+                <div class="yl_kicker">JAVASCRIPT · ARRAY PLAYGROUND</div>
+                <h1>数组方法实验室</h1>
+                <p>把数组想成一排水果盒：点击按钮，亲手观察元素怎样进出、排列、查找与变身。</p>
+                <a class="yl_back" href="index.html">← 返回首页</a>
+            </div>
+        </header>
+
+        <section class="yl_section" aria-labelledby="yl_live-title">
+            <div class="yl_section-heading">
+                <h2 id="yl_live-title">01 / 操作这一排水果</h2>
+                <p>上方小数字是索引，从 0 开始。</p>
+            </div>
+            <div class="yl_board">
+                <div class="yl_board-top">
+                    <span class="yl_array-name">yl_fruits = [ ... ]</span>
+                    <span class="yl_length" id="yl_length">length: 4</span>
+                </div>
+                <div class="yl_array-track" id="yl_array-track" aria-live="polite"></div>
+                <div class="yl_controls" aria-label="会改变原数组的方法">
+                    <button class="yl_control-btn yl_accent" type="button" data-action="push">push() 从末尾加入</button>
+                    <button class="yl_control-btn" type="button" data-action="pop">pop() 从末尾取出</button>
+                    <button class="yl_control-btn yl_accent" type="button" data-action="unshift">unshift() 从开头加入</button>
+                    <button class="yl_control-btn" type="button" data-action="shift">shift() 从开头取出</button>
+                    <button class="yl_control-btn" type="button" data-action="splice">splice() 删除中间项</button>
+                    <button class="yl_control-btn" type="button" data-action="reverse">reverse() 反转顺序</button>
+                    <button class="yl_control-btn" type="button" data-action="sort">sort() 排序</button>
+                    <button class="yl_control-btn" type="button" data-action="reset">重置示例数组</button>
+                </div>
+                <form class="yl_add-row" id="yl_add-form">
+                    <input id="yl_new-fruit" type="text" maxlength="12" placeholder="输入水果名，例如：芒果" aria-label="要加入数组的水果名">
+                    <button class="yl_control-btn yl_accent" type="submit">push 我的水果</button>
+                </form>
+                <div class="yl_status" id="yl_status" aria-live="polite">点击一个操作按钮，看看数组和代码发生了什么变化。</div>
+            </div>
+        </section>
+
+        <section class="yl_section" aria-labelledby="yl_methods-title">
+            <div class="yl_section-heading">
+                <h2 id="yl_methods-title">02 / 其他常用方法</h2>
+                <p>点击“试试看”，结果会显示在下方；演示不会改动水果盒。</p>
+            </div>
+            <div class="yl_methods" id="yl_methods"></div>
+            <div class="yl_console">
+                <div class="yl_console-title">OUTPUT / 运行结果</div>
+                <div class="yl_output" id="yl_output" aria-live="polite">等待运行一个方法……</div>
+            </div>
+            <div class="yl_tip">
+                💡 <strong>记忆小贴士：</strong>push、pop、shift、unshift、splice、reverse、sort 会改变原数组；slice、concat、map、filter 等会返回新结果。<code>forEach</code> 用于逐项执行操作，不会返回新数组。
+            </div>
+        </section>
+        <footer class="yl_footer">数组像一列有编号的盒子：方法就是整理它们的工具。</footer>
+    </main>
+
+    <script>
+        var yl_initialFruits = ["🍎 苹果", "🍌 香蕉", "🍊 橙子", "🍇 葡萄"];
+        var yl_fruits = yl_initialFruits.slice();
+        var yl_track = document.getElementById("yl_array-track");
+        var yl_length = document.getElementById("yl_length");
+        var yl_status = document.getElementById("yl_status");
+        var yl_output = document.getElementById("yl_output");
+        var yl_methods = [
+            {
+                name: "slice()",
+                description: "切一段出来，原数组不变。",
+                code: "yl_fruits.slice(1, 3)",
+                run: function (yl_array) { return JSON.stringify(yl_array.slice(1, 3)); }
+            },
+            {
+                name: "concat()",
+                description: "把另一排水果接到后面，返回新数组。",
+                code: 'yl_fruits.concat(["🥝 奇异果"])',
+                run: function (yl_array) { return JSON.stringify(yl_array.concat(["🥝 奇异果"])); }
+            },
+            {
+                name: "includes()",
+                description: "检查数组里有没有某个元素，返回 true / false。",
+                code: 'yl_fruits.includes("🍌 香蕉")',
+                run: function (yl_array) { return String(yl_array.includes("🍌 香蕉")); }
+            },
+            {
+                name: "indexOf()",
+                description: "查找元素的位置；找不到时返回 -1。",
+                code: 'yl_fruits.indexOf("🍊 橙子")',
+                run: function (yl_array) { return String(yl_array.indexOf("🍊 橙子")); }
+            },
+            {
+                name: "join()",
+                description: "把所有元素连接成一个字符串。",
+                code: 'yl_fruits.join(" → ")',
+                run: function (yl_array) { return yl_array.join(" → "); }
+            },
+            {
+                name: "forEach()",
+                description: "依次访问每个元素，适合逐项展示或执行操作。",
+                code: "yl_fruits.forEach((yl_item, yl_i) => ...)",
+                run: function (yl_array) {
+                    var yl_lines = [];
+                    yl_array.forEach(function (yl_item, yl_i) { yl_lines.push(yl_i + ": " + yl_item); });
+                    return yl_lines.join("　|　");
+                }
+            },
+            {
+                name: "map()",
+                description: "逐项加工，得到一个长度相同的新数组。",
+                code: 'yl_fruits.map(yl_item => yl_item + "！")',
+                run: function (yl_array) { return JSON.stringify(yl_array.map(function (yl_item) { return yl_item + "！"; })); }
+            },
+            {
+                name: "filter()",
+                description: "按条件筛选，留下符合要求的元素。",
+                code: 'yl_fruits.filter(yl_item => yl_item.includes("🍎"))',
+                run: function (yl_array) { return JSON.stringify(yl_array.filter(function (yl_item) { return yl_item.includes("🍎"); })); }
+            },
+            {
+                name: "find()",
+                description: "找到第一个符合条件的元素；没有则返回 undefined。",
+                code: 'yl_fruits.find(yl_item => yl_item.includes("🍇"))',
+                run: function (yl_array) { return String(yl_array.find(function (yl_item) { return yl_item.includes("🍇"); })); }
+            },
+            {
+                name: "reduce()",
+                description: "把所有元素累计成一个结果，这里统计水果数量。",
+                code: "yl_fruits.reduce((yl_sum) => yl_sum + 1, 0)",
+                run: function (yl_array) { return String(yl_array.reduce(function (yl_sum) { return yl_sum + 1; }, 0)) + " 个水果"; }
+            }
+        ];
+
+        function yl_renderArray() {
+            yl_track.textContent = "";
+            yl_length.textContent = "length: " + yl_fruits.length;
+            if (yl_fruits.length === 0) {
+                var yl_empty = document.createElement("span");
+                yl_empty.className = "yl_empty";
+                yl_empty.textContent = "数组空空的，试试 push() 加入水果。";
+                yl_track.appendChild(yl_empty);
+                return;
+            }
+            yl_fruits.forEach(function (yl_fruit, yl_index) {
+                var yl_item = document.createElement("div");
+                yl_item.className = "yl_item";
+                yl_item.dataset.index = yl_index;
+                yl_item.textContent = yl_fruit;
+                yl_track.appendChild(yl_item);
+            });
+        }
+
+        function yl_showChange(yl_method, yl_before, yl_result) {
+            yl_status.textContent = "";
+            var yl_strong = document.createElement("strong");
+            yl_strong.textContent = yl_method + " ";
+            yl_status.appendChild(yl_strong);
+            yl_status.appendChild(document.createTextNode(yl_before + " → " + JSON.stringify(yl_fruits) + "；返回值：" + JSON.stringify(yl_result)));
+        }
+
+        function yl_runMutation(yl_action) {
+            var yl_before = JSON.stringify(yl_fruits);
+            var yl_result;
+            var yl_method;
+            if (yl_action === "push") {
+                yl_method = 'push("🍉 西瓜")';
+                yl_result = yl_fruits.push("🍉 西瓜");
+            } else if (yl_action === "pop") {
+                yl_method = "pop()";
+                yl_result = yl_fruits.pop();
+            } else if (yl_action === "unshift") {
+                yl_method = 'unshift("🍓 草莓")';
+                yl_result = yl_fruits.unshift("🍓 草莓");
+            } else if (yl_action === "shift") {
+                yl_method = "shift()";
+                yl_result = yl_fruits.shift();
+            } else if (yl_action === "splice") {
+                var yl_removeIndex = Math.min(1, Math.max(yl_fruits.length - 1, 0));
+                yl_method = "splice(" + yl_removeIndex + ", 1)";
+                yl_result = yl_fruits.splice(yl_removeIndex, yl_fruits.length > 0 ? 1 : 0);
+            } else if (yl_action === "reverse") {
+                yl_method = "reverse()";
+                yl_result = yl_fruits.reverse();
+            } else if (yl_action === "sort") {
+                yl_method = "sort()";
+                yl_result = yl_fruits.sort();
+            } else if (yl_action === "reset") {
+                yl_method = "重置";
+                yl_fruits = yl_initialFruits.slice();
+                yl_result = yl_fruits.slice();
+            }
+            yl_renderArray();
+            yl_showChange(yl_method, yl_before, yl_result);
+        }
+
+        function yl_renderMethods() {
+            yl_methods.forEach(function (yl_method) {
+                var yl_card = document.createElement("article");
+                yl_card.className = "yl_method-card";
+                var yl_title = document.createElement("h3");
+                yl_title.textContent = yl_method.name;
+                var yl_description = document.createElement("p");
+                yl_description.textContent = yl_method.description;
+                var yl_code = document.createElement("code");
+                yl_code.className = "yl_method-code";
+                yl_code.textContent = yl_method.code;
+                var yl_button = document.createElement("button");
+                yl_button.className = "yl_method-btn";
+                yl_button.type = "button";
+                yl_button.textContent = "试试看";
+                yl_button.addEventListener("click", function () {
+                    yl_output.textContent = yl_method.name + " → " + yl_method.run(yl_fruits);
+                });
+                yl_card.appendChild(yl_title);
+                yl_card.appendChild(yl_description);
+                yl_card.appendChild(yl_code);
+                yl_card.appendChild(yl_button);
+                yl_methodsContainer.appendChild(yl_card);
+            });
+        }
+
+        var yl_methodsContainer = document.getElementById("yl_methods");
+        document.querySelectorAll("[data-action]").forEach(function (yl_button) {
+            yl_button.addEventListener("click", function () {
+                yl_runMutation(yl_button.dataset.action);
+            });
+        });
+
+        document.getElementById("yl_add-form").addEventListener("submit", function (yl_event) {
+            yl_event.preventDefault();
+            var yl_input = document.getElementById("yl_new-fruit");
+            var yl_fruit = yl_input.value.trim();
+            if (!yl_fruit) {
+                yl_input.focus();
+                return;
+            }
+            var yl_before = JSON.stringify(yl_fruits);
+            var yl_result = yl_fruits.push(yl_fruit);
+            yl_input.value = "";
+            yl_renderArray();
+            yl_showChange('push("' + yl_fruit + '")', yl_before, yl_result);
+        });
+
+        yl_renderArray();
+        yl_renderMethods();
+    </script>
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-10-29 | 使用模型：Copilot SDK（VS Code） | 功能名称：JavaScript 对象演示 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="font/iconfont.css">
+    <title>16-2 JavaScript 对象小档案</title>
+    <style>
+        :root {
+            --yl_ink: #172b3a;
+            --yl_muted: #647987;
+            --yl_paper: #f5f7f2;
+            --yl_teal: #087f78;
+            --yl_teal-dark: #075b59;
+            --yl_coral: #e87561;
+            --yl_yellow: #f4c95d;
+            --yl_line: #dce6df;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--yl_ink);
+            background:
+                radial-gradient(circle at 8% 10%, rgba(244, 201, 93, 0.22), transparent 25rem),
+                radial-gradient(circle at 92% 30%, rgba(8, 127, 120, 0.13), transparent 28rem),
+                var(--yl_paper);
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            line-height: 1.65;
+        }
+        button { font: inherit; cursor: pointer; }
+        code, pre { font-family: "Consolas", "Courier New", monospace; }
+        .yl_shell { width: min(1120px, calc(100% - 36px)); margin: 0 auto; padding: 28px 0 52px; }
+        .yl_hero {
+            position: relative; overflow: hidden; padding: clamp(26px, 5vw, 48px);
+            border-radius: 24px; color: #fff;
+            background: linear-gradient(125deg, #123b49, #087f78 68%, #39a18a);
+            box-shadow: 0 20px 50px rgba(23, 43, 58, 0.17);
+        }
+        .yl_hero::after {
+            content: "{ }"; position: absolute; right: 4%; bottom: -62px;
+            color: rgba(255, 255, 255, 0.1); font: 900 clamp(150px, 28vw, 310px)/1 "Consolas", monospace;
+            transform: rotate(-9deg); pointer-events: none;
+        }
+        .yl_hero-content { position: relative; z-index: 1; max-width: 700px; }
+        .yl_kicker { color: var(--yl_yellow); font-size: 12px; font-weight: 800; letter-spacing: 0.2em; }
+        .yl_hero h1 { margin: 9px 0 8px; font-size: clamp(30px, 5vw, 48px); line-height: 1.2; }
+        .yl_hero p { margin: 0; color: rgba(255, 255, 255, 0.84); }
+        .yl_back { display: inline-flex; align-items: center; gap: 7px; margin-top: 20px; color: var(--yl_yellow); font-size: 14px; text-decoration: none; }
+        .yl_back:hover { text-decoration: underline; }
+        .yl_intro {
+            display: flex; align-items: center; gap: 16px; margin: 24px 0; padding: 16px 20px;
+            border: 1px solid #e8dfbf; border-radius: 14px; color: #66572f; background: #fff9e8;
+        }
+        .yl_intro .iconfont { color: #bb8b1e; font-size: 24px; }
+        .yl_intro p { margin: 0; font-size: 14px; }
+        .yl_intro strong { color: #574411; }
+        .yl_workspace { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 18px; }
+        .yl_panel {
+            overflow: hidden; border: 1px solid rgba(220, 230, 223, 0.95); border-radius: 18px;
+            background: rgba(255, 255, 255, 0.92); box-shadow: 0 8px 24px rgba(23, 43, 58, 0.06);
+        }
+        .yl_panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 17px 20px; border-bottom: 1px solid var(--yl_line); }
+        .yl_panel-head h2 { margin: 0; font-size: 17px; }
+        .yl_badge { padding: 4px 10px; border-radius: 999px; color: var(--yl_teal-dark); background: #e3f3ed; font: 700 11px "Consolas", monospace; }
+        .yl_profile { display: flex; align-items: center; gap: 14px; margin: 18px; padding: 16px; border-radius: 15px; background: linear-gradient(135deg, #f3fbf7, #e1f3ea); }
+        .yl_avatar {
+            display: grid; flex: 0 0 58px; height: 58px; place-items: center; border-radius: 18px;
+            color: #fff; background: linear-gradient(145deg, #f0a27d, #e87561); font-size: 27px;
+            box-shadow: 0 5px 0 rgba(198, 104, 83, 0.2);
+        }
+        .yl_profile h3 { margin: 0; font-size: 18px; }
+        .yl_profile p { margin: 2px 0 0; color: var(--yl_muted); font-size: 12px; }
+        .yl_live { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; background: #45a77c; }
+        .yl_properties { display: grid; gap: 8px; padding: 0 18px 18px; }
+        .yl_property {
+            display: grid; grid-template-columns: minmax(84px, 0.8fr) minmax(0, 1.3fr) auto;
+            align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid #edf1ed;
+            border-radius: 10px; background: #fff;
+        }
+        .yl_property-key { color: var(--yl_teal-dark); font: 700 12px "Consolas", monospace; }
+        .yl_property-value { overflow-wrap: anywhere; font-size: 13px; }
+        .yl_type { padding: 3px 7px; border-radius: 6px; color: #765714; background: #fff3cc; font: 10px "Consolas", monospace; }
+        .yl_code-wrap { padding: 18px; }
+        .yl_code-label { margin-bottom: 9px; color: var(--yl_muted); font-size: 12px; }
+        .yl_code { margin: 0; padding: 16px; border-radius: 12px; color: #e5f3ed; background: #172b3a; font-size: 12px; line-height: 1.8; overflow-x: auto; white-space: pre; }
+        .yl_code .yl_comment { color: #91a6ad; }
+        .yl_code .yl_key { color: #f4c95d; }
+        .yl_code .yl_string { color: #a7dfc3; }
+        .yl_code .yl_method { color: #f29b89; }
+        .yl_object-output { margin-top: 12px; padding: 12px 14px; border: 1px dashed #c9e4e2; border-radius: 10px; color: var(--yl_teal-dark); background: #f4faf9; font: 12px/1.7 "Consolas", "Microsoft YaHei", monospace; overflow-wrap: anywhere; }
+        .yl_object-output strong { display: block; margin-bottom: 4px; color: var(--yl_coral); font-family: "Microsoft YaHei", sans-serif; }
+        .yl_section { margin-top: 26px; }
+        .yl_section-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
+        .yl_section-heading h2 { margin: 0; font-size: 21px; }
+        .yl_section-heading p { margin: 0; color: var(--yl_muted); font-size: 13px; }
+        .yl_controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+        .yl_action {
+            min-height: 76px; padding: 12px; border: 1px solid var(--yl_line); border-radius: 12px;
+            color: var(--yl_ink); background: #fff; text-align: left;
+            transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+        }
+        .yl_action:hover { transform: translateY(-2px); border-color: var(--yl_teal); background: #f4faf8; }
+        .yl_action strong { display: block; color: var(--yl_teal-dark); font-size: 13px; }
+        .yl_action code { display: block; margin-top: 4px; color: var(--yl_muted); font-size: 10px; }
+        .yl_method-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; margin-top: 14px; padding: 15px 18px; border: 1px solid #cfe4dc; border-radius: 14px; background: #eff8f3; }
+        .yl_method-card strong { display: block; color: var(--yl_teal-dark); font-size: 14px; }
+        .yl_method-card code { display: block; margin-top: 3px; color: #5d746e; font-size: 11px; }
+        .yl_method-button { min-height: 38px; padding: 7px 13px; border: 0; border-radius: 9px; color: #fff; background: var(--yl_teal); font-size: 12px; font-weight: 700; }
+        .yl_method-button:hover { background: var(--yl_teal-dark); }
+        .yl_log { min-height: 44px; margin-top: 12px; padding: 11px 14px; border-left: 4px solid var(--yl_yellow); border-radius: 0 10px 10px 0; color: #66572f; background: #fff9e8; font: 12px/1.7 "Consolas", "Microsoft YaHei", monospace; overflow-wrap: anywhere; }
+        .yl_topics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+        .yl_topic {
+            padding: 17px;
+            border: 1px solid rgba(220, 230, 223, 0.95);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 8px 24px rgba(23, 43, 58, 0.05);
+        }
+        .yl_topic h3 { margin: 0 0 5px; color: var(--yl_teal-dark); font-size: 15px; }
+        .yl_topic > p { margin: 0 0 11px; color: var(--yl_muted); font-size: 12px; }
+        .yl_topic-code { display: block; margin-bottom: 10px; padding: 9px 10px; border-radius: 8px; color: #e5f3ed; background: #172b3a; font-size: 11px; line-height: 1.6; overflow-wrap: anywhere; }
+        .yl_topic-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+        .yl_topic-button {
+            min-height: 34px;
+            padding: 6px 10px;
+            border: 1px solid #d5e7df;
+            border-radius: 8px;
+            color: var(--yl_teal-dark);
+            background: #f3fbf7;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .yl_topic-button:hover { border-color: var(--yl_teal); background: #e5f4ed; }
+        .yl_topic-output { min-height: 38px; margin-top: 10px; padding: 9px 10px; border-radius: 8px; color: #695b36; background: #fff9e8; font: 11px/1.6 "Consolas", "Microsoft YaHei", monospace; overflow-wrap: anywhere; }
+        .yl_tip { margin-top: 18px; padding: 14px 17px; border-radius: 12px; color: var(--yl_muted); background: rgba(255, 255, 255, 0.72); font-size: 13px; }
+        .yl_tip strong { color: var(--yl_teal-dark); }
+        .yl_footer { padding-top: 24px; color: var(--yl_muted); text-align: center; font-size: 12px; }
+        @media (max-width: 760px) {
+            .yl_workspace { grid-template-columns: 1fr; }
+            .yl_controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .yl_topics { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .yl_shell { width: min(100% - 24px, 1120px); padding-top: 12px; }
+            .yl_section-heading { align-items: start; flex-direction: column; }
+            .yl_property { grid-template-columns: 76px minmax(0, 1fr); }
+            .yl_type { grid-column: 2; justify-self: start; }
+            .yl_method-card { grid-template-columns: 1fr; }
+            .yl_method-button { justify-self: start; }
+        }
+    </style>
+</head>
+<body>
+    <main class="yl_shell">
+        <header class="yl_hero">
+            <div class="yl_hero-content">
+                <div class="yl_kicker">JAVASCRIPT · OBJECT STUDIO</div>
+                <h1>认识 JavaScript 对象</h1>
+                <p>一个对象，就像一张可以互动的个人档案：用属性描述它，用方法让它做事。</p>
+                <a class="yl_back" href="index.html"><i class="iconfont icon-fanhui" aria-hidden="true"></i> 返回首页</a>
+            </div>
+        </header>
+
+        <div class="yl_intro">
+            <i class="iconfont icon-bangzhu" aria-hidden="true"></i>
+            <p><strong>对象 = 属性 + 方法</strong>　属性保存对象的信息（名字、年龄、技能），方法是对象能执行的动作。属性和值以键值对的形式写在一对花括号里。</p>
+        </div>
+
+        <section class="yl_workspace" aria-label="对象档案与代码示例">
+            <article class="yl_panel">
+                <div class="yl_panel-head">
+                    <h2><i class="iconfont icon-FillCopy" aria-hidden="true"></i> 对象档案卡</h2>
+                    <span class="yl_badge">yl_student</span>
+                </div>
+                <div class="yl_profile">
+                    <div class="yl_avatar" aria-hidden="true">👩🏻‍💻</div>
+                    <div><h3 id="yl_student-name">王一诺</h3><p><span class="yl_live"></span><span id="yl_student-title">网页设计学习者</span></p></div>
+                </div>
+                <div class="yl_properties" id="yl_properties" aria-live="polite"></div>
+            </article>
+
+            <article class="yl_panel">
+                <div class="yl_panel-head">
+                    <h2>对象字面量 / object literal</h2>
+                    <span class="yl_badge">{ key: value }</span>
+                </div>
+                <div class="yl_code-wrap">
+                    <div class="yl_code-label">把现实中的“学生”写成 JavaScript 对象</div>
+                    <pre class="yl_code"><span class="yl_key">var</span> yl_student = {
+  name: <span class="yl_string">"王一诺"</span>,
+  title: <span class="yl_string">"网页设计学习者"</span>,
+  age: <span id="yl_code-age">20</span>,
+  city: <span id="yl_code-city" class="yl_string">"杭州"</span>,
+  skills: [<span class="yl_string">"HTML"</span>, <span class="yl_string">"CSS"</span>, <span class="yl_string">"JavaScript"</span>],
+  isLearning: <span class="yl_key">true</span>,
+  introduce: <span class="yl_key">function</span> () {
+    <span class="yl_key">return</span> <span class="yl_string">"你好，我是 "</span> + <span class="yl_method">this.name</span>;
+  }
+};</pre>
+                    <div class="yl_object-output" id="yl_object-output" aria-live="polite">
+                        <strong>运行结果</strong>
+                        console.log(yl_student.name) → 王一诺
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="yl_section" aria-labelledby="yl-actions-title">
+            <div class="yl_section-heading">
+                <h2 id="yl-actions-title">读取属性与增删改</h2>
+                <p>点号 / 方括号读取；创建、修改、删除都会更新档案卡。</p>
+            </div>
+            <div class="yl_controls">
+                <button class="yl_action" type="button" data-action="read-dot"><strong>🔎 读取姓名</strong><code>yl_student.name</code></button>
+                <button class="yl_action" type="button" data-action="read-bracket"><strong>🔎 读取城市</strong><code>yl_student["city"]</code></button>
+                <button class="yl_action" type="button" data-action="birthday"><strong>🎂 修改年龄</strong><code>yl_student.age++</code></button>
+                <button class="yl_action" type="button" data-action="city"><strong>📍 修改城市</strong><code>yl_student["city"] = ...</code></button>
+                <button class="yl_action" type="button" data-action="create-property"><strong>✨ 创建属性</strong><code>yl_student.favorite = "🍵 茶"</code></button>
+                <button class="yl_action" type="button" data-action="update-property"><strong>📝 修改属性</strong><code>yl_student.favorite = "☕ 咖啡"</code></button>
+                <button class="yl_action" type="button" data-action="delete-property"><strong>🧹 删除属性</strong><code>delete yl_student.favorite</code></button>
+            </div>
+            <div class="yl_method-card">
+                <div><strong>对象方法：让对象自我介绍</strong><code>yl_student.introduce()　→　通过 this.name 读取自己的属性</code></div>
+                <button class="yl_method-button" id="yl_introduce" type="button">调用 introduce()</button>
+            </div>
+            <div class="yl_log" id="yl_log" aria-live="polite">点击上面的按钮，看看对象的属性和方法怎样工作。</div>
+        </section>
+
+        <section class="yl_section" aria-labelledby="yl-more-title">
+            <div class="yl_section-heading">
+                <h2 id="yl-more-title">对象的其他常用操作</h2>
+                <p>遍历枚举、引用复制，以及 JSON 序列化。</p>
+            </div>
+            <div class="yl_topics">
+                <article class="yl_topic">
+                    <h3>遍历与枚举</h3>
+                    <p>分别取得对象的键、值、键值对，或用 for...in 逐项访问。</p>
+                    <code class="yl_topic-code">Object.keys(obj) · Object.values(obj)<br>Object.entries(obj) · for (var key in obj)</code>
+                    <div class="yl_topic-actions">
+                        <button class="yl_topic-button" type="button" data-topic-action="keys">Object.keys()</button>
+                        <button class="yl_topic-button" type="button" data-topic-action="values">Object.values()</button>
+                        <button class="yl_topic-button" type="button" data-topic-action="entries">Object.entries()</button>
+                        <button class="yl_topic-button" type="button" data-topic-action="for-in">for...in</button>
+                    </div>
+                    <div class="yl_topic-output" id="yl_enumeration-output" aria-live="polite">点击方法，查看枚举结果。</div>
+                </article>
+
+                <article class="yl_topic">
+                    <h3>复制值，还是复制引用？</h3>
+                    <p>对象赋值传递的是引用；浅拷贝只复制第一层，嵌套对象仍共享。</p>
+                    <code class="yl_topic-code">var alias = source; // 同一个对象<br>var copy = { ...source }; // 浅拷贝</code>
+                    <div class="yl_topic-actions">
+                        <button class="yl_topic-button" type="button" data-copy-action="reference">演示引用赋值</button>
+                        <button class="yl_topic-button" type="button" data-copy-action="shallow">演示浅拷贝</button>
+                        <button class="yl_topic-button" type="button" data-copy-action="reset">重置演示</button>
+                    </div>
+                    <div class="yl_topic-output" id="yl_copy-output" aria-live="polite">原对象与副本等待演示。</div>
+                </article>
+
+                <article class="yl_topic">
+                    <h3>序列化与反序列化</h3>
+                    <p>JSON.stringify 把数据变成 JSON 字符串；JSON.parse 再还原为新对象。函数属性不会被序列化。</p>
+                    <code class="yl_topic-code">var text = JSON.stringify(obj);<br>var restored = JSON.parse(text);</code>
+                    <div class="yl_topic-actions">
+                        <button class="yl_topic-button" type="button" data-json-action="stringify">JSON.stringify()</button>
+                        <button class="yl_topic-button" type="button" data-json-action="parse">JSON.parse()</button>
+                    </div>
+                    <div class="yl_topic-output" id="yl_json-output" aria-live="polite">点击 stringify 查看 JSON 文本。</div>
+                </article>
+
+                <article class="yl_topic">
+                    <h3>对象操作速记</h3>
+                    <p>用 Object.hasOwn() 检查自有属性；for...in 可能枚举到原型链上的属性。</p>
+                    <code class="yl_topic-code">"name" in obj · Object.hasOwn(obj, "name")<br>delete obj.key · Object.assign({}, obj)</code>
+                    <div class="yl_topic-output">
+                        <strong>记忆：</strong>读取用点号 / 方括号；新增和修改用赋值；删除用 delete；遍历用 keys / values / entries。
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <div class="yl_tip">
+            <strong>小结：</strong>用点号访问属性：<code>yl_student.name</code>；也可以用方括号：<code>yl_student["city"]</code>。当属性名存放在变量里时，方括号写法尤其方便。对象方法中的 <code>this</code> 指向调用该方法的对象。
+        </div>
+        <footer class="yl_footer">每个对象都是一组有关联的数据与行为。</footer>
+    </main>
+
+    <script>
+        var yl_student = {
+            name: "王一诺",
+            title: "网页设计学习者",
+            age: 20,
+            city: "杭州",
+            skills: ["HTML", "CSS", "JavaScript"],
+            isLearning: true,
+            introduce: function () {
+                return "你好，我是 " + this.name + "，一名" + this.title + "。";
+            }
+        };
+        var yl_properties = document.getElementById("yl_properties");
+        var yl_log = document.getElementById("yl_log");
+        var yl_output = document.getElementById("yl_object-output");
+        var yl_cities = ["杭州", "苏州", "成都", "厦门"];
+        var yl_cityIndex = 0;
+        var yl_copySource = { name: "原对象", profile: { color: "绿色" } };
+        var yl_copyAlias = yl_copySource;
+        var yl_shallowCopy = Object.assign({}, yl_copySource);
+        var yl_serializedStudent = "";
+
+        function yl_formatValue(yl_value) {
+            if (Array.isArray(yl_value)) { return "[" + yl_value.join(", ") + "]"; }
+            if (typeof yl_value === "function") { return "function () { ... }"; }
+            if (typeof yl_value === "string") { return '"' + yl_value + '"'; }
+            return String(yl_value);
+        }
+
+        function yl_renderProperties() {
+            yl_properties.textContent = "";
+            Object.keys(yl_student).forEach(function (yl_key) {
+                var yl_value = yl_student[yl_key];
+                var yl_row = document.createElement("div");
+                yl_row.className = "yl_property";
+                var yl_keyElement = document.createElement("span");
+                yl_keyElement.className = "yl_property-key";
+                yl_keyElement.textContent = yl_key;
+                var yl_valueElement = document.createElement("span");
+                yl_valueElement.className = "yl_property-value";
+                yl_valueElement.textContent = yl_formatValue(yl_value);
+                var yl_typeElement = document.createElement("span");
+                yl_typeElement.className = "yl_type";
+                yl_typeElement.textContent = Array.isArray(yl_value) ? "Array" : typeof yl_value;
+                yl_row.appendChild(yl_keyElement);
+                yl_row.appendChild(yl_valueElement);
+                yl_row.appendChild(yl_typeElement);
+                yl_properties.appendChild(yl_row);
+            });
+            document.getElementById("yl_student-name").textContent = yl_student.name;
+            document.getElementById("yl_student-title").textContent = yl_student.title;
+            document.getElementById("yl_code-age").textContent = yl_student.age;
+            document.getElementById("yl_code-city").textContent = '"' + yl_student.city + '"';
+        }
+
+        document.querySelectorAll("[data-action]").forEach(function (yl_button) {
+            yl_button.addEventListener("click", function () {
+                var yl_action = yl_button.dataset.action;
+                if (yl_action === "read-dot") {
+                    yl_log.textContent = "yl_student.name　→　" + yl_student.name;
+                } else if (yl_action === "read-bracket") {
+                    yl_log.textContent = 'yl_student["city"]　→　' + yl_student["city"];
+                } else if (yl_action === "birthday") {
+                    yl_student.age++;
+                    yl_renderProperties();
+                    yl_log.textContent = "yl_student.age++　→　age 现在是 " + yl_student.age;
+                } else if (yl_action === "city") {
+                    yl_cityIndex = (yl_cityIndex + 1) % yl_cities.length;
+                    yl_student["city"] = yl_cities[yl_cityIndex];
+                    yl_renderProperties();
+                    yl_log.textContent = 'yl_student["city"] = "' + yl_student.city + '"　→　city 已更新';
+                } else if (yl_action === "create-property") {
+                    if (Object.prototype.hasOwnProperty.call(yl_student, "favorite")) {
+                        yl_log.textContent = 'yl_student.favorite = "🍵 茶"　→　favorite 已存在，请使用“修改属性”';
+                        return;
+                    }
+                    yl_student.favorite = "🍵 茶";
+                    yl_renderProperties();
+                    yl_log.textContent = '创建：yl_student.favorite = "🍵 茶"';
+                } else if (yl_action === "update-property") {
+                    if (!Object.prototype.hasOwnProperty.call(yl_student, "favorite")) {
+                        yl_log.textContent = '修改失败：请先使用“创建属性”增加 yl_student.favorite';
+                        return;
+                    }
+                    yl_student.favorite = "☕ 咖啡";
+                    yl_renderProperties();
+                    yl_log.textContent = '修改：yl_student.favorite = "☕ 咖啡"';
+                } else if (yl_action === "delete-property") {
+                    if (!Object.prototype.hasOwnProperty.call(yl_student, "favorite")) {
+                        yl_log.textContent = "delete yl_student.favorite　→　对象中还没有 favorite 属性";
+                        return;
+                    }
+                    delete yl_student.favorite;
+                    yl_renderProperties();
+                    yl_log.textContent = "delete yl_student.favorite　→　favorite 属性已删除";
+                }
+            });
+        });
+
+        function yl_showTopicOutput(yl_id, yl_content) {
+            document.getElementById(yl_id).textContent = yl_content;
+        }
+
+        document.querySelectorAll("[data-topic-action]").forEach(function (yl_button) {
+            yl_button.addEventListener("click", function () {
+                var yl_action = yl_button.dataset.topicAction;
+                var yl_output;
+                if (yl_action === "keys") {
+                    yl_output = "Object.keys(yl_student) → " + JSON.stringify(Object.keys(yl_student));
+                } else if (yl_action === "values") {
+                    yl_output = "Object.values(yl_student) → " + JSON.stringify(Object.values(yl_student).map(function (yl_value) {
+                        return typeof yl_value === "function" ? "[Function]" : yl_value;
+                    }));
+                } else if (yl_action === "entries") {
+                    yl_output = "Object.entries(yl_student) → " + JSON.stringify(Object.entries(yl_student).map(function (yl_entry) {
+                        return [yl_entry[0], typeof yl_entry[1] === "function" ? "[Function]" : yl_entry[1]];
+                    }));
+                } else if (yl_action === "for-in") {
+                    var yl_keys = [];
+                    for (var yl_key in yl_student) {
+                        if (Object.prototype.hasOwnProperty.call(yl_student, yl_key)) {
+                            yl_keys.push(yl_key);
+                        }
+                    }
+                    yl_output = "for...in（仅自有属性）→ " + yl_keys.join(", ");
+                }
+                yl_showTopicOutput("yl_enumeration-output", yl_output);
+            });
+        });
+
+        function yl_renderCopyOutput(yl_note) {
+            var yl_details = "source=" + yl_copySource.profile.color +
+                " · alias=" + yl_copyAlias.profile.color +
+                " · shallowCopy=" + yl_shallowCopy.profile.color +
+                " · source === alias: " + String(yl_copySource === yl_copyAlias) +
+                " · source === shallowCopy: " + String(yl_copySource === yl_shallowCopy);
+            yl_showTopicOutput("yl_copy-output", yl_note + "　" + yl_details);
+        }
+
+        document.querySelectorAll("[data-copy-action]").forEach(function (yl_button) {
+            yl_button.addEventListener("click", function () {
+                var yl_action = yl_button.dataset.copyAction;
+                if (yl_action === "reference") {
+                    yl_copyAlias.profile.color = "蓝色";
+                    yl_renderCopyOutput("alias.profile.color = 蓝色；原对象同步变化：");
+                } else if (yl_action === "shallow") {
+                    yl_shallowCopy.profile.color = "红色";
+                    yl_renderCopyOutput("shallowCopy.profile.color = 红色；嵌套 profile 仍与原对象共享：");
+                } else if (yl_action === "reset") {
+                    yl_copySource = { name: "原对象", profile: { color: "绿色" } };
+                    yl_copyAlias = yl_copySource;
+                    yl_shallowCopy = Object.assign({}, yl_copySource);
+                    yl_renderCopyOutput("已重置。");
+                }
+            });
+        });
+
+        document.querySelectorAll("[data-json-action]").forEach(function (yl_button) {
+            yl_button.addEventListener("click", function () {
+                var yl_action = yl_button.dataset.jsonAction;
+                if (yl_action === "stringify") {
+                    yl_serializedStudent = JSON.stringify(yl_student);
+                    yl_showTopicOutput("yl_json-output", "JSON 字符串 → " + yl_serializedStudent);
+                } else if (yl_action === "parse") {
+                    if (!yl_serializedStudent) {
+                        yl_serializedStudent = JSON.stringify(yl_student);
+                    }
+                    var yl_restoredStudent = JSON.parse(yl_serializedStudent);
+                    var yl_hasMethod = Object.prototype.hasOwnProperty.call(yl_restoredStudent, "introduce");
+                    yl_showTopicOutput("yl_json-output", "JSON.parse() → name: " + yl_restoredStudent.name +
+                        " · 新对象（=== 原对象为 false）· introduce 方法存在：" + yl_hasMethod);
+                }
+            });
+        });
+
+        document.getElementById("yl_introduce").addEventListener("click", function () {
+            var yl_result = yl_student.introduce();
+            yl_output.textContent = "";
+            var yl_label = document.createElement("strong");
+            yl_label.textContent = "运行结果";
+            yl_output.appendChild(yl_label);
+            yl_output.appendChild(document.createTextNode("yl_student.introduce() → " + yl_result));
+            yl_log.textContent = "yl_student.introduce()　→　" + yl_result;
+        });
+
+        yl_renderProperties();
+    </script>
+</body>
+</html>

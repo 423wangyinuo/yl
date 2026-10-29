@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-10-29 | 使用模型：Copilot SDK（VS Code） | 功能名称：翻译平台特价专区页面仿制 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="font/iconfont.css">
+    <title>16-3 翻译平台特价专区</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            color: #23384b;
+            background: #fff;
+            font-family: "Microsoft YaHei", "SimSun", serif;
+        }
+
+        button { font: inherit; cursor: pointer; }
+
+        .yl_page {
+            width: min(100% - 32px, 520px);
+            margin: 14px auto 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .yl_deal-box {
+            border: 1px solid #ddd;
+            border-top: 0;
+        }
+
+        .yl_title {
+            display: flex;
+            align-items: center;
+            height: 52px;
+            padding: 0 11px;
+            border-left: 5px solid #ff6268;
+            border-bottom: 1px solid #ddd;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .yl_title-icon {
+            margin-right: 8px;
+            color: #c8d0d5;
+            font-size: 28px;
+        }
+
+        .yl_deal-list {
+            display: grid;
+            gap: 12px;
+            padding: 12px 12px;
+        }
+
+        .yl_deal {
+            display: grid;
+            grid-template-columns: 48px minmax(0, 1fr) auto;
+            align-items: center;
+            min-height: 45px;
+            padding: 0 11px;
+            border: 1px solid #d8d8d8;
+            color: #23384b;
+            background: #fff;
+            font-size: 18px;
+        }
+
+        .yl_deal-icon {
+            color: #ff686d;
+            font-size: 28px;
+        }
+
+        .yl_deal-count { white-space: nowrap; }
+
+        .yl_more {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 54px;
+            border: 0;
+            color: #fff;
+            background: #ff6268;
+            font-size: 17px;
+        }
+
+        .yl_more:hover { background: #f4555d; }
+
+        .yl_contribute {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            height: 51px;
+            margin-top: 18px;
+            border: 0;
+            color: #fff;
+            background: #428bca;
+            font-size: 19px;
+        }
+
+        .yl_contribute:hover { background: #347dbd; }
+        .yl_contribute .iconfont { font-size: 24px; }
+
+        .yl_follow {
+            display: grid;
+            grid-template-columns: minmax(130px, 41%) minmax(0, 1fr);
+            gap: 8px;
+            margin-top: 18px;
+            padding-top: 5px;
+            border-top: 1px solid #eee;
+        }
+
+        .yl_social-list {
+            display: grid;
+            grid-template-rows: repeat(4, minmax(54px, 1fr));
+            gap: 1px;
+        }
+
+        .yl_social {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            padding: 0 17px;
+            border: 0;
+            color: #fff;
+            background: #438dce;
+            font-size: 15px;
+            text-align: left;
+        }
+
+        .yl_social:first-child { background: #ff6268; }
+        .yl_social:hover { filter: brightness(0.95); }
+        .yl_social .iconfont { width: 24px; font-size: 25px; text-align: center; }
+
+        .yl_qr-area { min-width: 0; text-align: center; }
+
+        .yl_qr {
+            display: grid;
+            grid-template-columns: repeat(29, 1fr);
+            grid-template-rows: repeat(29, 1fr);
+            gap: 1px;
+            width: min(100%, 216px);
+            aspect-ratio: 1;
+            margin: 0 auto;
+            padding: 6px;
+            border: 1px solid #e8e8e8;
+            background: #fff;
+            image-rendering: pixelated;
+        }
+
+        .yl_qr-cell { background: #fff; }
+        .yl_qr-cell.yl_dark { background: #080808; }
+
+        .yl_qr-center {
+            display: grid;
+            grid-column: 13 / span 5;
+            grid-row: 13 / span 5;
+            place-items: center;
+            border: 2px solid #fff;
+            color: #3c88c7;
+            background: #fff;
+            box-shadow: 0 0 0 1px #ddd;
+            font-size: 8px;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .yl_qr-caption {
+            margin: 12px 0 2px;
+            color: #23384b;
+            font-size: 14px;
+        }
+
+        .yl_qr-note {
+            display: block;
+            margin-top: 2px;
+            color: #78838b;
+            font-family: "Microsoft YaHei", sans-serif;
+            font-size: 10px;
+        }
+
+        .yl_notice {
+            min-height: 0;
+            color: #688091;
+            font-family: "Microsoft YaHei", sans-serif;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 390px) {
+            .yl_page { width: calc(100% - 16px); margin-top: 12px; }
+            .yl_title { font-size: 18px; }
+            .yl_deal { grid-template-columns: 42px minmax(0, 1fr) auto; padding: 0 8px; font-size: 16px; }
+            .yl_contribute { font-size: 16px; }
+            .yl_follow { grid-template-columns: minmax(112px, 40%) minmax(0, 1fr); gap: 6px; }
+            .yl_social { gap: 7px; padding: 0 9px; font-size: 13px; }
+            .yl_qr { gap: 0.5px; padding: 4px; }
+            .yl_qr-caption { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <main class="yl_page">
+        <section class="yl_deal-box" aria-labelledby="yl_title">
+            <header class="yl_title" id="yl_title">
+                <i class="iconfont icon-faxian yl_title-icon" aria-hidden="true"></i>
+                <span>翻译平台特价专区</span>
+            </header>
+            <div class="yl_deal-list">
+                <div class="yl_deal">
+                    <i class="iconfont icon-shangcheng-copy yl_deal-icon" aria-hidden="true"></i>
+                    <span>8折专区</span>
+                    <span class="yl_deal-count">738 篇</span>
+                </div>
+                <div class="yl_deal">
+                    <i class="iconfont icon-shangcheng-copy yl_deal-icon" aria-hidden="true"></i>
+                    <span>5折专区</span>
+                    <span class="yl_deal-count">977 篇</span>
+                </div>
+                <div class="yl_deal">
+                    <i class="iconfont icon-shangcheng-copy yl_deal-icon" aria-hidden="true"></i>
+                    <span>1龙币专区</span>
+                    <span class="yl_deal-count">11420 篇</span>
+                </div>
+            </div>
+            <button class="yl_more" type="button" data-message="更多翻译平台译文">更多翻译平台译文</button>
+        </section>
+
+        <button class="yl_contribute" type="button" data-message="进入翻译加工厂，贡献才气">
+            <i class="iconfont icon-fuwu" aria-hidden="true"></i>
+            <span>进入翻译加工厂 贡献才气</span>
+        </button>
+
+        <section class="yl_follow" aria-label="关注龙腾翻译平台">
+            <div class="yl_social-list">
+                <button class="yl_social" type="button" data-message="微博">
+                    <i class="iconfont icon-shoucang" aria-hidden="true"></i><span>微博</span>
+                </button>
+                <button class="yl_social" type="button" data-message="公众号">
+                    <i class="iconfont icon-weixin" aria-hidden="true"></i><span>公众号</span>
+                </button>
+                <button class="yl_social" type="button" data-message="小程序">
+                    <i class="iconfont icon-FillCopy" aria-hidden="true"></i><span>小程序</span>
+                </button>
+                <button class="yl_social" type="button" data-message="安卓APP">
+                    <i class="iconfont icon-shouye" aria-hidden="true"></i><span>安卓APP</span>
+                </button>
+            </div>
+            <div class="yl_qr-area">
+                <div class="yl_qr" id="yl_qr" role="img" aria-label="二维码视觉示意图，不可扫描"></div>
+                <p class="yl_qr-caption">扫一扫关注龙腾官方微博</p>
+            </div>
+        </section>
+        <div class="yl_notice" id="yl_notice" aria-live="polite"></div>
+    </main>
+
+    <script>
+        var yl_qr = document.getElementById("yl_qr");
+        var yl_size = 29;
+        var yl_matrix = [];
+
+        for (var yl_row = 0; yl_row < yl_size; yl_row++) {
+            yl_matrix[yl_row] = [];
+            for (var yl_column = 0; yl_column < yl_size; yl_column++) {
+                var yl_seed = (yl_row * 17 + yl_column * 31 + yl_row * yl_column * 7) % 19;
+                yl_matrix[yl_row][yl_column] = yl_seed < 9;
+            }
+        }
+
+        function yl_setFinder(yl_startRow, yl_startColumn) {
+            for (var yl_rowOffset = -1; yl_rowOffset <= 7; yl_rowOffset++) {
+                for (var yl_columnOffset = -1; yl_columnOffset <= 7; yl_columnOffset++) {
+                    var yl_row = yl_startRow + yl_rowOffset;
+                    var yl_column = yl_startColumn + yl_columnOffset;
+                    if (yl_row < 0 || yl_column < 0 || yl_row >= yl_size || yl_column >= yl_size) {
+                        continue;
+                    }
+                    var yl_inside = yl_rowOffset >= 0 && yl_rowOffset <= 6 && yl_columnOffset >= 0 && yl_columnOffset <= 6;
+                    var yl_border = yl_rowOffset === 0 || yl_rowOffset === 6 || yl_columnOffset === 0 || yl_columnOffset === 6;
+                    var yl_center = yl_rowOffset >= 2 && yl_rowOffset <= 4 && yl_columnOffset >= 2 && yl_columnOffset <= 4;
+                    yl_matrix[yl_row][yl_column] = yl_inside && (yl_border || yl_center);
+                }
+            }
+        }
+
+        yl_setFinder(0, 0);
+        yl_setFinder(0, yl_size - 7);
+        yl_setFinder(yl_size - 7, 0);
+
+        for (var yl_qrRow = 0; yl_qrRow < yl_size; yl_qrRow++) {
+            for (var yl_qrColumn = 0; yl_qrColumn < yl_size; yl_qrColumn++) {
+                var yl_cell = document.createElement("span");
+                yl_cell.className = "yl_qr-cell" + (yl_matrix[yl_qrRow][yl_qrColumn] ? " yl_dark" : "");
+                yl_qr.appendChild(yl_cell);
+            }
+        }
+
+        var yl_center = document.createElement("span");
+        yl_center.className = "yl_qr-center";
+        yl_center.textContent = "龙腾翻译";
+        yl_qr.appendChild(yl_center);
+
+        document.querySelectorAll("[data-message]").forEach(function (yl_button) {
+            yl_button.addEventListener("click", function () {
+                document.getElementById("yl_notice").textContent = "页面示意：" + yl_button.dataset.message;
+            });
+        });
+    </script>
+</body>
+</html>

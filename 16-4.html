@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-10-29 | 使用模型：Copilot SDK（VS Code） | 功能名称：最新上市与即将上市标签切换 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-4 新车上市信息</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 18px 12px;
+            color: #333;
+            background: #f5f7f8;
+            font-family: "Microsoft YaHei", "SimSun", sans-serif;
+        }
+        .yl_widget {
+            width: min(100%, 560px);
+            margin: 0 auto;
+            border: 1px solid #d5dee5;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(37, 63, 84, 0.06);
+        }
+        .yl_tabs {
+            display: flex;
+            height: 38px;
+            border-bottom: 1px solid #cbd9e4;
+            background: #edf4f9;
+        }
+        .yl_tab {
+            min-width: 92px;
+            padding: 0 12px;
+            border: 0;
+            border-right: 1px solid transparent;
+            color: #164b78;
+            background: transparent;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .yl_tab:hover { background: #f8fbfd; }
+        .yl_tab[aria-selected="true"] {
+            position: relative;
+            margin-bottom: -1px;
+            border: 1px solid #cbd9e4;
+            border-bottom-color: #fff;
+            color: #07508b;
+            background: #fff;
+            font-weight: 700;
+        }
+        .yl_table-wrap { padding: 3px 11px 8px; }
+        .yl_table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+        .yl_table th { height: 34px; color: #555; font-size: 12px; font-weight: 700; text-align: left; }
+        .yl_table td {
+            height: 29px;
+            border-top: 1px dotted #d9e0e5;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .yl_table th:first-child, .yl_table td:first-child { width: 24%; }
+        .yl_table th:nth-child(2), .yl_table td:nth-child(2) { width: 45%; }
+        .yl_table th:last-child, .yl_table td:last-child { width: 31%; text-align: right; }
+        .yl_vehicle { display: inline-block; max-width: 100%; color: #15598d; text-decoration: none; }
+        .yl_vehicle:hover { color: #e45b36; text-decoration: underline; }
+        .yl_price { color: #24608d; font-family: Arial, sans-serif; }
+        .yl_empty { padding: 22px 0; color: #7a858d; text-align: center !important; }
+        .yl_back { display: block; width: min(100%, 560px); margin: 12px auto; color: #32678e; font-size: 13px; text-decoration: none; }
+        .yl_back:hover { text-decoration: underline; }
+        .yl_status { min-height: 20px; margin-top: 4px; color: #71808a; font-size: 11px; text-align: right; }
+        @media (max-width: 360px) {
+            body { padding: 12px 8px; }
+            .yl_tab { min-width: 86px; font-size: 14px; }
+            .yl_table-wrap { padding-right: 8px; padding-left: 8px; }
+            .yl_table, .yl_table th { font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <a class="yl_back" href="index.html">← 返回首页</a>
+        <section class="yl_widget" aria-label="新车上市信息">
+            <div class="yl_tabs" role="tablist" aria-label="上市状态">
+                <button class="yl_tab" id="yl_tab-latest" type="button" role="tab" aria-selected="true" aria-controls="yl_panel" tabindex="0" data-list="latest">最新上市</button>
+                <button class="yl_tab" id="yl_tab-upcoming" type="button" role="tab" aria-selected="false" aria-controls="yl_panel" tabindex="-1" data-list="upcoming">即将上市</button>
+            </div>
+            <div class="yl_table-wrap" id="yl_panel" role="tabpanel" aria-labelledby="yl_tab-latest" tabindex="0">
+                <table class="yl_table">
+                    <thead>
+                        <tr>
+                            <th scope="col">上市时间</th>
+                            <th scope="col">品牌/车型</th>
+                            <th scope="col">售价（万元）</th>
+                        </tr>
+                    </thead>
+                    <tbody id="yl_car-list"></tbody>
+                </table>
+                <div class="yl_status" id="yl_status" aria-live="polite"></div>
+            </div>
+        </section>
+    </main>
+    <script>
+        var yl_carData = {
+            latest: [
+                { date: "12月13日", model: "沃尔沃S60L", price: "26.99–38.49" },
+                { date: "12月12日", model: "Jeep牧马人龙腾典藏", price: "47.99–59.99" },
+                { date: "12月10日", model: "一汽大众高尔夫7", price: "11.89–18.29" },
+                { date: "12月6日", model: "2014款吉思特", price: "419.0–666.0" },
+                { date: "12月5日", model: "起亚新款K5", price: "15.98–25.18" },
+                { date: "12月5日", model: "2014款奥德赛", price: "22.98–28.68" }
+            ],
+            upcoming: [
+                { date: "12月20日", model: "全新一代城市SUV", price: "预售 18.80起" },
+                { date: "12月22日", model: "星耀纯电轿车", price: "预售 15.99起" },
+                { date: "12月25日", model: "新款运动型轿车", price: "待公布" },
+                { date: "12月28日", model: "云途插电混动", price: "预售 22.50起" },
+                { date: "1月5日", model: "全新紧凑型SUV", price: "待公布" },
+                { date: "1月10日", model: "远行新能源旅行车", price: "预售 19.80起" }
+            ]
+        };
+        var yl_carList = document.getElementById("yl_car-list");
+        var yl_tabs = Array.prototype.slice.call(document.querySelectorAll(".yl_tab"));
+        var yl_panel = document.getElementById("yl_panel");
+        var yl_status = document.getElementById("yl_status");
+
+        function yl_renderList(yl_listName) {
+            var yl_cars = yl_carData[yl_listName];
+            yl_carList.textContent = "";
+            if (!yl_cars || yl_cars.length === 0) {
+                var yl_emptyRow = document.createElement("tr");
+                var yl_emptyCell = document.createElement("td");
+                yl_emptyCell.className = "yl_empty";
+                yl_emptyCell.colSpan = 3;
+                yl_emptyCell.textContent = "暂无上市信息";
+                yl_emptyRow.appendChild(yl_emptyCell);
+                yl_carList.appendChild(yl_emptyRow);
+                return;
+            }
+            yl_cars.forEach(function (yl_car) {
+                var yl_row = document.createElement("tr");
+                var yl_dateCell = document.createElement("td");
+                var yl_modelCell = document.createElement("td");
+                var yl_priceCell = document.createElement("td");
+                var yl_link = document.createElement("a");
+                yl_dateCell.textContent = yl_car.date;
+                yl_link.className = "yl_vehicle";
+                yl_link.href = "#";
+                yl_link.textContent = yl_car.model;
+                yl_link.addEventListener("click", function (yl_event) {
+                    yl_event.preventDefault();
+                    yl_status.textContent = "已选择车型：" + yl_car.model;
+                });
+                yl_modelCell.appendChild(yl_link);
+                yl_priceCell.className = "yl_price";
+                yl_priceCell.textContent = yl_car.price;
+                yl_row.appendChild(yl_dateCell);
+                yl_row.appendChild(yl_modelCell);
+                yl_row.appendChild(yl_priceCell);
+                yl_carList.appendChild(yl_row);
+            });
+        }
+
+        function yl_selectTab(yl_tab, yl_focus) {
+            yl_tabs.forEach(function (yl_item) {
+                var yl_isActive = yl_item === yl_tab;
+                yl_item.setAttribute("aria-selected", String(yl_isActive));
+                yl_item.tabIndex = yl_isActive ? 0 : -1;
+            });
+            yl_panel.setAttribute("aria-labelledby", yl_tab.id);
+            yl_status.textContent = "";
+            yl_renderList(yl_tab.dataset.list);
+            if (yl_focus) {
+                yl_tab.focus();
+            }
+        }
+
+        yl_tabs.forEach(function (yl_tab, yl_index) {
+            yl_tab.addEventListener("click", function () {
+                yl_selectTab(yl_tab, false);
+            });
+            yl_tab.addEventListener("keydown", function (yl_event) {
+                if (yl_event.key === "ArrowRight" || yl_event.key === "ArrowLeft") {
+                    yl_event.preventDefault();
+                    var yl_direction = yl_event.key === "ArrowRight" ? 1 : -1;
+                    var yl_nextIndex = (yl_index + yl_direction + yl_tabs.length) % yl_tabs.length;
+                    yl_selectTab(yl_tabs[yl_nextIndex], true);
+                } else if (yl_event.key === "Home" || yl_event.key === "End") {
+                    yl_event.preventDefault();
+                    yl_selectTab(yl_tabs[yl_event.key === "Home" ? 0 : yl_tabs.length - 1], true);
+                }
+            });
+        });
+
+        yl_renderList("latest");
+    </script>
+</body>
+</html>
