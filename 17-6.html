@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-11-02 | 使用模型：Copilot SDK（VS Code） | 功能名称：Promise 与 async 包饺子流程 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="使用 Promise 链和 async/await，通过 setTimeout 模拟买菜、和面、和馅、包饺子和吃饺子的异步流程。">
+    <title>17-6 Promise 与 async 包饺子</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --yl_ink: #172b3a;
+            --yl_muted: #647987;
+            --yl_paper: #f5f7f2;
+            --yl_teal: #087f78;
+            --yl_teal-dark: #075b59;
+            --yl_coral: #e87561;
+            --yl_yellow: #f4c95d;
+            --yl_line: #dce6df;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh; color: var(--yl_ink);
+            background:
+                radial-gradient(circle at 8% 8%, rgba(244, 201, 93, 0.22), transparent 25rem),
+                radial-gradient(circle at 95% 35%, rgba(8, 127, 120, 0.12), transparent 28rem),
+                var(--yl_paper);
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif; line-height: 1.65;
+        }
+        button { font: inherit; cursor: pointer; }
+        code, pre { font-family: "Consolas", "Courier New", monospace; }
+        .yl_shell { width: min(1120px, calc(100% - 36px)); margin: 0 auto; padding: 28px 0 52px; }
+        .yl_hero {
+            position: relative; overflow: hidden; padding: clamp(26px, 5vw, 48px);
+            border-radius: 24px; color: #fff;
+            background: linear-gradient(125deg, #123b49, #087f78 68%, #39a18a);
+            box-shadow: 0 20px 50px rgba(23, 43, 58, 0.17);
+        }
+        .yl_hero::after {
+            content: "await"; position: absolute; right: 3%; bottom: -48px;
+            color: rgba(255, 255, 255, 0.1); font: 900 clamp(100px, 19vw, 210px)/1 "Consolas", monospace;
+            transform: rotate(-8deg); pointer-events: none;
+        }
+        .yl_hero-content { position: relative; z-index: 1; max-width: 720px; }
+        .yl_kicker { color: var(--yl_yellow); font-size: 12px; font-weight: 800; letter-spacing: 0.2em; }
+        .yl_hero h1 { margin: 9px 0 8px; font-size: clamp(30px, 5vw, 48px); line-height: 1.2; }
+        .yl_hero p { margin: 0; color: rgba(255, 255, 255, 0.84); }
+        .yl_back { display: inline-flex; gap: 7px; margin-top: 20px; color: var(--yl_yellow); font-size: 14px; text-decoration: none; }
+        .yl_back:hover { text-decoration: underline; }
+        .yl_intro {
+            display: flex; align-items: flex-start; gap: 14px; margin: 22px 0;
+            padding: 16px 20px; border: 1px solid #e8dfbf; border-radius: 14px;
+            color: #66572f; background: #fff9e8;
+        }
+        .yl_intro-mark { flex: 0 0 auto; color: #bb8b1e; font-size: 21px; font-weight: 900; }
+        .yl_intro p { margin: 0; font-size: 14px; }
+        .yl_intro strong { color: #574411; }
+        .yl_panel {
+            overflow: hidden; border: 1px solid rgba(220, 230, 223, 0.95); border-radius: 18px;
+            background: rgba(255, 255, 255, 0.94); box-shadow: 0 8px 24px rgba(23, 43, 58, 0.06);
+        }
+        .yl_panel-head {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            padding: 17px 20px; border-bottom: 1px solid var(--yl_line);
+        }
+        .yl_panel-head h2 { margin: 0; font-size: 17px; }
+        .yl_badge { padding: 4px 10px; border-radius: 999px; color: var(--yl_teal-dark); background: #e3f3ed; font: 700 11px "Consolas", monospace; }
+        .yl_toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; padding: 17px 20px; }
+        .yl_button {
+            display: inline-flex; justify-content: center; align-items: center; gap: 8px;
+            min-height: 40px; padding: 9px 15px; border: 0; border-radius: 9px;
+            color: #fff; background: var(--yl_teal); font-size: 13px; font-weight: 800;
+            transition: background 160ms ease, transform 160ms ease;
+        }
+        .yl_button:hover:not(:disabled) { background: var(--yl_teal-dark); transform: translateY(-1px); }
+        .yl_button:focus-visible { outline: 3px solid rgba(8, 127, 120, 0.25); outline-offset: 3px; }
+        .yl_button:disabled { cursor: not-allowed; opacity: 0.5; }
+        .yl_button.yl_secondary { border: 1px solid var(--yl_line); color: var(--yl_ink); background: #fff; }
+        .yl_button.yl_secondary:hover:not(:disabled) { border-color: var(--yl_teal); color: var(--yl_teal-dark); background: #f4faf9; }
+        .yl_run-status { margin-left: auto; color: var(--yl_muted); font-size: 12px; }
+        .yl_run-status.yl_running { color: #9a6e12; }
+        .yl_run-status.yl_finished { color: #286d51; }
+        .yl_flow { padding: 8px 20px 22px; }
+        .yl_step {
+            position: relative; display: grid; grid-template-columns: 38px minmax(0, 1fr) auto;
+            align-items: center; gap: 12px; min-height: 70px; padding: 12px 15px;
+            border: 1px solid var(--yl_line); border-radius: 12px; background: #fff;
+            transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+        }
+        .yl_step + .yl_connector { position: relative; width: 2px; height: 24px; margin: 0 auto; background: #dce6df; }
+        .yl_step + .yl_connector::after { content: ""; position: absolute; bottom: -1px; left: -4px; width: 8px; height: 8px; border-right: 2px solid #91a6a4; border-bottom: 2px solid #91a6a4; transform: rotate(45deg); }
+        .yl_step.yl_active { border-color: #e5bf61; background: #fffaf0; box-shadow: 0 0 0 3px rgba(244, 201, 93, 0.13); }
+        .yl_step.yl_done { border-color: #b9ddc9; background: #f5fbf6; }
+        .yl_step.yl_skipped { opacity: 0.55; }
+        .yl_step-icon { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 11px; color: var(--yl_teal-dark); background: #e3f3ed; font-size: 18px; }
+        .yl_step.yl_active .yl_step-icon { color: #7a5a13; background: #fff0c7; }
+        .yl_step.yl_done .yl_step-icon { color: #286d51; background: #e5f4e9; }
+        .yl_step-copy { min-width: 0; }
+        .yl_step-copy h3 { margin: 0; font-size: 14px; }
+        .yl_step-copy p { margin: 2px 0 0; color: var(--yl_muted); font-size: 11px; }
+        .yl_step-time { color: var(--yl_muted); font: 700 11px "Consolas", monospace; white-space: nowrap; }
+        .yl_parallel { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .yl_parallel-label { margin: 0 0 9px; color: var(--yl_teal-dark); font-size: 11px; font-weight: 800; text-align: center; }
+        .yl_parallel .yl_step { grid-template-columns: 34px minmax(0, 1fr); min-height: 82px; padding: 11px; }
+        .yl_parallel .yl_step-icon { width: 32px; height: 32px; }
+        .yl_parallel .yl_step-time { grid-column: 2; margin-top: -6px; }
+        .yl_log-panel { margin-top: 18px; }
+        .yl_log { display: grid; gap: 0; max-height: 300px; margin: 0; padding: 4px 20px 18px; overflow: auto; list-style: none; }
+        .yl_log-item { display: grid; grid-template-columns: 62px 10px minmax(0, 1fr); align-items: start; gap: 9px; padding: 9px 0; border-bottom: 1px solid #edf1ed; font-size: 12px; }
+        .yl_log-time { color: var(--yl_muted); font: 11px "Consolas", monospace; }
+        .yl_log-dot { width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: #d6a53c; }
+        .yl_log-item.yl_log-done .yl_log-dot { background: #45a77c; }
+        .yl_log-item.yl_log-reset .yl_log-dot { background: #819298; }
+        .yl_log-text { overflow-wrap: anywhere; }
+        .yl_code-examples { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+        .yl_code-card { overflow: hidden; border: 1px solid var(--yl_line); border-radius: 14px; background: rgba(255,255,255,.9); }
+        .yl_code-card h3 { margin: 0; padding: 12px 15px; border-bottom: 1px solid var(--yl_line); font-size: 13px; }
+        .yl_code { min-height: 215px; margin: 0; padding: 14px; overflow: auto; color: #e5f3ed; background: #172b3a; font-size: 11px; line-height: 1.75; tab-size: 2; }
+        .yl_code-note { margin: 0; padding: 10px 14px; color: var(--yl_muted); font-size: 11px; }
+        .yl_footer { padding-top: 28px; color: var(--yl_muted); text-align: center; font-size: 12px; }
+        @media (max-width: 700px) {
+            .yl_step { grid-template-columns: 36px minmax(0,1fr); }
+            .yl_step-time { grid-column: 2; margin-top: -6px; }
+            .yl_code-examples { grid-template-columns: 1fr; }
+            .yl_code { min-height: 0; }
+        }
+        @media (max-width: 480px) {
+            .yl_shell { width: min(100% - 24px, 1120px); padding-top: 12px; }
+            .yl_hero { border-radius: 18px; }
+            .yl_panel-head { padding: 14px; }
+            .yl_toolbar { padding: 13px 14px; }
+            .yl_run-status { flex: 1 0 100%; margin-left: 0; }
+            .yl_flow { padding: 4px 12px 16px; }
+            .yl_step { gap: 9px; padding: 10px; }
+            .yl_parallel { grid-template-columns: 1fr; gap: 8px; }
+            .yl_parallel-label { margin-bottom: 6px; }
+            .yl_log { padding-right: 14px; padding-left: 14px; }
+            .yl_log-item { grid-template-columns: 50px 9px minmax(0,1fr); gap: 7px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <main class="yl_shell">
+        <header class="yl_hero">
+            <div class="yl_hero-content">
+                <span class="yl_kicker">17-6 / PROMISE &amp; ASYNC</span>
+                <h1>包一盘热腾腾的饺子</h1>
+                <p>买原料、准备食材、和面和和馅，再包饺子、吃饺子——用异步代码安排好每一步。</p>
+                <a class="yl_back" href="index.html">← 返回课堂实践首页</a>
+            </div>
+        </header>
+
+        <aside class="yl_intro">
+            <span class="yl_intro-mark" aria-hidden="true">🥟</span>
+            <p><strong>流程重点：</strong>买原料需要 6 秒，取好原料后，和面与和馅会同时进行。两项都完成之后才能包饺子，包好后才开始吃。可分别运行 Promise 链或 async/await，观察相同流程的不同写法。</p>
+        </aside>
+
+        <section class="yl_panel" aria-labelledby="yl_flow-title">
+            <div class="yl_panel-head">
+                <h2 id="yl_flow-title">饺子制作流程</h2>
+                <span class="yl_badge">ASYNC FLOW</span>
+            </div>
+            <div class="yl_toolbar">
+                <button class="yl_button" id="yl_run-promise" type="button">▶ Promise 链演示</button>
+                <button class="yl_button yl_secondary" id="yl_run-async" type="button">▶ async / await 演示</button>
+                <button class="yl_button yl_secondary" id="yl_reset" type="button" disabled>重新开始</button>
+                <span class="yl_run-status" id="yl_run-status" role="status" aria-live="polite">选择一种方式开始流程</span>
+            </div>
+
+            <div class="yl_flow">
+                <article class="yl_step" id="yl_step-buy" data-step="buy">
+                    <span class="yl_step-icon" aria-hidden="true">🛒</span>
+                    <div class="yl_step-copy"><h3>1. 买原料</h3><p>去市场买面粉、肉、蔬菜和调料。</p></div>
+                    <span class="yl_step-time">6 秒</span>
+                </article>
+                <div class="yl_connector" aria-hidden="true"></div>
+                <article class="yl_step" id="yl_step-collect" data-step="collect">
+                    <span class="yl_step-icon" aria-hidden="true">🧺</span>
+                    <div class="yl_step-copy"><h3>2. 取原料</h3><p>把买好的食材拿回厨房。</p></div>
+                    <span class="yl_step-time">1.5 秒</span>
+                </article>
+                <div class="yl_connector" aria-hidden="true"></div>
+                <div>
+                    <p class="yl_parallel-label">3. 原料备好后，同时开始这两项任务 · Promise.all()</p>
+                    <div class="yl_parallel">
+                        <article class="yl_step" id="yl_step-dough" data-step="dough">
+                            <span class="yl_step-icon" aria-hidden="true">🥣</span>
+                            <div class="yl_step-copy"><h3>和面</h3><p>把面粉和水揉成面团。</p></div>
+                            <span class="yl_step-time">3 秒</span>
+                        </article>
+                        <article class="yl_step" id="yl_step-filling" data-step="filling">
+                            <span class="yl_step-icon" aria-hidden="true">🥬</span>
+                            <div class="yl_step-copy"><h3>和馅</h3><p>把肉、菜和调料拌好。</p></div>
+                            <span class="yl_step-time">4 秒</span>
+                        </article>
+                    </div>
+                </div>
+                <div class="yl_connector" aria-hidden="true"></div>
+                <article class="yl_step" id="yl_step-wrap" data-step="wrap">
+                    <span class="yl_step-icon" aria-hidden="true">🥟</span>
+                    <div class="yl_step-copy"><h3>4. 包饺子</h3><p>面团和馅料都准备好后，开始包饺子。</p></div>
+                    <span class="yl_step-time">2.5 秒</span>
+                </article>
+                <div class="yl_connector" aria-hidden="true"></div>
+                <article class="yl_step" id="yl_step-eat" data-step="eat">
+                    <span class="yl_step-icon" aria-hidden="true">🍽️</span>
+                    <div class="yl_step-copy"><h3>5. 吃饺子</h3><p>饺子包好啦，趁热开动！</p></div>
+                    <span class="yl_step-time">1.5 秒</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="yl_panel yl_log-panel" aria-labelledby="yl_log-title">
+            <div class="yl_panel-head">
+                <h2 id="yl_log-title">实时流程记录</h2>
+                <span class="yl_badge" id="yl_elapsed">00:00</span>
+            </div>
+            <ol class="yl_log" id="yl_log" aria-live="polite">
+                <li class="yl_log-item yl_log-reset"><span class="yl_log-time">—</span><span class="yl_log-dot"></span><span class="yl_log-text">流程记录会显示在这里。</span></li>
+            </ol>
+        </section>
+
+        <section class="yl_code-examples" aria-label="两种异步写法示例">
+            <article class="yl_code-card">
+                <h3>Promise 链：then + Promise.all</h3>
+                <pre class="yl_code"><code>买原料()
+  .then(取原料)
+  .then(function () {
+    return Promise.all([
+      和面(),
+      和馅()
+    ]);
+  })
+  .then(包饺子)
+  .then(吃饺子);</code></pre>
+                <p class="yl_code-note">每个 then 等前一步完成；Promise.all 等并行任务全部完成。</p>
+            </article>
+            <article class="yl_code-card">
+                <h3>async / await：更接近顺序阅读</h3>
+                <pre class="yl_code"><code>async function 包饺子流程() {
+  await 买原料();
+  await 取原料();
+  await Promise.all([
+    和面(),
+    和馅()
+  ]);
+  await 包饺子();
+  await 吃饺子();
+}</code></pre>
+                <p class="yl_code-note">await 等待 Promise；并行任务仍要一起交给 Promise.all。</p>
+            </article>
+        </section>
+
+        <footer class="yl_footer">所有步骤均由 setTimeout 模拟；买原料 6 秒，和面与和馅并行。</footer>
+    </main>
+
+    <script>
+        var yl_stepDurations = {
+            buy: 6000,
+            collect: 1500,
+            dough: 3000,
+            filling: 4000,
+            wrap: 2500,
+            eat: 1500
+        };
+        var yl_stepLabels = {
+            buy: "去市场买原料",
+            collect: "取回买好的原料",
+            dough: "和面",
+            filling: "和馅",
+            wrap: "包饺子",
+            eat: "吃饺子"
+        };
+        var yl_runId = 0;
+        var yl_running = false;
+        var yl_runStartedAt = 0;
+        var yl_activeTimers = [];
+        var yl_clockId = null;
+        var yl_promiseButton = document.getElementById("yl_run-promise");
+        var yl_asyncButton = document.getElementById("yl_run-async");
+        var yl_resetButton = document.getElementById("yl_reset");
+        var yl_runStatus = document.getElementById("yl_run-status");
+        var yl_log = document.getElementById("yl_log");
+        var yl_elapsed = document.getElementById("yl_elapsed");
+
+        function yl_formatElapsed(yl_milliseconds) {
+            var yl_totalSeconds = Math.floor(yl_milliseconds / 1000);
+            var yl_minutes = String(Math.floor(yl_totalSeconds / 60)).padStart(2, "0");
+            var yl_seconds = String(yl_totalSeconds % 60).padStart(2, "0");
+            return yl_minutes + ":" + yl_seconds;
+        }
+
+        function yl_addLog(yl_message, yl_state) {
+            var yl_item = document.createElement("li");
+            var yl_time = document.createElement("span");
+            var yl_dot = document.createElement("span");
+            var yl_text = document.createElement("span");
+            yl_item.className = "yl_log-item" + (yl_state ? " yl_log-" + yl_state : "");
+            yl_time.className = "yl_log-time";
+            yl_time.textContent = yl_formatElapsed(Date.now() - yl_runStartedAt);
+            yl_dot.className = "yl_log-dot";
+            yl_text.className = "yl_log-text";
+            yl_text.textContent = yl_message;
+            yl_item.appendChild(yl_time);
+            yl_item.appendChild(yl_dot);
+            yl_item.appendChild(yl_text);
+            yl_log.appendChild(yl_item);
+            yl_log.scrollTop = yl_log.scrollHeight;
+        }
+
+        function yl_updateClock() {
+            yl_elapsed.textContent = yl_formatElapsed(Date.now() - yl_runStartedAt);
+        }
+
+        function yl_setStep(yl_name, yl_state) {
+            var yl_step = document.querySelector('[data-step="' + yl_name + '"]');
+            yl_step.classList.remove("yl_active", "yl_done", "yl_skipped");
+            if (yl_state) {
+                yl_step.classList.add("yl_" + yl_state);
+            }
+        }
+
+        function yl_wait(yl_name, yl_runToken) {
+            return new Promise(function (yl_resolve, yl_reject) {
+                if (yl_runToken !== yl_runId) {
+                    yl_reject(new Error("流程已重新开始"));
+                    return;
+                }
+
+                yl_setStep(yl_name, "active");
+                yl_addLog("开始：" + yl_stepLabels[yl_name] + "（约 " + (yl_stepDurations[yl_name] / 1000) + " 秒）", "");
+
+                var yl_timerEntry = { id: null, reject: yl_reject };
+                yl_timerEntry.id = setTimeout(function () {
+                    yl_activeTimers = yl_activeTimers.filter(function (yl_entry) {
+                        return yl_entry !== yl_timerEntry;
+                    });
+                    if (yl_runToken !== yl_runId) {
+                        yl_reject(new Error("流程已重新开始"));
+                        return;
+                    }
+                    yl_setStep(yl_name, "done");
+                    yl_addLog("完成：" + yl_stepLabels[yl_name], "done");
+                    yl_resolve(yl_name);
+                }, yl_stepDurations[yl_name]);
+                yl_activeTimers.push(yl_timerEntry);
+            });
+        }
+
+        function yl_finishRun(yl_runToken, yl_method) {
+            if (yl_runToken !== yl_runId) {
+                return;
+            }
+            yl_running = false;
+            clearInterval(yl_clockId);
+            yl_clockId = null;
+            yl_updateClock();
+            yl_promiseButton.disabled = false;
+            yl_asyncButton.disabled = false;
+            yl_resetButton.disabled = false;
+            yl_resetButton.textContent = "重新开始";
+            yl_runStatus.className = "yl_run-status yl_finished";
+            yl_runStatus.textContent = yl_method + " 流程完成";
+            yl_addLog("饺子做好也吃完啦！全部流程完成。", "done");
+        }
+
+        function yl_failRun(yl_error, yl_runToken) {
+            if (yl_runToken !== yl_runId || yl_error.message === "流程已重新开始") {
+                return;
+            }
+            yl_running = false;
+            clearInterval(yl_clockId);
+            yl_clockId = null;
+            yl_promiseButton.disabled = false;
+            yl_asyncButton.disabled = false;
+            yl_resetButton.disabled = false;
+            yl_resetButton.textContent = "重新开始";
+            yl_runStatus.className = "yl_run-status";
+            yl_runStatus.textContent = "流程中断";
+            yl_addLog("流程发生错误：" + yl_error.message, "reset");
+            console.error("包饺子异步流程失败：", yl_error);
+        }
+
+        function yl_runPromiseFlow(yl_runToken) {
+            yl_wait("buy", yl_runToken)
+                .then(function () {
+                    return yl_wait("collect", yl_runToken);
+                })
+                .then(function () {
+                    return Promise.all([
+                        yl_wait("dough", yl_runToken),
+                        yl_wait("filling", yl_runToken)
+                    ]);
+                })
+                .then(function () {
+                    return yl_wait("wrap", yl_runToken);
+                })
+                .then(function () {
+                    return yl_wait("eat", yl_runToken);
+                })
+                .then(function () {
+                    yl_finishRun(yl_runToken, "Promise");
+                })
+                .catch(function (yl_error) {
+                    yl_failRun(yl_error, yl_runToken);
+                });
+        }
+
+        async function yl_runAsyncFlow(yl_runToken) {
+            try {
+                await yl_wait("buy", yl_runToken);
+                await yl_wait("collect", yl_runToken);
+                await Promise.all([
+                    yl_wait("dough", yl_runToken),
+                    yl_wait("filling", yl_runToken)
+                ]);
+                await yl_wait("wrap", yl_runToken);
+                await yl_wait("eat", yl_runToken);
+                yl_finishRun(yl_runToken, "async / await");
+            } catch (yl_error) {
+                yl_failRun(yl_error, yl_runToken);
+            }
+        }
+
+        function yl_startRun(yl_method) {
+            if (yl_running) {
+                return;
+            }
+
+            yl_runId += 1;
+            yl_running = true;
+            yl_runStartedAt = Date.now();
+            yl_activeTimers = [];
+            document.querySelectorAll("[data-step]").forEach(function (yl_step) {
+                yl_step.classList.remove("yl_active", "yl_done", "yl_skipped");
+            });
+            yl_log.replaceChildren();
+            yl_elapsed.textContent = "00:00";
+            yl_promiseButton.disabled = true;
+            yl_asyncButton.disabled = true;
+            yl_resetButton.disabled = false;
+            yl_resetButton.textContent = "取消并重置";
+            yl_runStatus.className = "yl_run-status yl_running";
+            yl_runStatus.textContent = "正在运行 " + yl_method + " 流程";
+            yl_clockId = setInterval(yl_updateClock, 250);
+            yl_addLog("开始使用 " + yl_method + " 演示包饺子流程。", "");
+
+            if (yl_method === "Promise") {
+                yl_runPromiseFlow(yl_runId);
+            } else {
+                yl_runAsyncFlow(yl_runId);
+            }
+        }
+
+        function yl_resetRun() {
+            yl_runStartedAt = Date.now();
+            if (yl_running) {
+                yl_runId += 1;
+                yl_activeTimers.forEach(function (yl_entry) {
+                    clearTimeout(yl_entry.id);
+                    yl_entry.reject(new Error("流程已重新开始"));
+                });
+                yl_activeTimers = [];
+                clearInterval(yl_clockId);
+                yl_clockId = null;
+                yl_running = false;
+                yl_addLog("流程已重置，未完成的定时任务已取消。", "reset");
+            } else {
+                yl_log.replaceChildren();
+                yl_addLog("流程已重置，可以选择一种异步写法重新开始。", "reset");
+            }
+
+            document.querySelectorAll("[data-step]").forEach(function (yl_step) {
+                yl_step.classList.remove("yl_active", "yl_done", "yl_skipped");
+            });
+            yl_elapsed.textContent = "00:00";
+            yl_promiseButton.disabled = false;
+            yl_asyncButton.disabled = false;
+            yl_resetButton.disabled = true;
+            yl_resetButton.textContent = "重新开始";
+            yl_runStatus.className = "yl_run-status";
+            yl_runStatus.textContent = "选择一种方式开始流程";
+        }
+
+        yl_promiseButton.addEventListener("click", function () {
+            yl_startRun("Promise");
+        });
+        yl_asyncButton.addEventListener("click", function () {
+            yl_startRun("async / await");
+        });
+        yl_resetButton.addEventListener("click", yl_resetRun);
+    </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-11-02 | 使用模型：Copilot SDK（VS Code） | 功能名称：Fetch 商品列表 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="使用原生 fetch() 获取 DummyJSON 商品列表，并通过商品 ID 查看详情。">
+    <title>17-3 Fetch 商品列表</title>
+    <style>
+        :root { color-scheme: light; --yl_ink: #172b3a; --yl_muted: #647987; --yl_paper: #f5f7f2; --yl_teal: #087f78; --yl_teal-dark: #075b59; --yl_coral: #e87561; --yl_yellow: #f4c95d; --yl_line: #dce6df; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh; color: var(--yl_ink);
+            background: radial-gradient(circle at 8% 8%, rgba(244, 201, 93, 0.22), transparent 25rem), radial-gradient(circle at 95% 35%, rgba(8, 127, 120, 0.12), transparent 28rem), var(--yl_paper);
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif; line-height: 1.65;
+        }
+        button { font: inherit; cursor: pointer; }
+        code { font-family: "Consolas", "Courier New", monospace; }
+        .yl_shell { width: min(1120px, calc(100% - 36px)); margin: 0 auto; padding: 28px 0 52px; }
+        .yl_hero { position: relative; overflow: hidden; padding: clamp(26px, 5vw, 48px); border-radius: 24px; color: #fff; background: linear-gradient(125deg, #123b49, #087f78 68%, #39a18a); box-shadow: 0 20px 50px rgba(23, 43, 58, 0.17); }
+        .yl_hero::after { content: "GET"; position: absolute; right: 4%; bottom: -55px; color: rgba(255,255,255,.1); font: 900 clamp(120px,23vw,250px)/1 "Consolas",monospace; transform: rotate(-9deg); pointer-events: none; }
+        .yl_hero-content { position: relative; z-index: 1; max-width: 720px; }
+        .yl_kicker { color: var(--yl_yellow); font-size: 12px; font-weight: 800; letter-spacing: .2em; }
+        .yl_hero h1 { margin: 9px 0 8px; font-size: clamp(30px,5vw,48px); line-height: 1.2; }
+        .yl_hero p { margin: 0; color: rgba(255,255,255,.84); }
+        .yl_back { display: inline-flex; gap: 7px; margin-top: 20px; color: var(--yl_yellow); font-size: 14px; text-decoration: none; }
+        .yl_back:hover { text-decoration: underline; }
+        .yl_intro { display: flex; gap: 14px; margin: 22px 0; padding: 16px 20px; border: 1px solid #e8dfbf; border-radius: 14px; color: #66572f; background: #fff9e8; }
+        .yl_intro-mark { flex: 0 0 auto; color: #bb8b1e; font-size: 21px; font-weight: 900; }
+        .yl_intro p { margin: 0; font-size: 14px; }
+        .yl_intro strong { color: #574411; }
+        .yl_request { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 14px; margin-bottom: 18px; padding: 16px 18px; border: 1px solid var(--yl_line); border-radius: 14px; background: rgba(255,255,255,.92); box-shadow: 0 8px 24px rgba(23,43,58,.05); }
+        .yl_method { padding: 6px 10px; border-radius: 7px; color: #fff; background: var(--yl_teal); font: 800 12px "Consolas",monospace; }
+        .yl_endpoint { min-width: 0; }
+        .yl_endpoint-label { display: block; margin-bottom: 3px; color: var(--yl_muted); font-size: 11px; font-weight: 700; }
+        .yl_endpoint code { display: block; overflow-wrap: anywhere; color: var(--yl_teal-dark); font-size: 12px; }
+        .yl_button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; padding: 10px 15px; border: 0; border-radius: 9px; color: #fff; background: var(--yl_teal); font-size: 13px; font-weight: 800; transition: background 160ms ease, transform 160ms ease; }
+        .yl_button:hover:not(:disabled) { background: var(--yl_teal-dark); transform: translateY(-1px); }
+        .yl_button:focus-visible { outline: 3px solid rgba(8,127,120,.25); outline-offset: 3px; }
+        .yl_button:disabled { cursor: wait; opacity: .72; }
+        .yl_panel { overflow: hidden; border: 1px solid rgba(220,230,223,.95); border-radius: 18px; background: rgba(255,255,255,.94); box-shadow: 0 8px 24px rgba(23,43,58,.06); }
+        .yl_panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 20px; border-bottom: 1px solid var(--yl_line); }
+        .yl_panel-head h2 { margin: 0; font-size: 17px; }
+        .yl_count { padding: 4px 10px; border-radius: 999px; color: var(--yl_teal-dark); background: #e3f3ed; font: 700 11px "Consolas",monospace; }
+        .yl_status { display: flex; align-items: center; gap: 9px; min-height: 54px; margin: 0; padding: 13px 20px; border-bottom: 1px solid #edf1ed; color: var(--yl_muted); font-size: 13px; }
+        .yl_status::before { content: ""; flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: #9aa8ad; }
+        .yl_status.yl_loading::before { background: #d89e27; animation: yl_pulse 900ms ease-in-out infinite alternate; }
+        .yl_status.yl_success::before { background: #45a77c; }
+        .yl_status.yl_error { color: #a34a3b; background: #fff8f5; }
+        .yl_status.yl_error::before { background: #d95f4c; }
+        @keyframes yl_pulse { to { opacity: .35; transform: scale(.7); } }
+        .yl_products { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 13px; padding: 18px; }
+        .yl_product { display: flex; min-width: 0; flex-direction: column; overflow: hidden; border: 1px solid #edf1ed; border-radius: 13px; background: #fff; transition: border-color 160ms ease,box-shadow 160ms ease,transform 160ms ease; }
+        .yl_product:hover { transform: translateY(-2px); border-color: #b7d9d2; box-shadow: 0 8px 20px rgba(23,43,58,.07); }
+        .yl_product-image-wrap { display: grid; height: 160px; place-items: center; padding: 12px; background: #f7f9f6; }
+        .yl_product-image { width: 100%; height: 100%; object-fit: contain; }
+        .yl_product-info { display: flex; flex: 1; flex-direction: column; padding: 14px; }
+        .yl_product-top { display: flex; justify-content: space-between; gap: 7px; }
+        .yl_category { padding: 4px 8px; border-radius: 999px; color: var(--yl_teal-dark); background: #e3f3ed; font-size: 10px; font-weight: 800; }
+        .yl_rating { color: #9a6e12; font: 700 11px "Consolas",monospace; white-space: nowrap; }
+        .yl_product h3 { margin: 12px 0 6px; font-size: 14px; line-height: 1.45; }
+        .yl_product-description { display: -webkit-box; min-height: 58px; margin: 0; overflow: hidden; color: var(--yl_muted); font-size: 12px; line-height: 1.6; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+        .yl_product-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 14px; }
+        .yl_price { color: var(--yl_coral); font-size: 16px; font-weight: 900; }
+        .yl_detail-link { color: var(--yl_teal-dark); font-size: 11px; font-weight: 800; text-decoration: none; }
+        .yl_detail-link:hover { text-decoration: underline; }
+        .yl_error { grid-column: 1 / -1; margin: 0; padding: 24px 12px; color: #a34a3b; text-align: center; font-size: 13px; }
+        .yl_note { margin: 15px 2px 0; color: var(--yl_muted); font-size: 12px; }
+        .yl_footer { padding-top: 28px; color: var(--yl_muted); text-align: center; font-size: 12px; }
+        @media (max-width: 900px) { .yl_products { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+        @media (max-width: 680px) { .yl_products { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+        @media (max-width: 600px) {
+            .yl_shell { width: min(100% - 24px,1120px); padding-top: 12px; }
+            .yl_hero { border-radius: 18px; }
+            .yl_request { grid-template-columns: auto minmax(0,1fr); gap: 10px; padding: 13px; }
+            .yl_request .yl_button { grid-column: 1 / -1; }
+            .yl_panel-head { padding: 14px; }
+            .yl_status { padding-right: 14px; padding-left: 14px; }
+            .yl_products { gap: 9px; padding: 12px; }
+            .yl_product-image-wrap { height: 130px; }
+            .yl_product-info { padding: 11px; }
+        }
+        @media (max-width: 380px) { .yl_products { grid-template-columns: 1fr; } }
+        @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+    </style>
+</head>
+<body>
+    <main class="yl_shell">
+        <header class="yl_hero">
+            <div class="yl_hero-content">
+                <span class="yl_kicker">17-3 / PRODUCT API</span>
+                <h1>商品列表</h1>
+                <p>用原生 fetch() 获取接口数据，点击商品查看对应 ID 的详细信息。</p>
+                <a class="yl_back" href="index.html">← 返回课堂实践首页</a>
+            </div>
+        </header>
+
+        <aside class="yl_intro">
+            <span class="yl_intro-mark" aria-hidden="true">↗</span>
+            <p><strong>列表接口：</strong>页面加载后请求 DummyJSON 的默认商品列表。每张商品卡片都链接到详情页，详情页会使用商品 ID 再请求单个商品数据。</p>
+        </aside>
+
+        <section class="yl_request" aria-label="商品列表请求">
+            <span class="yl_method">GET</span>
+            <div class="yl_endpoint">
+                <span class="yl_endpoint-label">商品列表接口</span>
+                <code id="yl_endpoint"></code>
+            </div>
+            <button class="yl_button" id="yl_reload" type="button">↻ 重新获取</button>
+        </section>
+
+        <section class="yl_panel" aria-labelledby="yl_list-title">
+            <div class="yl_panel-head">
+                <h2 id="yl_list-title">全部商品</h2>
+                <span class="yl_count" id="yl_count">等待请求</span>
+            </div>
+            <p class="yl_status" id="yl_status" role="status" aria-live="polite">正在获取商品列表……</p>
+            <div class="yl_products" id="yl_products" aria-live="polite"></div>
+        </section>
+
+        <p class="yl_note">商品数据与图片来自 DummyJSON。点击“查看详情”获取该商品的完整信息。</p>
+        <footer class="yl_footer">fetch() 请求列表接口，商品 ID 用于加载对应详情。</footer>
+    </main>
+
+    <script>
+        var yl_apiUrl = "https://dummyjson.com/products?limit=8";
+        var yl_reloadButton = document.getElementById("yl_reload");
+        var yl_status = document.getElementById("yl_status");
+        var yl_count = document.getElementById("yl_count");
+        var yl_products = document.getElementById("yl_products");
+
+        document.getElementById("yl_endpoint").textContent = yl_apiUrl;
+
+        function yl_setStatus(yl_message, yl_state) {
+            yl_status.className = "yl_status" + (yl_state ? " yl_" + yl_state : "");
+            yl_status.textContent = yl_message;
+        }
+
+        function yl_renderProducts(yl_items) {
+            yl_products.replaceChildren();
+            yl_items.forEach(function (yl_product) {
+                var yl_card = document.createElement("article");
+                var yl_imageWrap = document.createElement("div");
+                var yl_image = document.createElement("img");
+                var yl_info = document.createElement("div");
+                var yl_top = document.createElement("div");
+                var yl_rating = document.createElement("span");
+                var yl_bottom = document.createElement("div");
+                var yl_link = document.createElement("a");
+
+                yl_card.className = "yl_product";
+                yl_imageWrap.className = "yl_product-image-wrap";
+                yl_image.className = "yl_product-image";
+                yl_image.src = yl_product.thumbnail;
+                yl_image.alt = yl_product.title;
+                yl_image.loading = "lazy";
+                yl_image.addEventListener("error", function () {
+                    yl_image.removeAttribute("src");
+                    yl_image.classList.add("yl_image-missing");
+                    yl_image.alt = "商品图片暂不可用";
+                }, { once: true });
+                yl_imageWrap.appendChild(yl_image);
+
+                yl_info.className = "yl_product-info";
+                yl_top.className = "yl_product-top";
+                var yl_category = document.createElement("span");
+                yl_category.className = "yl_category";
+                yl_category.textContent = yl_product.category;
+                yl_rating.className = "yl_rating";
+                yl_rating.textContent = "★ " + Number(yl_product.rating).toFixed(1);
+                yl_top.appendChild(yl_category);
+                yl_top.appendChild(yl_rating);
+                yl_info.appendChild(yl_top);
+
+                var yl_title = document.createElement("h3");
+                yl_title.textContent = yl_product.title;
+                yl_info.appendChild(yl_title);
+                var yl_description = document.createElement("p");
+                yl_description.className = "yl_product-description";
+                yl_description.textContent = yl_product.description;
+                yl_info.appendChild(yl_description);
+
+                yl_bottom.className = "yl_product-bottom";
+                var yl_price = document.createElement("strong");
+                yl_price.className = "yl_price";
+                yl_price.textContent = "$" + Number(yl_product.price).toFixed(2);
+                yl_link.className = "yl_detail-link";
+                yl_link.href = "17-3-detail.html?id=" + encodeURIComponent(yl_product.id);
+                yl_link.textContent = "查看详情 →";
+                yl_bottom.appendChild(yl_price);
+                yl_bottom.appendChild(yl_link);
+                yl_info.appendChild(yl_bottom);
+
+                yl_card.appendChild(yl_imageWrap);
+                yl_card.appendChild(yl_info);
+                yl_products.appendChild(yl_card);
+            });
+        }
+
+        async function yl_loadProducts() {
+            yl_reloadButton.disabled = true;
+            yl_reloadButton.textContent = "正在获取…";
+            yl_count.textContent = "请求中";
+            yl_products.replaceChildren();
+            yl_setStatus("正在向 DummyJSON 发起 GET 请求……", "loading");
+
+            try {
+                var yl_response = await fetch(yl_apiUrl, {
+                    method: "GET",
+                    headers: { "Accept": "application/json" }
+                });
+                if (!yl_response.ok) {
+                    throw new Error("接口返回 HTTP " + yl_response.status + " " + yl_response.statusText);
+                }
+
+                var yl_data = await yl_response.json();
+                if (!yl_data || !Array.isArray(yl_data.products) || !yl_data.products.every(function (yl_product) {
+                    return yl_product &&
+                        Number.isInteger(yl_product.id) &&
+                        typeof yl_product.title === "string" &&
+                        typeof yl_product.description === "string" &&
+                        typeof yl_product.category === "string" &&
+                        typeof yl_product.thumbnail === "string" &&
+                        Number.isFinite(yl_product.price) &&
+                        Number.isFinite(yl_product.rating);
+                })) {
+                    throw new Error("接口响应格式不符合预期：商品列表字段缺失或类型错误。");
+                }
+
+                yl_renderProducts(yl_data.products);
+                yl_count.textContent = yl_data.products.length + " 件商品";
+                yl_setStatus("请求成功 · HTTP " + yl_response.status + " · 已获取 " + yl_data.products.length + " 件商品", "success");
+            } catch (yl_error) {
+                yl_count.textContent = "请求失败";
+                yl_setStatus("无法获取商品列表：" + yl_error.message, "error");
+                var yl_errorMessage = document.createElement("p");
+                yl_errorMessage.className = "yl_error";
+                yl_errorMessage.textContent = "请稍后重试；确认网络可以访问 dummyjson.com 后，点击“重新获取”。";
+                yl_products.appendChild(yl_errorMessage);
+                console.error("商品列表请求失败：", yl_error);
+            } finally {
+                yl_reloadButton.disabled = false;
+                yl_reloadButton.textContent = "↻ 重新获取";
+            }
+        }
+
+        yl_reloadButton.addEventListener("click", yl_loadProducts);
+        yl_loadProducts();
+    </script>
+</body>
+</html>

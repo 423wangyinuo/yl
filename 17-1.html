@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-11-02 | 使用模型：Copilot SDK（VS Code） | 功能名称：JSON 数据展示器 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="通过可切换格式的 JSON 示例，认识结构化数据的组织方式。">
+    <title>17-1 JSON 数据展示器</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --yl_ink: #172b3a;
+            --yl_muted: #647987;
+            --yl_paper: #f5f7f2;
+            --yl_teal: #087f78;
+            --yl_teal-dark: #075b59;
+            --yl_coral: #e87561;
+            --yl_yellow: #f4c95d;
+            --yl_line: #dce6df;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--yl_ink);
+            background:
+                radial-gradient(circle at 8% 8%, rgba(244, 201, 93, 0.22), transparent 25rem),
+                radial-gradient(circle at 95% 35%, rgba(8, 127, 120, 0.12), transparent 28rem),
+                var(--yl_paper);
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            line-height: 1.65;
+        }
+
+        button { font: inherit; cursor: pointer; }
+        code, pre { font-family: "Consolas", "Courier New", monospace; }
+
+        .yl_shell { width: min(1120px, calc(100% - 36px)); margin: 0 auto; padding: 28px 0 52px; }
+        .yl_hero {
+            position: relative; overflow: hidden; padding: clamp(26px, 5vw, 48px);
+            border-radius: 24px; color: #fff;
+            background: linear-gradient(125deg, #123b49, #087f78 68%, #39a18a);
+            box-shadow: 0 20px 50px rgba(23, 43, 58, 0.17);
+        }
+        .yl_hero::after {
+            content: "{ }"; position: absolute; right: 4%; bottom: -62px;
+            color: rgba(255, 255, 255, 0.1); font: 900 clamp(150px, 28vw, 310px)/1 "Consolas", monospace;
+            transform: rotate(-9deg); pointer-events: none;
+        }
+        .yl_hero-content { position: relative; z-index: 1; max-width: 720px; }
+        .yl_kicker { color: var(--yl_yellow); font-size: 12px; font-weight: 800; letter-spacing: 0.2em; }
+        .yl_hero h1 { margin: 9px 0 8px; font-size: clamp(30px, 5vw, 48px); line-height: 1.2; }
+        .yl_hero p { margin: 0; color: rgba(255, 255, 255, 0.84); }
+        .yl_back { display: inline-flex; align-items: center; gap: 7px; margin-top: 20px; color: var(--yl_yellow); font-size: 14px; text-decoration: none; }
+        .yl_back:hover { text-decoration: underline; }
+        .yl_intro {
+            display: flex; align-items: flex-start; gap: 14px; margin: 22px 0;
+            padding: 16px 20px; border: 1px solid #e8dfbf; border-radius: 14px;
+            color: #66572f; background: #fff9e8;
+        }
+        .yl_intro-mark { flex: 0 0 auto; color: #bb8b1e; font-size: 21px; font-weight: 900; }
+        .yl_intro p { margin: 0; font-size: 14px; }
+        .yl_intro strong { color: #574411; }
+        .yl_workspace { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr); gap: 18px; }
+        .yl_panel {
+            overflow: hidden; border: 1px solid rgba(220, 230, 223, 0.95); border-radius: 18px;
+            background: rgba(255, 255, 255, 0.94); box-shadow: 0 8px 24px rgba(23, 43, 58, 0.06);
+        }
+        .yl_panel-head {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            padding: 17px 20px; border-bottom: 1px solid var(--yl_line);
+        }
+        .yl_panel-head h2 { margin: 0; font-size: 17px; }
+        .yl_badge { padding: 4px 10px; border-radius: 999px; color: var(--yl_teal-dark); background: #e3f3ed; font: 700 11px "Consolas", monospace; }
+        .yl_toolbar { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px 18px 0; }
+        .yl_button {
+            padding: 7px 12px; border: 1px solid var(--yl_line); border-radius: 8px;
+            color: var(--yl_ink); background: #fff; font-size: 12px; font-weight: 700;
+            transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+        }
+        .yl_button:hover { border-color: var(--yl_teal); }
+        .yl_button:focus-visible { outline: 3px solid rgba(8, 127, 120, 0.25); outline-offset: 2px; }
+        .yl_button.yl_is-active { border-color: var(--yl_teal); color: #fff; background: var(--yl_teal); }
+        .yl_json {
+            min-height: 360px; max-height: 540px; margin: 14px 18px 8px; padding: 18px;
+            overflow: auto; border-radius: 12px; color: #e5f3ed; background: #172b3a;
+            font-size: 13px; line-height: 1.8; tab-size: 2;
+        }
+        .yl_status { min-height: 24px; margin: 0 18px 15px; color: var(--yl_muted); font-size: 12px; }
+        .yl_guide { padding: 18px 20px 20px; }
+        .yl_guide-intro { margin: 0 0 14px; color: var(--yl_muted); font-size: 13px; }
+        .yl_type-list { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+        .yl_type-row {
+            display: grid; grid-template-columns: 90px minmax(0, 1fr); align-items: center; gap: 10px;
+            padding: 10px 11px; border: 1px solid #edf1ed; border-radius: 10px; background: #fff;
+        }
+        .yl_type-name { color: var(--yl_teal-dark); font: 700 12px "Consolas", monospace; }
+        .yl_type-example { color: var(--yl_muted); font: 12px "Consolas", "Microsoft YaHei", monospace; overflow-wrap: anywhere; }
+        .yl_tip { margin-top: 14px; padding: 13px 14px; border-radius: 10px; color: #574411; background: #fff7df; font-size: 12px; }
+        .yl_tip code { color: #9c5e19; }
+        .yl_section { margin-top: 26px; }
+        .yl_section-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
+        .yl_section-heading h2 { margin: 0; font-size: 21px; }
+        .yl_section-heading p { margin: 0; color: var(--yl_muted); font-size: 13px; }
+        .yl_records { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+        .yl_record {
+            padding: 17px; border: 1px solid var(--yl_line); border-radius: 14px;
+            background: rgba(255, 255, 255, 0.9); box-shadow: 0 6px 18px rgba(23, 43, 58, 0.04);
+        }
+        .yl_record-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .yl_record-category { color: var(--yl_teal-dark); font-size: 11px; font-weight: 800; }
+        .yl_record-state { padding: 3px 8px; border-radius: 999px; color: #4a744c; background: #eaf5e7; font-size: 10px; }
+        .yl_record-state.yl_unavailable { color: #9a5142; background: #fff0e9; }
+        .yl_record h3 { margin: 12px 0 4px; font-size: 17px; }
+        .yl_record p { margin: 0; color: var(--yl_muted); font-size: 12px; }
+        .yl_record-price { display: block; margin-top: 14px; color: var(--yl_coral); font-size: 16px; font-weight: 800; }
+        .yl_footer { padding-top: 28px; color: var(--yl_muted); text-align: center; font-size: 12px; }
+
+        @media (max-width: 760px) {
+            .yl_workspace { grid-template-columns: 1fr; }
+            .yl_records { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .yl_section-heading { align-items: flex-start; flex-direction: column; }
+        }
+        @media (max-width: 480px) {
+            .yl_shell { width: min(100% - 24px, 1120px); padding-top: 12px; }
+            .yl_hero { border-radius: 18px; }
+            .yl_records { grid-template-columns: 1fr; }
+            .yl_panel-head { padding: 14px; }
+            .yl_json { min-height: 300px; margin-right: 12px; margin-left: 12px; padding: 13px; font-size: 11px; }
+            .yl_toolbar { padding-right: 12px; padding-left: 12px; }
+            .yl_status { margin-right: 12px; margin-left: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <main class="yl_shell">
+        <header class="yl_hero">
+            <div class="yl_hero-content">
+                <span class="yl_kicker">17-1 / DATA FORMAT</span>
+                <h1>JSON 数据展示器</h1>
+                <p>从一段可读的数据文本出发，看看 JSON 如何组织列表、对象与不同类型的值。</p>
+                <a class="yl_back" href="index.html">← 返回课堂实践首页</a>
+            </div>
+        </header>
+
+        <aside class="yl_intro">
+            <span class="yl_intro-mark" aria-hidden="true">{ }</span>
+            <p><strong>JSON</strong> 是一种轻量的数据交换格式。它用文本表达结构化数据，常用于保存配置或在网页与服务器之间传递信息；下面的示例可以切换为美化或紧凑格式。</p>
+        </aside>
+
+        <section class="yl_workspace" aria-label="JSON 示例与语法说明">
+            <article class="yl_panel">
+                <div class="yl_panel-head">
+                    <h2>示例数据</h2>
+                    <span class="yl_badge">application / json</span>
+                </div>
+                <div class="yl_toolbar" role="group" aria-label="JSON 格式">
+                    <button class="yl_button yl_is-active" id="yl_pretty-button" type="button" aria-pressed="true">美化格式</button>
+                    <button class="yl_button" id="yl_compact-button" type="button" aria-pressed="false">紧凑格式</button>
+                </div>
+                <pre class="yl_json" id="yl_json-view" tabindex="0" aria-label="JSON 数据内容"></pre>
+                <p class="yl_status" id="yl_json-status" aria-live="polite"></p>
+            </article>
+
+            <aside class="yl_panel">
+                <div class="yl_panel-head">
+                    <h2>JSON 值类型</h2>
+                    <span class="yl_badge">SYNTAX</span>
+                </div>
+                <div class="yl_guide">
+                    <p class="yl_guide-intro">JSON 的值可以是对象、数组或基本数据类型：</p>
+                    <ul class="yl_type-list">
+                        <li class="yl_type-row"><span class="yl_type-name">object</span><code class="yl_type-example">{ "name": "小林" }</code></li>
+                        <li class="yl_type-row"><span class="yl_type-name">array</span><code class="yl_type-example">["HTML", "CSS"]</code></li>
+                        <li class="yl_type-row"><span class="yl_type-name">string</span><code class="yl_type-example">"你好"</code></li>
+                        <li class="yl_type-row"><span class="yl_type-name">number</span><code class="yl_type-example">18.5</code></li>
+                        <li class="yl_type-row"><span class="yl_type-name">boolean</span><code class="yl_type-example">true / false</code></li>
+                        <li class="yl_type-row"><span class="yl_type-name">null</span><code class="yl_type-example">null</code></li>
+                    </ul>
+                    <div class="yl_tip">键名和字符串必须使用双引号；JSON 不支持注释，也不能直接写入 <code>undefined</code> 或函数。</div>
+                </div>
+            </aside>
+        </section>
+
+        <section class="yl_section" aria-labelledby="yl_records-title">
+            <div class="yl_section-heading">
+                <h2 id="yl_records-title">数据也可以这样阅读</h2>
+                <p>同一份 JSON 已解析成下方的图书卡片。</p>
+            </div>
+            <div class="yl_records" id="yl_records" aria-live="polite"></div>
+        </section>
+        <footer class="yl_footer">JSON 负责描述数据，不负责定义数据如何显示。</footer>
+    </main>
+
+    <script type="application/json" id="yl_json-source">
+[
+  {
+    "id": 101,
+    "title": "网页设计入门",
+    "category": "HTML",
+    "price": 28.5,
+    "available": true,
+    "description": "认识网页结构与常用标签。"
+  },
+  {
+    "id": 102,
+    "title": "CSS 视觉练习",
+    "category": "CSS",
+    "price": 36,
+    "available": true,
+    "description": "用样式、布局和颜色构建页面。"
+  },
+  {
+    "id": 103,
+    "title": "JavaScript 数组手册",
+    "category": "JavaScript",
+    "price": 42,
+    "available": false,
+    "description": "通过小例子练习数组操作。"
+  }
+]
+    </script>
+    <script>
+        var yl_jsonSource = document.getElementById("yl_json-source").textContent;
+        var yl_books = JSON.parse(yl_jsonSource);
+        var yl_jsonView = document.getElementById("yl_json-view");
+        var yl_jsonStatus = document.getElementById("yl_json-status");
+        var yl_prettyButton = document.getElementById("yl_pretty-button");
+        var yl_compactButton = document.getElementById("yl_compact-button");
+
+        function yl_showJson(yl_compact) {
+            yl_jsonView.textContent = JSON.stringify(yl_books, null, yl_compact ? 0 : 2);
+            yl_prettyButton.classList.toggle("yl_is-active", !yl_compact);
+            yl_compactButton.classList.toggle("yl_is-active", yl_compact);
+            yl_prettyButton.setAttribute("aria-pressed", String(!yl_compact));
+            yl_compactButton.setAttribute("aria-pressed", String(yl_compact));
+            yl_jsonStatus.textContent = yl_compact
+                ? "当前为紧凑格式 · " + yl_books.length + " 条记录"
+                : "当前为美化格式 · " + yl_books.length + " 条记录";
+        }
+
+        function yl_renderBooks() {
+            var yl_container = document.getElementById("yl_records");
+            yl_books.forEach(function (yl_book) {
+                var yl_card = document.createElement("article");
+                var yl_top = document.createElement("div");
+                var yl_category = document.createElement("span");
+                var yl_state = document.createElement("span");
+                var yl_title = document.createElement("h3");
+                var yl_description = document.createElement("p");
+                var yl_price = document.createElement("strong");
+
+                yl_card.className = "yl_record";
+                yl_top.className = "yl_record-top";
+                yl_category.className = "yl_record-category";
+                yl_category.textContent = yl_book.category + " · ID " + yl_book.id;
+                yl_state.className = "yl_record-state" + (yl_book.available ? "" : " yl_unavailable");
+                yl_state.textContent = yl_book.available ? "可借阅" : "暂不可借";
+                yl_title.textContent = yl_book.title;
+                yl_description.textContent = yl_book.description;
+                yl_price.className = "yl_record-price";
+                yl_price.textContent = "¥" + yl_book.price.toFixed(2);
+                yl_top.appendChild(yl_category);
+                yl_top.appendChild(yl_state);
+                yl_card.appendChild(yl_top);
+                yl_card.appendChild(yl_title);
+                yl_card.appendChild(yl_description);
+                yl_card.appendChild(yl_price);
+                yl_container.appendChild(yl_card);
+            });
+        }
+
+        yl_prettyButton.addEventListener("click", function () {
+            yl_showJson(false);
+        });
+        yl_compactButton.addEventListener("click", function () {
+            yl_showJson(true);
+        });
+
+        yl_showJson(false);
+        yl_renderBooks();
+    </script>
+</body>
+</html>

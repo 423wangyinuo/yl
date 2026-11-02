@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-11-02 | 使用模型：Copilot SDK（VS Code） | 功能名称：Fetch 商品详情 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="根据商品 ID 使用原生 fetch() 获取并展示 DummyJSON 商品详情。">
+    <title>17-3 商品详情</title>
+    <style>
+        :root { color-scheme: light; --yl_ink: #172b3a; --yl_muted: #647987; --yl_paper: #f5f7f2; --yl_teal: #087f78; --yl_teal-dark: #075b59; --yl_coral: #e87561; --yl_yellow: #f4c95d; --yl_line: #dce6df; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh; color: var(--yl_ink);
+            background: radial-gradient(circle at 8% 8%, rgba(244,201,93,.22), transparent 25rem), radial-gradient(circle at 95% 35%, rgba(8,127,120,.12), transparent 28rem), var(--yl_paper);
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif; line-height: 1.65;
+        }
+        button, input { font: inherit; }
+        button { cursor: pointer; }
+        code, pre { font-family: "Consolas", "Courier New", monospace; }
+        .yl_shell { width: min(1120px, calc(100% - 36px)); margin: 0 auto; padding: 28px 0 52px; }
+        .yl_hero { position: relative; overflow: hidden; padding: clamp(26px,5vw,48px); border-radius: 24px; color: #fff; background: linear-gradient(125deg,#123b49,#087f78 68%,#39a18a); box-shadow: 0 20px 50px rgba(23,43,58,.17); }
+        .yl_hero::after { content: "DETAIL"; position: absolute; right: 3%; bottom: -43px; color: rgba(255,255,255,.1); font: 900 clamp(80px,16vw,175px)/1 "Consolas",monospace; transform: rotate(-8deg); pointer-events: none; }
+        .yl_hero-content { position: relative; z-index: 1; max-width: 720px; }
+        .yl_kicker { color: var(--yl_yellow); font-size: 12px; font-weight: 800; letter-spacing: .2em; }
+        .yl_hero h1 { margin: 9px 0 8px; font-size: clamp(30px,5vw,48px); line-height: 1.2; }
+        .yl_hero p { margin: 0; color: rgba(255,255,255,.84); }
+        .yl_back { display: inline-flex; gap: 7px; margin-top: 20px; color: var(--yl_yellow); font-size: 14px; text-decoration: none; }
+        .yl_back:hover { text-decoration: underline; }
+        .yl_intro { display: flex; gap: 14px; margin: 22px 0; padding: 16px 20px; border: 1px solid #e8dfbf; border-radius: 14px; color: #66572f; background: #fff9e8; }
+        .yl_intro-mark { flex: 0 0 auto; color: #bb8b1e; font-size: 21px; font-weight: 900; }
+        .yl_intro p { margin: 0; font-size: 14px; }
+        .yl_intro strong { color: #574411; }
+        .yl_request { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 14px; margin-bottom: 18px; padding: 16px 18px; border: 1px solid var(--yl_line); border-radius: 14px; background: rgba(255,255,255,.92); box-shadow: 0 8px 24px rgba(23,43,58,.05); }
+        .yl_method { padding: 6px 10px; border-radius: 7px; color: #fff; background: var(--yl_teal); font: 800 12px "Consolas",monospace; }
+        .yl_endpoint { min-width: 0; }
+        .yl_endpoint-label { display: block; margin-bottom: 3px; color: var(--yl_muted); font-size: 11px; font-weight: 700; }
+        .yl_endpoint code { display: block; overflow-wrap: anywhere; color: var(--yl_teal-dark); font-size: 12px; }
+        .yl_form { display: flex; align-items: center; gap: 7px; }
+        .yl_id-input { width: 78px; padding: 8px 9px; border: 1px solid var(--yl_line); border-radius: 8px; color: var(--yl_ink); background: #fff; }
+        .yl_id-input:focus-visible { outline: 3px solid rgba(8,127,120,.2); outline-offset: 1px; border-color: var(--yl_teal); }
+        .yl_button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; padding: 10px 15px; border: 0; border-radius: 9px; color: #fff; background: var(--yl_teal); font-size: 13px; font-weight: 800; transition: background 160ms ease,transform 160ms ease; }
+        .yl_button:hover:not(:disabled) { background: var(--yl_teal-dark); transform: translateY(-1px); }
+        .yl_button:focus-visible { outline: 3px solid rgba(8,127,120,.25); outline-offset: 3px; }
+        .yl_button:disabled { cursor: wait; opacity: .72; }
+        .yl_panel { overflow: hidden; border: 1px solid rgba(220,230,223,.95); border-radius: 18px; background: rgba(255,255,255,.94); box-shadow: 0 8px 24px rgba(23,43,58,.06); }
+        .yl_panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 20px; border-bottom: 1px solid var(--yl_line); }
+        .yl_panel-head h2 { margin: 0; font-size: 17px; }
+        .yl_badge { padding: 4px 10px; border-radius: 999px; color: var(--yl_teal-dark); background: #e3f3ed; font: 700 11px "Consolas",monospace; }
+        .yl_status { display: flex; align-items: center; gap: 9px; min-height: 54px; margin: 0; padding: 13px 20px; border-bottom: 1px solid #edf1ed; color: var(--yl_muted); font-size: 13px; }
+        .yl_status::before { content: ""; flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: #9aa8ad; }
+        .yl_status.yl_loading::before { background: #d89e27; animation: yl_pulse 900ms ease-in-out infinite alternate; }
+        .yl_status.yl_success::before { background: #45a77c; }
+        .yl_status.yl_error { color: #a34a3b; background: #fff8f5; }
+        .yl_status.yl_error::before { background: #d95f4c; }
+        @keyframes yl_pulse { to { opacity: .35; transform: scale(.7); } }
+        .yl_detail { display: grid; grid-template-columns: minmax(0,1fr) minmax(280px,.95fr); gap: 24px; padding: 22px; }
+        .yl_gallery { min-width: 0; }
+        .yl_main-image-wrap { display: grid; min-height: 330px; overflow: hidden; place-items: center; border-radius: 14px; background: #f7f9f6; }
+        .yl_main-image { display: block; width: 100%; height: 390px; object-fit: contain; }
+        .yl_thumbnails { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; }
+        .yl_thumb-button { flex: 0 0 68px; width: 68px; height: 68px; padding: 4px; overflow: hidden; border: 1px solid var(--yl_line); border-radius: 9px; background: #fff; }
+        .yl_thumb-button.yl_selected { border: 2px solid var(--yl_teal); }
+        .yl_thumb-button img { width: 100%; height: 100%; object-fit: contain; }
+        .yl_product-info { min-width: 0; }
+        .yl_category { display: inline-block; padding: 4px 9px; border-radius: 999px; color: var(--yl_teal-dark); background: #e3f3ed; font-size: 11px; font-weight: 800; }
+        .yl_product-info h3 { margin: 10px 0 7px; font-size: clamp(22px,3vw,32px); line-height: 1.3; }
+        .yl_rating { color: #9a6e12; font-size: 13px; font-weight: 800; }
+        .yl_description { margin: 14px 0; color: var(--yl_muted); font-size: 14px; }
+        .yl_price-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin: 15px 0; }
+        .yl_price { color: var(--yl_coral); font-size: 28px; font-weight: 900; }
+        .yl_original-price { color: var(--yl_muted); font-size: 13px; text-decoration: line-through; }
+        .yl_discount { color: #a34a3b; font-size: 12px; font-weight: 800; }
+        .yl_facts { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; margin: 18px 0 0; }
+        .yl_fact { padding: 10px 11px; border: 1px solid #edf1ed; border-radius: 9px; }
+        .yl_fact dt { color: var(--yl_muted); font-size: 10px; }
+        .yl_fact dd { margin: 3px 0 0; font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
+        .yl_raw { margin: 0 22px 22px; border: 1px solid var(--yl_line); border-radius: 11px; }
+        .yl_raw[hidden] { display: none; }
+        .yl_raw summary { padding: 11px 13px; color: var(--yl_teal-dark); cursor: pointer; font-size: 12px; font-weight: 800; }
+        .yl_json { max-height: 380px; margin: 0; padding: 15px; overflow: auto; border-radius: 0 0 11px 11px; color: #e5f3ed; background: #172b3a; font-size: 11px; line-height: 1.7; }
+        .yl_error { margin: 0; padding: 28px 16px; color: #a34a3b; text-align: center; font-size: 13px; }
+        .yl_note { margin: 15px 2px 0; color: var(--yl_muted); font-size: 12px; }
+        .yl_footer { padding-top: 28px; color: var(--yl_muted); text-align: center; font-size: 12px; }
+        @media (max-width: 760px) { .yl_detail { grid-template-columns: 1fr; gap: 18px; } .yl_main-image { height: 320px; } }
+        @media (max-width: 600px) {
+            .yl_shell { width: min(100% - 24px,1120px); padding-top: 12px; }
+            .yl_hero { border-radius: 18px; }
+            .yl_request { grid-template-columns: auto minmax(0,1fr); gap: 10px; padding: 13px; }
+            .yl_form { grid-column: 1 / -1; justify-content: flex-end; }
+            .yl_panel-head { padding: 14px; }
+            .yl_status { padding-right: 14px; padding-left: 14px; }
+            .yl_detail { gap: 14px; padding: 14px; }
+            .yl_main-image-wrap { min-height: 240px; }
+            .yl_main-image { height: 280px; }
+            .yl_raw { margin-right: 14px; margin-left: 14px; }
+        }
+        @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+    </style>
+</head>
+<body>
+    <main class="yl_shell">
+        <header class="yl_hero">
+            <div class="yl_hero-content">
+                <span class="yl_kicker">17-3 / PRODUCT DETAIL</span>
+                <h1>商品详情</h1>
+                <p>从商品列表传入 ID，再通过接口获取这件商品的完整数据。</p>
+                <a class="yl_back" href="17-3.html">← 返回商品列表</a>
+            </div>
+        </header>
+
+        <aside class="yl_intro">
+            <span class="yl_intro-mark" aria-hidden="true">#</span>
+            <p><strong>按 ID 获取：</strong>详情页面读取地址栏中的 <code>?id=商品编号</code>，请求对应的单商品接口。也可以在右侧输入框修改 ID。</p>
+        </aside>
+
+        <section class="yl_request" aria-label="商品详情请求">
+            <span class="yl_method">GET</span>
+            <div class="yl_endpoint">
+                <span class="yl_endpoint-label">当前详情接口</span>
+                <code id="yl_endpoint"></code>
+            </div>
+            <form class="yl_form" id="yl_id-form">
+                <label class="yl_endpoint-label" for="yl_id-input">商品 ID</label>
+                <input class="yl_id-input" id="yl_id-input" name="id" type="number" min="1" step="1" value="1" required>
+                <button class="yl_button" id="yl_reload" type="submit">获取详情</button>
+            </form>
+        </section>
+
+        <section class="yl_panel" aria-labelledby="yl_detail-title">
+            <div class="yl_panel-head">
+                <h2 id="yl_detail-title">商品信息</h2>
+                <span class="yl_badge" id="yl_product-id">ID —</span>
+            </div>
+            <p class="yl_status" id="yl_status" role="status" aria-live="polite">正在获取商品详情……</p>
+            <div id="yl_detail-container"></div>
+            <details class="yl_raw" id="yl_raw-details" hidden>
+                <summary>查看接口返回的原始 JSON</summary>
+                <pre class="yl_json" id="yl_json"></pre>
+            </details>
+        </section>
+
+        <p class="yl_note">接口地址格式：<code>https://dummyjson.com/products/{id}</code></p>
+        <footer class="yl_footer">商品详情由 DummyJSON 提供，页面按 ID 使用 fetch() 单独请求。</footer>
+    </main>
+
+    <script>
+        var yl_apiBase = "https://dummyjson.com/products/";
+        var yl_form = document.getElementById("yl_id-form");
+        var yl_idInput = document.getElementById("yl_id-input");
+        var yl_reloadButton = document.getElementById("yl_reload");
+        var yl_status = document.getElementById("yl_status");
+        var yl_detailContainer = document.getElementById("yl_detail-container");
+        var yl_productIdBadge = document.getElementById("yl_product-id");
+        var yl_rawDetails = document.getElementById("yl_raw-details");
+        var yl_json = document.getElementById("yl_json");
+        var yl_productId = new URLSearchParams(window.location.search).get("id") || "1";
+
+        document.getElementById("yl_endpoint").textContent = yl_apiBase + yl_productId;
+        yl_idInput.value = yl_productId;
+
+        function yl_setStatus(yl_message, yl_state) {
+            yl_status.className = "yl_status" + (yl_state ? " yl_" + yl_state : "");
+            yl_status.textContent = yl_message;
+        }
+
+        function yl_appendText(yl_parent, yl_tagName, yl_className, yl_text) {
+            var yl_element = document.createElement(yl_tagName);
+            yl_element.className = yl_className;
+            yl_element.textContent = yl_text;
+            yl_parent.appendChild(yl_element);
+            return yl_element;
+        }
+
+        function yl_renderProduct(yl_product) {
+            yl_detailContainer.replaceChildren();
+            var yl_detail = document.createElement("div");
+            var yl_gallery = document.createElement("div");
+            var yl_mainImageWrap = document.createElement("div");
+            var yl_mainImage = document.createElement("img");
+            var yl_thumbnails = document.createElement("div");
+            var yl_info = document.createElement("div");
+
+            yl_detail.className = "yl_detail";
+            yl_gallery.className = "yl_gallery";
+            yl_mainImageWrap.className = "yl_main-image-wrap";
+            yl_mainImage.className = "yl_main-image";
+            yl_mainImage.src = yl_product.images[0] || yl_product.thumbnail;
+            yl_mainImage.alt = yl_product.title;
+            yl_mainImage.addEventListener("error", function () {
+                yl_mainImage.alt = "商品图片暂不可用";
+                yl_mainImage.removeAttribute("src");
+            }, { once: true });
+            yl_mainImageWrap.appendChild(yl_mainImage);
+            yl_gallery.appendChild(yl_mainImageWrap);
+
+            yl_thumbnails.className = "yl_thumbnails";
+            yl_product.images.forEach(function (yl_imageUrl, yl_index) {
+                var yl_thumbButton = document.createElement("button");
+                var yl_thumbImage = document.createElement("img");
+                yl_thumbButton.className = "yl_thumb-button" + (yl_index === 0 ? " yl_selected" : "");
+                yl_thumbButton.type = "button";
+                yl_thumbButton.setAttribute("aria-label", "查看商品图片 " + (yl_index + 1));
+                yl_thumbImage.src = yl_imageUrl;
+                yl_thumbImage.alt = "";
+                yl_thumbImage.loading = "lazy";
+                yl_thumbButton.appendChild(yl_thumbImage);
+                yl_thumbButton.addEventListener("click", function () {
+                    yl_mainImage.src = yl_imageUrl;
+                    yl_mainImage.alt = yl_product.title + "，图片 " + (yl_index + 1);
+                    yl_thumbnails.querySelectorAll(".yl_thumb-button").forEach(function (yl_button) {
+                        yl_button.classList.remove("yl_selected");
+                    });
+                    yl_thumbButton.classList.add("yl_selected");
+                });
+                yl_thumbnails.appendChild(yl_thumbButton);
+            });
+            yl_gallery.appendChild(yl_thumbnails);
+
+            yl_info.className = "yl_product-info";
+            yl_appendText(yl_info, "span", "yl_category", yl_product.category);
+            yl_appendText(yl_info, "h3", "", yl_product.title);
+            yl_appendText(yl_info, "div", "yl_rating", "★ " + Number(yl_product.rating).toFixed(1) + " / 5");
+            yl_appendText(yl_info, "p", "yl_description", yl_product.description);
+
+            var yl_priceRow = document.createElement("div");
+            yl_priceRow.className = "yl_price-row";
+            yl_appendText(yl_priceRow, "strong", "yl_price", "$" + Number(yl_product.price).toFixed(2));
+            yl_appendText(yl_priceRow, "span", "yl_original-price", "原价 $" + (yl_product.price / (1 - yl_product.discountPercentage / 100)).toFixed(2));
+            yl_appendText(yl_priceRow, "span", "yl_discount", "优惠 " + Number(yl_product.discountPercentage).toFixed(1) + "%");
+            yl_info.appendChild(yl_priceRow);
+
+            var yl_facts = document.createElement("dl");
+            yl_facts.className = "yl_facts";
+            [
+                ["品牌", yl_product.brand || "未提供"],
+                ["库存", String(yl_product.stock)],
+                ["SKU", yl_product.sku || "未提供"],
+                ["商品编号", String(yl_product.id)]
+            ].forEach(function (yl_fact) {
+                var yl_factContainer = document.createElement("div");
+                yl_factContainer.className = "yl_fact";
+                yl_appendText(yl_factContainer, "dt", "", yl_fact[0]);
+                yl_appendText(yl_factContainer, "dd", "", yl_fact[1]);
+                yl_facts.appendChild(yl_factContainer);
+            });
+            yl_info.appendChild(yl_facts);
+            yl_detail.appendChild(yl_gallery);
+            yl_detail.appendChild(yl_info);
+            yl_detailContainer.appendChild(yl_detail);
+        }
+
+        async function yl_loadProduct(yl_id) {
+            if (!/^[1-9]\d*$/.test(yl_id)) {
+                yl_productIdBadge.textContent = "ID 无效";
+                yl_setStatus("商品 ID 必须是大于 0 的整数。", "error");
+                yl_detailContainer.replaceChildren();
+                yl_rawDetails.hidden = true;
+                return;
+            }
+
+            yl_productId = yl_id;
+            yl_idInput.value = yl_productId;
+            var yl_requestUrl = yl_apiBase + encodeURIComponent(yl_productId);
+            document.getElementById("yl_endpoint").textContent = yl_requestUrl;
+            yl_productIdBadge.textContent = "ID " + yl_productId;
+            yl_reloadButton.disabled = true;
+            yl_reloadButton.textContent = "正在获取…";
+            yl_detailContainer.replaceChildren();
+            yl_rawDetails.hidden = true;
+            yl_setStatus("正在请求商品 ID " + yl_productId + " 的详情……", "loading");
+
+            try {
+                var yl_response = await fetch(yl_requestUrl, {
+                    method: "GET",
+                    headers: { "Accept": "application/json" }
+                });
+                if (!yl_response.ok) {
+                    throw new Error("接口返回 HTTP " + yl_response.status + " " + yl_response.statusText);
+                }
+
+                var yl_product = await yl_response.json();
+                if (!yl_product ||
+                    !Number.isInteger(yl_product.id) ||
+                    typeof yl_product.title !== "string" ||
+                    typeof yl_product.description !== "string" ||
+                    typeof yl_product.category !== "string" ||
+                    !Number.isFinite(yl_product.price) ||
+                    !Number.isFinite(yl_product.rating) ||
+                    !Array.isArray(yl_product.images)) {
+                    throw new Error("接口响应格式不符合预期：商品详情字段缺失或类型错误。");
+                }
+
+                yl_renderProduct(yl_product);
+                yl_json.textContent = JSON.stringify(yl_product, null, 2);
+                yl_rawDetails.hidden = false;
+                yl_productIdBadge.textContent = "ID " + yl_product.id;
+                yl_setStatus("请求成功 · HTTP " + yl_response.status + " · 商品 ID " + yl_product.id, "success");
+                var yl_url = new URL(window.location.href);
+                yl_url.searchParams.set("id", yl_product.id);
+                window.history.replaceState(null, "", yl_url);
+            } catch (yl_error) {
+                yl_productIdBadge.textContent = "请求失败";
+                yl_setStatus("无法获取商品详情：" + yl_error.message, "error");
+                yl_appendText(yl_detailContainer, "p", "yl_error", "请检查商品 ID 是否存在，以及网络是否可以访问 dummyjson.com。");
+                console.error("商品详情请求失败：", yl_error);
+            } finally {
+                yl_reloadButton.disabled = false;
+                yl_reloadButton.textContent = "获取详情";
+            }
+        }
+
+        yl_form.addEventListener("submit", function (yl_event) {
+            yl_event.preventDefault();
+            yl_loadProduct(yl_idInput.value.trim());
+        });
+
+        yl_loadProduct(yl_productId);
+    </script>
+</body>
+</html>

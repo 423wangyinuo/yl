@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-11-02 | 使用模型：Copilot SDK（VS Code） | 功能名称：Fetch 接口数据展示 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="使用原生 JavaScript fetch() 请求随机狗狗图片接口，并展示接口返回的数据。">
+    <title>17-2 Fetch 随机狗狗图片</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --yl_ink: #172b3a;
+            --yl_muted: #647987;
+            --yl_paper: #f5f7f2;
+            --yl_teal: #087f78;
+            --yl_teal-dark: #075b59;
+            --yl_coral: #e87561;
+            --yl_yellow: #f4c95d;
+            --yl_line: #dce6df;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--yl_ink);
+            background:
+                radial-gradient(circle at 8% 8%, rgba(244, 201, 93, 0.22), transparent 25rem),
+                radial-gradient(circle at 95% 35%, rgba(8, 127, 120, 0.12), transparent 28rem),
+                var(--yl_paper);
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            line-height: 1.65;
+        }
+
+        button { font: inherit; cursor: pointer; }
+        code, pre { font-family: "Consolas", "Courier New", monospace; }
+        .yl_shell { width: min(1120px, calc(100% - 36px)); margin: 0 auto; padding: 28px 0 52px; }
+        .yl_hero {
+            position: relative; overflow: hidden; padding: clamp(26px, 5vw, 48px);
+            border-radius: 24px; color: #fff;
+            background: linear-gradient(125deg, #123b49, #087f78 68%, #39a18a);
+            box-shadow: 0 20px 50px rgba(23, 43, 58, 0.17);
+        }
+        .yl_hero::after {
+            content: "fetch()"; position: absolute; right: 3%; bottom: -34px;
+            color: rgba(255, 255, 255, 0.1); font: 900 clamp(76px, 15vw, 170px)/1 "Consolas", monospace;
+            transform: rotate(-8deg); pointer-events: none;
+        }
+        .yl_hero-content { position: relative; z-index: 1; max-width: 720px; }
+        .yl_kicker { color: var(--yl_yellow); font-size: 12px; font-weight: 800; letter-spacing: 0.2em; }
+        .yl_hero h1 { margin: 9px 0 8px; font-size: clamp(30px, 5vw, 48px); line-height: 1.2; }
+        .yl_hero p { margin: 0; color: rgba(255, 255, 255, 0.84); }
+        .yl_back { display: inline-flex; align-items: center; gap: 7px; margin-top: 20px; color: var(--yl_yellow); font-size: 14px; text-decoration: none; }
+        .yl_back:hover { text-decoration: underline; }
+        .yl_intro {
+            display: flex; align-items: flex-start; gap: 14px; margin: 22px 0;
+            padding: 16px 20px; border: 1px solid #e8dfbf; border-radius: 14px;
+            color: #66572f; background: #fff9e8;
+        }
+        .yl_intro-mark { flex: 0 0 auto; color: #bb8b1e; font-size: 21px; font-weight: 900; }
+        .yl_intro p { margin: 0; font-size: 14px; }
+        .yl_intro strong { color: #574411; }
+        .yl_request {
+            display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center;
+            gap: 14px; margin-bottom: 18px; padding: 16px 18px;
+            border: 1px solid var(--yl_line); border-radius: 14px;
+            background: rgba(255, 255, 255, 0.92); box-shadow: 0 8px 24px rgba(23, 43, 58, 0.05);
+        }
+        .yl_method { padding: 6px 10px; border-radius: 7px; color: #fff; background: var(--yl_teal); font: 800 12px "Consolas", monospace; }
+        .yl_endpoint { min-width: 0; }
+        .yl_endpoint-label { display: block; margin-bottom: 3px; color: var(--yl_muted); font-size: 11px; font-weight: 700; }
+        .yl_endpoint code { display: block; overflow-wrap: anywhere; color: var(--yl_teal-dark); font-size: 12px; }
+        .yl_button {
+            display: inline-flex; justify-content: center; align-items: center; gap: 8px;
+            padding: 10px 15px; border: 0; border-radius: 9px;
+            color: #fff; background: var(--yl_teal); font-size: 13px; font-weight: 800;
+            transition: background 160ms ease, transform 160ms ease;
+        }
+        .yl_button:hover:not(:disabled) { background: var(--yl_teal-dark); transform: translateY(-1px); }
+        .yl_button:focus-visible { outline: 3px solid rgba(8, 127, 120, 0.25); outline-offset: 3px; }
+        .yl_button:disabled { cursor: wait; opacity: 0.72; }
+        .yl_panel {
+            overflow: hidden; border: 1px solid rgba(220, 230, 223, 0.95); border-radius: 18px;
+            background: rgba(255, 255, 255, 0.94); box-shadow: 0 8px 24px rgba(23, 43, 58, 0.06);
+        }
+        .yl_panel-head {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            padding: 17px 20px; border-bottom: 1px solid var(--yl_line);
+        }
+        .yl_panel-head h2 { margin: 0; font-size: 17px; }
+        .yl_count { padding: 4px 10px; border-radius: 999px; color: var(--yl_teal-dark); background: #e3f3ed; font: 700 11px "Consolas", monospace; }
+        .yl_status {
+            display: flex; align-items: center; gap: 9px; min-height: 54px;
+            margin: 0; padding: 13px 20px; border-bottom: 1px solid #edf1ed;
+            color: var(--yl_muted); font-size: 13px;
+        }
+        .yl_status::before { content: ""; flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: #9aa8ad; }
+        .yl_status.yl_loading::before { background: #d89e27; animation: yl_pulse 900ms ease-in-out infinite alternate; }
+        .yl_status.yl_success::before { background: #45a77c; }
+        .yl_status.yl_error { color: #a34a3b; background: #fff8f5; }
+        .yl_status.yl_error::before { background: #d95f4c; }
+        @keyframes yl_pulse { to { opacity: 0.35; transform: scale(0.7); } }
+        .yl_dog-stage { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(240px, 0.75fr); gap: 18px; padding: 18px; }
+        .yl_dog-stage[hidden] { display: none; }
+        .yl_dog-figure { display: grid; min-width: 0; min-height: 300px; margin: 0; overflow: hidden; place-items: center; border-radius: 14px; background: #eef4f0; }
+        .yl_dog-image { display: block; width: 100%; max-height: 540px; object-fit: contain; }
+        .yl_dog-details { align-self: center; padding: 20px; border: 1px solid #edf1ed; border-radius: 14px; background: #fff; }
+        .yl_dog-label { color: var(--yl_muted); font-size: 11px; font-weight: 700; }
+        .yl_dog-details h3 { margin: 5px 0 16px; color: var(--yl_teal-dark); font-size: clamp(20px, 3vw, 28px); text-transform: capitalize; }
+        .yl_dog-details p { margin: 0 0 7px; color: var(--yl_muted); font-size: 12px; }
+        .yl_dog-link { display: inline-block; margin-top: 12px; color: var(--yl_teal-dark); font-size: 12px; font-weight: 800; overflow-wrap: anywhere; }
+        .yl_image-error { margin: 0; padding: 20px; color: #a34a3b; text-align: center; font-size: 13px; }
+        .yl_raw { margin: 0 18px 18px; border: 1px solid var(--yl_line); border-radius: 11px; }
+        .yl_raw summary { padding: 11px 13px; color: var(--yl_teal-dark); cursor: pointer; font-size: 12px; font-weight: 800; }
+        .yl_json { max-height: 380px; margin: 0; padding: 15px; overflow: auto; border-radius: 0 0 11px 11px; color: #e5f3ed; background: #172b3a; font-size: 11px; line-height: 1.7; }
+        .yl_error-detail { grid-column: 1 / -1; margin: 0; padding: 16px; border-radius: 10px; color: #a34a3b; background: #fff8f5; font-size: 13px; overflow-wrap: anywhere; }
+        .yl_note { margin: 15px 2px 0; color: var(--yl_muted); font-size: 12px; }
+        .yl_footer { padding-top: 28px; color: var(--yl_muted); text-align: center; font-size: 12px; }
+
+        @media (max-width: 760px) { .yl_dog-stage { grid-template-columns: 1fr; } }
+        @media (max-width: 600px) {
+            .yl_shell { width: min(100% - 24px, 1120px); padding-top: 12px; }
+            .yl_hero { border-radius: 18px; }
+            .yl_request { grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 13px; }
+            .yl_request .yl_button { grid-column: 1 / -1; }
+            .yl_panel-head { padding: 14px; }
+            .yl_status { padding-right: 14px; padding-left: 14px; }
+            .yl_dog-stage { gap: 12px; padding: 12px; }
+            .yl_dog-figure { min-height: 220px; }
+            .yl_dog-details { padding: 15px; }
+            .yl_raw { margin-right: 12px; margin-left: 12px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <main class="yl_shell">
+        <header class="yl_hero">
+            <div class="yl_hero-content">
+                <span class="yl_kicker">17-2 / FETCH API</span>
+                <h1>把接口数据带进网页</h1>
+                <p>使用浏览器原生 fetch() 请求随机狗狗图片接口，让 JSON 响应变成一张真实图片。</p>
+                <a class="yl_back" href="index.html">← 返回课堂实践首页</a>
+            </div>
+        </header>
+
+        <aside class="yl_intro">
+            <span class="yl_intro-mark" aria-hidden="true">↗</span>
+            <p><strong>跨域请求：</strong>本页通过 <code>fetch()</code> 请求 Dog CEO 的公开随机图片接口。接口返回图片地址和请求状态；页面再把图片地址放入 <code>&lt;img&gt;</code> 中显示。请通过 HTTP(S) 打开页面以获得稳定的网络请求环境。</p>
+        </aside>
+
+        <section class="yl_request" aria-label="接口请求设置">
+            <span class="yl_method">GET</span>
+            <div class="yl_endpoint">
+                <span class="yl_endpoint-label">请求地址 · Dog CEO API</span>
+                <code id="yl_endpoint"></code>
+            </div>
+            <button class="yl_button" id="yl_reload" type="button">↻ 重新获取</button>
+        </section>
+
+        <section class="yl_panel" aria-labelledby="yl_results-title">
+            <div class="yl_panel-head">
+                <h2 id="yl_results-title">随机狗狗图片</h2>
+                <span class="yl_count" id="yl_count">等待请求</span>
+            </div>
+            <p class="yl_status" id="yl_status" role="status" aria-live="polite">正在获取随机狗狗图片……</p>
+            <div class="yl_dog-stage" id="yl_dog-stage" hidden></div>
+            <details class="yl_raw" id="yl_raw-details" hidden>
+                <summary>查看接口返回的原始 JSON</summary>
+                <pre class="yl_json" id="yl_json"></pre>
+            </details>
+        </section>
+
+        <p class="yl_note">提示：点击“重新获取”即可再次请求一张随机图片；若失败，请检查网络连接后重试。</p>
+        <footer class="yl_footer">fetch() 获取响应，JSON.parse 由 response.json() 完成，DOM 负责呈现数据。</footer>
+    </main>
+
+    <script>
+        var yl_apiUrl = "https://dog.ceo/api/breeds/image/random";
+        var yl_reloadButton = document.getElementById("yl_reload");
+        var yl_status = document.getElementById("yl_status");
+        var yl_count = document.getElementById("yl_count");
+        var yl_dogStage = document.getElementById("yl_dog-stage");
+        var yl_rawDetails = document.getElementById("yl_raw-details");
+        var yl_json = document.getElementById("yl_json");
+
+        document.getElementById("yl_endpoint").textContent = yl_apiUrl;
+
+        function yl_setStatus(yl_message, yl_state) {
+            yl_status.className = "yl_status" + (yl_state ? " yl_" + yl_state : "");
+            yl_status.textContent = yl_message;
+        }
+
+        function yl_appendText(yl_parent, yl_tagName, yl_className, yl_text) {
+            var yl_element = document.createElement(yl_tagName);
+            yl_element.className = yl_className;
+            yl_element.textContent = yl_text;
+            yl_parent.appendChild(yl_element);
+            return yl_element;
+        }
+
+        function yl_renderDog(yl_data) {
+            yl_dogStage.replaceChildren();
+            var yl_imageUrl = yl_data.message;
+            var yl_breedMatch = yl_imageUrl.match(/\/breeds\/([^/]+)\//);
+            var yl_breed = yl_breedMatch
+                ? yl_breedMatch[1].split("-").join(" ")
+                : "random dog";
+            var yl_figure = document.createElement("figure");
+            var yl_image = document.createElement("img");
+            var yl_details = document.createElement("div");
+            var yl_link = document.createElement("a");
+
+            yl_figure.className = "yl_dog-figure";
+            yl_image.className = "yl_dog-image";
+            yl_image.src = yl_imageUrl;
+            yl_image.alt = "随机获取的 " + yl_breed + " 狗狗图片";
+            yl_image.addEventListener("error", function () {
+                var yl_error = document.createElement("p");
+                yl_error.className = "yl_image-error";
+                yl_error.textContent = "图片加载失败，请点击“重新获取”再试一次。";
+                yl_figure.replaceChildren(yl_error);
+                yl_setStatus("接口请求成功，但图片加载失败。", "error");
+            });
+            yl_figure.appendChild(yl_image);
+
+            yl_details.className = "yl_dog-details";
+            yl_appendText(yl_details, "span", "yl_dog-label", "DOG CEO · RANDOM IMAGE");
+            yl_appendText(yl_details, "h3", "", yl_breed);
+            yl_appendText(yl_details, "p", "", "接口状态：" + yl_data.status);
+            yl_appendText(yl_details, "p", "", "图片由 Dog CEO API 随机提供。");
+            yl_link.className = "yl_dog-link";
+            yl_link.href = yl_imageUrl;
+            yl_link.target = "_blank";
+            yl_link.rel = "noopener noreferrer";
+            yl_link.textContent = "在新窗口查看原图 ↗";
+            yl_details.appendChild(yl_link);
+
+            yl_dogStage.appendChild(yl_figure);
+            yl_dogStage.appendChild(yl_details);
+            yl_dogStage.hidden = false;
+        }
+
+        async function yl_loadDog() {
+            yl_reloadButton.disabled = true;
+            yl_reloadButton.textContent = "正在获取…";
+            yl_count.textContent = "请求中";
+            yl_dogStage.hidden = true;
+            yl_dogStage.replaceChildren();
+            yl_rawDetails.hidden = true;
+            yl_setStatus("正在向 Dog CEO 发起 GET 请求……", "loading");
+
+            try {
+                var yl_response = await fetch(yl_apiUrl, {
+                    method: "GET",
+                    headers: { "Accept": "application/json" }
+                });
+
+                if (!yl_response.ok) {
+                    throw new Error("接口返回 HTTP " + yl_response.status + " " + yl_response.statusText);
+                }
+
+                var yl_data = await yl_response.json();
+                if (!yl_data || yl_data.status !== "success" || typeof yl_data.message !== "string") {
+                    throw new Error("接口响应格式不符合预期：需要 success 状态和图片地址。");
+                }
+                var yl_imageUrl;
+                try {
+                    yl_imageUrl = new URL(yl_data.message);
+                } catch (yl_urlError) {
+                    throw new Error("接口返回的图片地址不是有效 URL。");
+                }
+                if (yl_imageUrl.protocol !== "https:" || yl_imageUrl.hostname !== "images.dog.ceo") {
+                    throw new Error("接口返回了非预期的图片地址。");
+                }
+
+                yl_renderDog(yl_data);
+                yl_json.textContent = JSON.stringify(yl_data, null, 2);
+                yl_rawDetails.hidden = false;
+                yl_count.textContent = "1 张图片";
+                yl_setStatus("请求成功 · HTTP " + yl_response.status + " · 已获取随机狗狗图片", "success");
+            } catch (yl_error) {
+                yl_count.textContent = "请求失败";
+                yl_setStatus("无法获取接口数据：" + yl_error.message, "error");
+                yl_dogStage.replaceChildren();
+                yl_dogStage.hidden = false;
+                yl_appendText(yl_dogStage, "p", "yl_image-error", "请检查网络连接后重试；接口地址为 https://dog.ceo/api/breeds/image/random。");
+                console.error("随机狗狗图片请求失败：", yl_error);
+            } finally {
+                yl_reloadButton.disabled = false;
+                yl_reloadButton.textContent = "↻ 重新获取";
+            }
+        }
+
+        yl_reloadButton.addEventListener("click", yl_loadDog);
+        yl_loadDog();
+    </script>
+</body>
+</html>
