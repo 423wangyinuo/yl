@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 作者：王一诺 | 建立时间：2026-10-22 | 使用模型：Copilot | 功能名称：Three.js 智能客服三维数据图表 -->
+    <title>18-7 Three.js 智能客服数据分析</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            color: #17243b;
+            background: #f2f6fc;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            min-width: 320px;
+            margin: 0;
+            background:
+                radial-gradient(circle at 85% 0%, rgba(108, 153, 255, .16), transparent 28rem),
+                #f2f6fc;
+        }
+
+        .yl_page {
+            width: min(1200px, calc(100% - 36px));
+            margin: 0 auto;
+            padding: 46px 0 56px;
+        }
+
+        .yl_header { margin-bottom: 26px; }
+        .yl_eyebrow {
+            margin: 0 0 8px;
+            color: #5273b8;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .16em;
+        }
+        .yl_header h1 { margin: 0; font-size: clamp(26px, 4vw, 38px); }
+        .yl_intro { max-width: 760px; margin: 12px 0 0; color: #65728a; line-height: 1.8; }
+
+        .yl_chart_card {
+            margin-top: 22px;
+            overflow: hidden;
+            border: 1px solid #e3eaf5;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, .94);
+            box-shadow: 0 14px 40px rgba(34, 62, 108, .08);
+        }
+
+        .yl_card_header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 22px 24px 12px;
+        }
+
+        .yl_card_header h2 { margin: 0; font-size: 20px; }
+        .yl_card_header p { margin: 7px 0 0; color: #77839a; font-size: 13px; line-height: 1.6; }
+        .yl_reset {
+            flex: 0 0 auto;
+            border: 1px solid #dce5f3;
+            border-radius: 9px;
+            padding: 8px 12px;
+            color: #385789;
+            background: #f7f9fd;
+            font: inherit;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .yl_reset:hover { background: #edf3ff; }
+        .yl_reset:focus-visible { outline: 3px solid #9bb9f4; outline-offset: 2px; }
+
+        .yl_legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px 16px;
+            padding: 0 24px 8px;
+        }
+        .yl_legend_item { display: inline-flex; align-items: center; gap: 7px; color: #65728a; font-size: 12px; }
+        .yl_legend_dot { width: 9px; height: 9px; border-radius: 50%; }
+        .yl_axis_summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            padding: 2px 24px 10px;
+        }
+        .yl_axis_summary span {
+            border: 1px solid #e6ecf5;
+            border-radius: 999px;
+            padding: 4px 9px;
+            color: #68768e;
+            background: #f8faff;
+            font-size: 11px;
+        }
+
+        .yl_viewport {
+            position: relative;
+            height: 440px;
+            overflow: hidden;
+            cursor: grab;
+            touch-action: none;
+            background: linear-gradient(180deg, #fbfdff, #f8faff);
+        }
+        .yl_viewport.yl_dragging { cursor: grabbing; }
+        .yl_viewport canvas { display: block; width: 100%; height: 100%; }
+        .yl_tooltip {
+            position: absolute;
+            z-index: 2;
+            display: none;
+            max-width: 220px;
+            padding: 9px 11px;
+            border: 1px solid rgba(202, 215, 237, .9);
+            border-radius: 9px;
+            color: #273853;
+            background: rgba(255, 255, 255, .97);
+            box-shadow: 0 8px 24px rgba(33, 54, 91, .14);
+            font-size: 12px;
+            line-height: 1.65;
+            pointer-events: none;
+        }
+        .yl_hint { margin: 0; padding: 0 24px 18px; color: #8994a8; font-size: 12px; }
+        .yl_error { padding: 20px 24px; color: #a33a32; background: #fff3f1; }
+
+        @media (max-width: 640px) {
+            .yl_page { width: min(100% - 22px, 1200px); padding-top: 30px; }
+            .yl_card_header { padding: 18px 16px 10px; }
+            .yl_legend, .yl_axis_summary { padding-right: 16px; padding-left: 16px; }
+            .yl_hint { padding-right: 16px; padding-left: 16px; }
+            .yl_viewport { height: 360px; }
+            .yl_card_header h2 { font-size: 17px; }
+            .yl_card_header p { max-width: 290px; }
+        }
+    </style>
+    <script src="cdn/three/three.min.js"></script>
+</head>
+<body>
+    <main class="yl_page">
+        <header class="yl_header">
+            <p class="yl_eyebrow">CUSTOMER SERVICE · 3D ANALYTICS</p>
+            <h1>智能客服三维数据分析</h1>
+            <p class="yl_intro">通过 Three.js 将客服运营指标呈现在三维空间中。拖动图表旋转视角，滚动鼠标缩放，悬停数据图形查看详情。</p>
+        </header>
+
+        <section class="yl_chart_card" aria-labelledby="yl_volume_title">
+            <div class="yl_card_header">
+                <div>
+                    <h2 id="yl_volume_title">月度咨询量 · 3D 分组柱状图</h2>
+                    <p>比较不同咨询类别的月度接待量，纵轴为咨询数量。</p>
+                </div>
+                <button class="yl_reset" type="button" data-yl-reset="yl_volume_view">重置视角</button>
+            </div>
+            <div class="yl_legend" id="yl_volume_legend" aria-label="咨询类别图例"></div>
+            <div class="yl_axis_summary" aria-label="图表坐标说明">
+                <span>横轴 · 月份</span><span>纵轴 · 咨询量（人次）</span><span>纵深 · 咨询类别</span>
+            </div>
+            <div class="yl_viewport" id="yl_volume_view" role="img" aria-label="智能客服月度咨询量三维分组柱状图">
+                <div class="yl_tooltip"></div>
+            </div>
+            <p class="yl_hint">提示：拖动旋转 · 滚轮缩放 · 悬停柱体查看月份、类别及咨询量</p>
+        </section>
+
+        <section class="yl_chart_card" aria-labelledby="yl_quality_title">
+            <div class="yl_card_header">
+                <div>
+                    <h2 id="yl_quality_title">服务质量 · 3D 多指标趋势图</h2>
+                    <p>以响应时长、满意度和一次解决率展示各服务组的月度质量表现。</p>
+                </div>
+                <button class="yl_reset" type="button" data-yl-reset="yl_quality_view">重置视角</button>
+            </div>
+            <div class="yl_legend" id="yl_quality_legend" aria-label="服务组图例"></div>
+            <div class="yl_axis_summary" aria-label="图表坐标说明">
+                <span>横轴 · 平均响应时长（秒）</span><span>纵轴 · 满意度（分）</span><span>纵深 · 一次解决率（%）</span>
+            </div>
+            <div class="yl_viewport" id="yl_quality_view" role="img" aria-label="响应时长、满意度和一次解决率三维趋势图">
+                <div class="yl_tooltip"></div>
+            </div>
+            <p class="yl_hint">提示：横轴为平均响应秒数，纵轴为满意度评分，纵深为一次解决率；悬停球形数据点查看月份与指标。</p>
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            "use strict";
+
+            var yl_months = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
+            var yl_colors = [0x5478e8, 0x31a890, 0xf0a34a, 0x9a70d6, 0xe36f82];
+            var yl_categories = ["商品咨询", "订单物流", "售后退款", "账户服务", "促销活动"];
+            var yl_volume_values = [
+                [520, 548, 610, 585, 640, 690, 720, 745, 708, 780, 835, 910],
+                [390, 405, 428, 455, 482, 510, 530, 552, 565, 590, 625, 660],
+                [260, 275, 288, 320, 340, 365, 388, 410, 395, 438, 462, 490],
+                [180, 190, 202, 215, 230, 245, 255, 270, 282, 300, 322, 350],
+                [310, 298, 340, 372, 410, 438, 472, 495, 520, 565, 612, 700]
+            ];
+            var yl_service_groups = ["售前服务", "订单服务", "售后服务", "会员服务"];
+            var yl_service_colors = [0x5478e8, 0x31a890, 0xf0a34a, 0xe36f82];
+            var yl_services = [
+                { response: 24, satisfaction: 4.55, resolution: 78 },
+                { response: 31, satisfaction: 4.36, resolution: 72 },
+                { response: 39, satisfaction: 4.22, resolution: 67 },
+                { response: 28, satisfaction: 4.48, resolution: 81 }
+            ];
+
+            function yl_addLegend(yl_id, yl_names, yl_palette) {
+                var yl_container = document.getElementById(yl_id);
+                yl_names.forEach(function (yl_name, yl_index) {
+                    var yl_item = document.createElement("span");
+                    var yl_dot = document.createElement("span");
+                    yl_item.className = "yl_legend_item";
+                    yl_dot.className = "yl_legend_dot";
+                    yl_dot.style.backgroundColor = "#" + yl_palette[yl_index].toString(16).padStart(6, "0");
+                    yl_item.appendChild(yl_dot);
+                    yl_item.appendChild(document.createTextNode(yl_name));
+                    yl_container.appendChild(yl_item);
+                });
+            }
+
+            function yl_addLine(yl_scene, yl_points, yl_color, yl_opacity) {
+                var yl_geometry = new THREE.BufferGeometry().setFromPoints(yl_points);
+                var yl_material = new THREE.LineBasicMaterial({ color: yl_color, transparent: true, opacity: yl_opacity || 1 });
+                yl_scene.add(new THREE.Line(yl_geometry, yl_material));
+            }
+
+            function yl_addAxes(yl_scene, yl_config) {
+                var yl_xMin = -6;
+                var yl_xMax = 6;
+                var yl_zMin = -3;
+                var yl_zMax = 3;
+                var yl_yMax = yl_config.yMax;
+                var yl_gridColor = 0xdde5f1;
+                var yl_axisColor = 0x93a2b9;
+
+                for (var yl_i = 0; yl_i <= 6; yl_i += 1) {
+                    var yl_x = yl_xMin + yl_i * 2;
+                    yl_addLine(yl_scene, [new THREE.Vector3(yl_x, 0, yl_zMin), new THREE.Vector3(yl_x, 0, yl_zMax)], yl_gridColor, 0.8);
+                }
+                for (var yl_j = 0; yl_j <= 6; yl_j += 1) {
+                    var yl_z = yl_zMin + yl_j;
+                    yl_addLine(yl_scene, [new THREE.Vector3(yl_xMin, 0, yl_z), new THREE.Vector3(yl_xMax, 0, yl_z)], yl_gridColor, 0.8);
+                }
+                for (var yl_tick = 0; yl_tick <= yl_config.tickCount; yl_tick += 1) {
+                    var yl_y = yl_yMax * yl_tick / yl_config.tickCount;
+                    yl_addLine(yl_scene, [new THREE.Vector3(yl_xMin, yl_y, yl_zMin), new THREE.Vector3(yl_xMin, yl_y, yl_zMax)], yl_gridColor, 0.55);
+                }
+
+                yl_addLine(yl_scene, [new THREE.Vector3(yl_xMin, 0, yl_zMin), new THREE.Vector3(yl_xMax, 0, yl_zMin)], yl_axisColor, 1);
+                yl_addLine(yl_scene, [new THREE.Vector3(yl_xMin, 0, yl_zMin), new THREE.Vector3(yl_xMin, yl_yMax, yl_zMin)], yl_axisColor, 1);
+                yl_addLine(yl_scene, [new THREE.Vector3(yl_xMin, 0, yl_zMin), new THREE.Vector3(yl_xMin, 0, yl_zMax)], yl_axisColor, 1);
+
+            }
+
+            function yl_createChart(yl_viewId, yl_initial, yl_buildScene) {
+                var yl_view = document.getElementById(yl_viewId);
+                var yl_tooltip = yl_view.querySelector(".yl_tooltip");
+                var yl_scene = new THREE.Scene();
+                yl_scene.background = new THREE.Color(0xf9fbff);
+                var yl_camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+                var yl_renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+                var yl_raycaster = new THREE.Raycaster();
+                var yl_pointer = new THREE.Vector2();
+                var yl_interactive = [];
+                var yl_target = new THREE.Vector3(0, 1.8, 0);
+                var yl_distance = yl_initial.distance;
+                var yl_theta = yl_initial.theta;
+                var yl_phi = yl_initial.phi;
+                var yl_dragging = false;
+                var yl_lastX = 0;
+                var yl_lastY = 0;
+
+                yl_renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+                yl_renderer.outputColorSpace = THREE.SRGBColorSpace;
+                yl_renderer.toneMapping = THREE.NoToneMapping;
+                yl_renderer.domElement.setAttribute("aria-hidden", "true");
+                yl_view.insertBefore(yl_renderer.domElement, yl_tooltip);
+                yl_scene.add(new THREE.HemisphereLight(0xffffff, 0xdce5f2, 0.85));
+                var yl_keyLight = new THREE.DirectionalLight(0xffffff, 2.3);
+                yl_keyLight.position.set(-5, 10, 8);
+                yl_scene.add(yl_keyLight);
+                yl_keyLight.intensity = 1.35;
+                var yl_fillLight = new THREE.DirectionalLight(0xc8d8ff, 0.45);
+                yl_fillLight.position.set(8, 5, -6);
+                yl_scene.add(yl_fillLight);
+
+                function yl_updateCamera() {
+                    yl_phi = Math.max(0.2, Math.min(Math.PI / 2.05, yl_phi));
+                    yl_camera.position.set(
+                        yl_target.x + yl_distance * Math.sin(yl_phi) * Math.sin(yl_theta),
+                        yl_target.y + yl_distance * Math.cos(yl_phi),
+                        yl_target.z + yl_distance * Math.sin(yl_phi) * Math.cos(yl_theta)
+                    );
+                    yl_camera.lookAt(yl_target);
+                    yl_renderer.render(yl_scene, yl_camera);
+                }
+
+                function yl_resize() {
+                    var yl_width = yl_view.clientWidth;
+                    var yl_height = yl_view.clientHeight;
+                    if (!yl_width || !yl_height) return;
+                    yl_camera.aspect = yl_width / yl_height;
+                    yl_camera.zoom = Math.min(2.1, Math.max(1, yl_camera.aspect / 1.45));
+                    yl_camera.updateProjectionMatrix();
+                    yl_renderer.setSize(yl_width, yl_height, false);
+                    yl_updateCamera();
+                }
+
+                function yl_hideTooltip() {
+                    yl_tooltip.style.display = "none";
+                }
+
+                yl_buildScene(yl_scene, yl_interactive);
+                yl_updateCamera();
+                yl_resize();
+
+                yl_view.addEventListener("pointerdown", function (yl_event) {
+                    if (yl_event.button !== 0) return;
+                    yl_dragging = true;
+                    yl_lastX = yl_event.clientX;
+                    yl_lastY = yl_event.clientY;
+                    yl_view.classList.add("yl_dragging");
+                    yl_view.setPointerCapture(yl_event.pointerId);
+                    yl_hideTooltip();
+                });
+                yl_view.addEventListener("pointermove", function (yl_event) {
+                    if (yl_dragging) {
+                        yl_theta -= (yl_event.clientX - yl_lastX) * 0.008;
+                        yl_phi -= (yl_event.clientY - yl_lastY) * 0.008;
+                        yl_lastX = yl_event.clientX;
+                        yl_lastY = yl_event.clientY;
+                        yl_updateCamera();
+                        return;
+                    }
+                    var yl_rect = yl_renderer.domElement.getBoundingClientRect();
+                    yl_pointer.x = ((yl_event.clientX - yl_rect.left) / yl_rect.width) * 2 - 1;
+                    yl_pointer.y = -((yl_event.clientY - yl_rect.top) / yl_rect.height) * 2 + 1;
+                    yl_raycaster.setFromCamera(yl_pointer, yl_camera);
+                    var yl_hits = yl_raycaster.intersectObjects(yl_interactive, false);
+                    if (!yl_hits.length) {
+                        yl_hideTooltip();
+                        return;
+                    }
+                    var yl_hit = yl_hits[0];
+                    yl_tooltip.textContent = yl_hit.object.userData.yl_detail;
+                    yl_tooltip.style.display = "block";
+                    var yl_tooltipX = Math.min(yl_event.offsetX + 14, yl_view.clientWidth - 230);
+                    var yl_tooltipY = Math.max(8, yl_event.offsetY - 12);
+                    yl_tooltip.style.left = Math.max(8, yl_tooltipX) + "px";
+                    yl_tooltip.style.top = yl_tooltipY + "px";
+                });
+                function yl_endDrag(yl_event) {
+                    yl_dragging = false;
+                    yl_view.classList.remove("yl_dragging");
+                    if (yl_view.hasPointerCapture(yl_event.pointerId)) yl_view.releasePointerCapture(yl_event.pointerId);
+                }
+                yl_view.addEventListener("pointerup", yl_endDrag);
+                yl_view.addEventListener("pointercancel", yl_endDrag);
+                yl_view.addEventListener("pointerleave", yl_hideTooltip);
+                yl_view.addEventListener("wheel", function (yl_event) {
+                    yl_event.preventDefault();
+                    yl_distance = Math.max(10, Math.min(38, yl_distance * (yl_event.deltaY > 0 ? 1.08 : 0.92)));
+                    yl_updateCamera();
+                }, { passive: false });
+                document.querySelector('[data-yl-reset="' + yl_viewId + '"]').addEventListener("click", function () {
+                    yl_theta = yl_initial.theta;
+                    yl_phi = yl_initial.phi;
+                    yl_distance = yl_initial.distance;
+                    yl_updateCamera();
+                });
+                if (window.ResizeObserver) {
+                    var yl_observer = new ResizeObserver(yl_resize);
+                    yl_observer.observe(yl_view);
+                } else {
+                    window.addEventListener("resize", yl_resize);
+                }
+            }
+
+            function yl_buildVolumeScene(yl_scene, yl_interactive) {
+                yl_addAxes(yl_scene, {
+                    yMax: 6,
+                    tickCount: 5
+                });
+                yl_volume_values.forEach(function (yl_values, yl_categoryIndex) {
+                    yl_values.forEach(function (yl_value, yl_monthIndex) {
+                        var yl_height = yl_value / 1000 * 6;
+                        var yl_geometry = new THREE.BoxGeometry(0.58, yl_height, 0.58);
+                        var yl_material = new THREE.MeshStandardMaterial({
+                            color: yl_colors[yl_categoryIndex],
+                            roughness: 0.42,
+                            metalness: 0.03
+                        });
+                        var yl_bar = new THREE.Mesh(yl_geometry, yl_material);
+                        yl_bar.position.set(-5.5 + yl_monthIndex, yl_height / 2, -2 + yl_categoryIndex);
+                        yl_bar.userData.yl_detail = yl_months[yl_monthIndex] + " · " + yl_categories[yl_categoryIndex] + "：" + yl_value + " 人次";
+                        yl_scene.add(yl_bar);
+                        yl_interactive.push(yl_bar);
+                    });
+                });
+            }
+
+            function yl_buildQualityScene(yl_scene, yl_interactive) {
+                yl_addAxes(yl_scene, {
+                    yMax: 2,
+                    tickCount: 4
+                });
+
+                yl_services.forEach(function (yl_service, yl_serviceIndex) {
+                    var yl_positions = [];
+                    for (var yl_monthIndex = 0; yl_monthIndex < 12; yl_monthIndex += 1) {
+                        var yl_wave = Math.sin((yl_monthIndex + yl_serviceIndex * 1.8) * 0.72);
+                        var yl_response = Math.max(8, Math.min(57, yl_service.response + yl_wave * 5 + (yl_monthIndex % 3 - 1) * 1.4));
+                        var yl_satisfaction = Math.max(3.2, Math.min(4.95, yl_service.satisfaction + Math.cos((yl_monthIndex + yl_serviceIndex) * 0.62) * 0.17));
+                        var yl_resolution = Math.max(52, Math.min(98, yl_service.resolution + Math.sin((yl_monthIndex + yl_serviceIndex) * 0.48) * 8));
+                        yl_positions.push(new THREE.Vector3(
+                            -6 + yl_response / 60 * 12,
+                            yl_satisfaction - 3,
+                            -3 + (yl_resolution - 50) / 50 * 6
+                        ));
+                    }
+
+                    var yl_line = new THREE.Line(
+                        new THREE.BufferGeometry().setFromPoints(yl_positions),
+                        new THREE.LineBasicMaterial({ color: yl_service_colors[yl_serviceIndex], transparent: true, opacity: 0.72 })
+                    );
+                    yl_scene.add(yl_line);
+
+                    yl_positions.forEach(function (yl_position, yl_monthIndex) {
+                        var yl_wave = Math.sin((yl_monthIndex + yl_serviceIndex * 1.8) * 0.72);
+                        var yl_response = Math.max(8, Math.min(57, yl_service.response + yl_wave * 5 + (yl_monthIndex % 3 - 1) * 1.4));
+                        var yl_satisfaction = Math.max(3.2, Math.min(4.95, yl_service.satisfaction + Math.cos((yl_monthIndex + yl_serviceIndex) * 0.62) * 0.17));
+                        var yl_resolution = Math.max(52, Math.min(98, yl_service.resolution + Math.sin((yl_monthIndex + yl_serviceIndex) * 0.48) * 8));
+                        var yl_sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.115, 16, 12),
+                            new THREE.MeshStandardMaterial({ color: yl_service_colors[yl_serviceIndex], roughness: 0.3 })
+                        );
+                        yl_sphere.position.copy(yl_position);
+                        yl_sphere.userData.yl_detail =
+                            yl_service_groups[yl_serviceIndex] + " · " + yl_months[yl_monthIndex] +
+                            "：响应 " + yl_response.toFixed(1) + " 秒，满意度 " + yl_satisfaction.toFixed(2) +
+                            "，一次解决率 " + yl_resolution.toFixed(1) + "%";
+                        yl_scene.add(yl_sphere);
+                        yl_interactive.push(yl_sphere);
+                    });
+                });
+            }
+
+            yl_addLegend("yl_volume_legend", yl_categories, yl_colors);
+            yl_addLegend("yl_quality_legend", yl_service_groups, yl_service_colors);
+
+            if (!window.THREE || !window.WebGLRenderingContext) {
+                document.querySelectorAll(".yl_viewport").forEach(function (yl_view) {
+                    yl_view.innerHTML = '<div class="yl_error">当前浏览器不支持 WebGL，无法显示三维图表。</div>';
+                });
+                return;
+            }
+
+            try {
+                yl_createChart("yl_volume_view", { theta: 0.82, phi: 0.91, distance: 23 }, yl_buildVolumeScene);
+                yl_createChart("yl_quality_view", { theta: 0.82, phi: 0.91, distance: 22 }, yl_buildQualityScene);
+            } catch (yl_error) {
+                document.querySelectorAll(".yl_viewport").forEach(function (yl_view) {
+                    yl_view.innerHTML = '<div class="yl_error">三维图表初始化失败，请检查浏览器的 WebGL 支持。</div>';
+                });
+                console.error("Three.js chart initialization failed:", yl_error);
+            }
+        }());
+    </script>
+</body>
+</html>

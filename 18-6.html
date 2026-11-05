@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-11-05 | 使用模型：Copilot SDK（VS Code） | 功能名称：Mermaid 智能客服流程图与 ER 图 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="使用本地 Mermaid 绘制智能客服服务流程图与数据库 ER 图。">
+    <title>18-6 Mermaid 智能客服流程与 ER 图</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            --yl_ink: #19313e;
+            --yl_muted: #657b87;
+            --yl_line: #dce7e9;
+            --yl_teal: #087f78;
+        }
+        * { box-sizing: border-box; }
+        body {
+            min-height: 100vh; margin: 0; padding: 26px 18px 48px; color: var(--yl_ink);
+            background:
+                radial-gradient(circle at 8% 0, rgba(89,190,173,.16), transparent 30rem),
+                radial-gradient(circle at 95% 16%, rgba(103,140,202,.10), transparent 28rem),
+                #f4f7f7;
+        }
+        .yl_page { width: min(1200px, 100%); margin: 0 auto; }
+        .yl_back { color: #557181; font-size: 13px; text-decoration: none; }
+        .yl_back:hover { color: var(--yl_teal); }
+        .yl_heading { margin: 26px 0 20px; }
+        .yl_kicker { color: var(--yl_teal); font-size: 11px; font-weight: 800; letter-spacing: .2em; }
+        h1 { margin: 7px 0; font-size: clamp(26px, 4vw, 38px); }
+        .yl_heading p { max-width: 800px; margin: 0; color: var(--yl_muted); font-size: 14px; line-height: 1.8; }
+        .yl_cards { display: grid; gap: 20px; }
+        .yl_card {
+            overflow: hidden; border: 1px solid var(--yl_line); border-radius: 17px;
+            background: rgba(255,255,255,.95); box-shadow: 0 14px 38px rgba(34,66,78,.075);
+        }
+        .yl_card-head {
+            display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
+            gap: 10px 18px; padding: 18px 21px 14px;
+        }
+        .yl_card-head h2 { margin: 0; font-size: 16px; }
+        .yl_card-head p { margin: 4px 0 0; color: var(--yl_muted); font-size: 11px; line-height: 1.7; }
+        .yl_card-actions { display: flex; align-items: center; gap: 8px; }
+        .yl_badge {
+            padding: 4px 9px; border: 1px solid #d9eae5; border-radius: 999px;
+            color: #27736b; background: #f0f8f6; font-size: 10px; font-weight: 700;
+        }
+        .yl_button {
+            padding: 7px 10px; border: 1px solid #cfe0e0; border-radius: 8px; color: #155d5c;
+            background: #f3faf9; font: inherit; font-size: 11px; font-weight: 700; cursor: pointer;
+        }
+        .yl_button:hover { border-color: #79b8b2; background: #e8f6f3; }
+        .yl_button:focus-visible { outline: 3px solid rgba(8,127,120,.25); outline-offset: 2px; }
+        .yl_diagram-scroll { overflow: auto; overscroll-behavior-x: contain; border-top: 1px solid #edf1f2; }
+        .yl_diagram {
+            min-width: 980px; min-height: 250px; padding: 20px;
+            color: #19313e; text-align: center;
+        }
+        .yl_diagram svg { display: block; max-width: none; margin: 0 auto; }
+        .yl_diagram .node rect, .yl_diagram .node polygon, .yl_diagram .node circle {
+            filter: drop-shadow(0 2px 2px rgba(30,60,70,.06));
+        }
+        .yl_hint {
+            padding: 10px 18px; border-top: 1px solid #edf1f2; color: #788991;
+            font-size: 10px; line-height: 1.65;
+        }
+        .yl_status { min-height: 20px; margin: 14px 2px 0; color: #6d818b; font-size: 12px; }
+        .yl_status.yl_error { color: #a33a38; }
+        .yl_notes {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px;
+        }
+        .yl_note-card { padding: 14px; border: 1px solid #e0e9eb; border-radius: 12px; background: #fff; }
+        .yl_note-card h3 { margin: 0 0 6px; color: #28525b; font-size: 12px; }
+        .yl_note-card p { margin: 0; color: #6d818b; font-size: 10px; line-height: 1.75; }
+        @media (max-width: 620px) {
+            body { padding: 19px 12px 36px; }
+            .yl_heading { margin-top: 22px; }
+            .yl_card { border-radius: 13px; }
+            .yl_card-head { padding-right: 15px; padding-left: 15px; }
+            .yl_notes { grid-template-columns: 1fr; }
+            .yl_diagram { padding: 16px 10px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; }
+        }
+    </style>
+</head>
+<body>
+    <main class="yl_page">
+        <a class="yl_back" href="index.html">← 返回练习首页</a>
+        <header class="yl_heading">
+            <div class="yl_kicker">MERMAID · CUSTOMER SUPPORT SYSTEM</div>
+            <h1>智能客服系统设计图</h1>
+            <p>从用户提问、知识检索增强生成，到人工协同与数据治理；同时展示支撑会话、消息、知识库和检索追踪的数据实体关系。</p>
+        </header>
+
+        <div class="yl_cards">
+            <section class="yl_card" aria-labelledby="yl_flow-heading">
+                <div class="yl_card-head">
+                    <div>
+                        <h2 id="yl_flow-heading">智能客服服务流程</h2>
+                        <p>覆盖鉴权、安全检查、RAG 检索、答案校验、低置信转人工和反馈闭环。</p>
+                    </div>
+                    <div class="yl_card-actions">
+                        <span class="yl_badge">FLOWCHART</span>
+                        <button class="yl_button" type="button" data-download="yl_flow_diagram" data-filename="customer-service-flow.svg">下载 SVG</button>
+                    </div>
+                </div>
+                <div class="yl_diagram-scroll">
+                    <div class="yl_diagram yl_flow-diagram" id="yl_flow_diagram" role="img" aria-label="智能客服流程图">
+                        <pre class="yl_mermaid">
+flowchart TB
+    U["用户提问"] --> GW["渠道接入与身份鉴权"]
+    GW --> IN["输入安全检查"]
+    IN --> ORC["会话编排与意图识别"]
+    ORC -->|知识问答| Q["上下文补全与查询改写"]
+    ORC -->|人工服务| AG["创建人工协助工单"]
+    Q --> RET["混合检索与权限过滤"]
+    KB[("知识库索引")] --> RET
+    RET --> RR["证据去重与相关性重排"]
+    RR --> CONF{"证据充分且可信？"}
+    CONF -->|是| LLM["基于证据生成答复"]
+    CONF -->|否| ASK["请求补充信息或转人工"]
+    LLM --> CHECK["引用校验与输出安全"]
+    CHECK -->|通过| OUT["返回答案与知识来源"]
+    CHECK -->|未通过| AG
+    ASK -->|用户补充| Q
+    ASK -->|需要人工| AG
+    AG --> HUMAN["坐席查看上下文并处理"]
+    HUMAN --> OUT
+    OUT --> RATE["用户评价与问题反馈"]
+    RATE --> LOG["记录会话、检索与处理结果"]
+    LOG -.-> REVIEW["知识审核与效果评估"]
+    REVIEW -.-> KB
+    classDef user fill:#eaf3ff,stroke:#6f95ce,color:#203c60
+    classDef process fill:#eaf7f4,stroke:#5a9e91,color:#214a45
+    classDef model fill:#f1edfc,stroke:#9280c6,color:#403568
+    classDef decision fill:#fff6e8,stroke:#d2a153,color:#654912
+    classDef support fill:#fff1ec,stroke:#d78c72,color:#673a2c
+    classDef data fill:#eef2f4,stroke:#8799a2,color:#344750
+    class U,OUT user
+    class GW,IN,ORC,Q,RET,RR,CHECK,RATE,LOG process
+    class LLM model
+    class CONF decision
+    class AG,ASK,HUMAN,REVIEW support
+    class KB data
+                        </pre>
+                    </div>
+                </div>
+                <div class="yl_hint">实线表示在线请求与响应，虚线表示运营评估及知识更新回路。窄屏可横向滚动查看完整流程。</div>
+            </section>
+
+            <section class="yl_card" aria-labelledby="yl_er-heading">
+                <div class="yl_card-head">
+                    <div>
+                        <h2 id="yl_er-heading">智能客服数据模型 ER 图</h2>
+                        <p>展示用户、会话、消息、知识文档、检索记录、反馈和人工协助之间的主外键关系。</p>
+                    </div>
+                    <div class="yl_card-actions">
+                        <span class="yl_badge">ENTITY RELATIONSHIP</span>
+                        <button class="yl_button" type="button" data-download="yl_er_diagram" data-filename="customer-service-er.svg">下载 SVG</button>
+                    </div>
+                </div>
+                <div class="yl_diagram-scroll">
+                    <div class="yl_diagram yl_er-diagram" id="yl_er_diagram" role="img" aria-label="智能客服数据库实体关系图">
+                        <pre class="yl_mermaid">
+erDiagram
+    CUSTOMER ||--o{ CONVERSATION : starts
+    CONVERSATION ||--|{ MESSAGE : contains
+    MESSAGE ||--o{ RETRIEVAL_RECORD : triggers
+    KNOWLEDGE_DOCUMENT ||--|{ KNOWLEDGE_CHUNK : splits_into
+    KNOWLEDGE_CHUNK ||--o{ RETRIEVAL_RECORD : appears_in
+    CONVERSATION ||--o{ FEEDBACK : receives
+    MESSAGE o|--o{ FEEDBACK : evaluates
+    CONVERSATION ||--o{ HUMAN_HANDOFF : escalates
+    HUMAN_AGENT ||--o{ HUMAN_HANDOFF : handles
+
+    CUSTOMER {
+        string customer_id PK
+        string display_name
+        string contact_hash
+        datetime created_at
+    }
+    CONVERSATION {
+        string conversation_id PK
+        string customer_id FK
+        string channel
+        string status
+        datetime started_at
+        datetime ended_at
+    }
+    MESSAGE {
+        string message_id PK
+        string conversation_id FK
+        string sender_type
+        text content
+        string safety_status
+        datetime created_at
+    }
+    KNOWLEDGE_DOCUMENT {
+        string document_id PK
+        string title
+        string version
+        string access_scope
+        string review_status
+        datetime updated_at
+    }
+    KNOWLEDGE_CHUNK {
+        string chunk_id PK
+        string document_id FK
+        int chunk_index
+        text content
+        string embedding_ref
+        string metadata_json
+    }
+    RETRIEVAL_RECORD {
+        string retrieval_id PK
+        string message_id FK
+        string chunk_id FK
+        float relevance_score
+        int rank
+        string index_version
+        datetime retrieved_at
+    }
+    FEEDBACK {
+        string feedback_id PK
+        string conversation_id FK
+        string message_id FK
+        int rating
+        text comment
+        string review_status
+        datetime created_at
+    }
+    HUMAN_AGENT {
+        string agent_id PK
+        string team_name
+        string permission_scope
+        boolean active
+    }
+    HUMAN_HANDOFF {
+        string handoff_id PK
+        string conversation_id FK
+        string agent_id FK
+        string reason
+        string status
+        datetime assigned_at
+        datetime resolved_at
+    }
+                        </pre>
+                    </div>
+                </div>
+                <div class="yl_hint">PK 为主键，FK 为外键。知识片段保存原文定位及向量引用；检索记录保留相关度、排序和索引版本，便于追溯与评测。</div>
+            </section>
+        </div>
+
+        <section class="yl_notes" aria-label="设计说明">
+            <article class="yl_note-card">
+                <h3>可信回答</h3>
+                <p>检索结果需经过知识权限过滤；生成答案保留来源依据，证据不足时澄清、拒答或转人工。</p>
+            </article>
+            <article class="yl_note-card">
+                <h3>人工协同</h3>
+                <p>转人工时传递会话上下文和失败原因，坐席处理结果可进入复核队列，不直接未经审核写入知识库。</p>
+            </article>
+            <article class="yl_note-card">
+                <h3>数据治理</h3>
+                <p>联系信息采用脱敏或哈希保存；访问权限、保留期限和数据删除策略需按实际业务与隐私要求配置。</p>
+            </article>
+        </section>
+        <div class="yl_status" id="yl_render_status" role="status" aria-live="polite">流程图和 ER 图加载中…</div>
+    </main>
+    <script src="cdn/mermaid/mermaid.min.js"></script>
+    <script>
+        (function () {
+            var yl_status = document.getElementById("yl_render_status");
+            var yl_diagrams = Array.prototype.slice.call(document.querySelectorAll(".yl_mermaid"));
+            var yl_downloadButtons = Array.prototype.slice.call(document.querySelectorAll("[data-download]"));
+
+            function yl_showError(yl_message) {
+                yl_status.classList.add("yl_error");
+                yl_status.textContent = yl_message;
+            }
+
+            function yl_downloadSvg(yl_button) {
+                var yl_container = document.getElementById(yl_button.getAttribute("data-download"));
+                var yl_svg = yl_container.querySelector("svg");
+                var yl_clone;
+                var yl_blob;
+                var yl_url;
+                var yl_link;
+                if (!yl_svg) {
+                    yl_showError("图表尚未渲染完成，暂时无法下载 SVG。");
+                    return;
+                }
+                yl_clone = yl_svg.cloneNode(true);
+                yl_clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+                yl_clone.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+                yl_clone.setAttribute("role", "img");
+                yl_blob = new Blob([new XMLSerializer().serializeToString(yl_clone)], { type: "image/svg+xml;charset=utf-8" });
+                yl_url = URL.createObjectURL(yl_blob);
+                yl_link = document.createElement("a");
+                yl_link.href = yl_url;
+                yl_link.download = yl_button.getAttribute("data-filename");
+                document.body.appendChild(yl_link);
+                yl_link.click();
+                yl_link.remove();
+                yl_status.textContent = "已生成并下载 " + yl_link.download + "。";
+                window.setTimeout(function () { URL.revokeObjectURL(yl_url); }, 1000);
+            }
+
+            if (!window.mermaid) {
+                yl_showError("Mermaid 未能加载。请确认 cdn/mermaid/mermaid.min.js 文件存在。");
+                return;
+            }
+
+            window.mermaid.initialize({
+                startOnLoad: false,
+                securityLevel: "strict",
+                theme: "base",
+                flowchart: { useMaxWidth: true, htmlLabels: true, curve: "basis", nodeSpacing: 34, rankSpacing: 46 },
+                er: { useMaxWidth: true, entityPadding: 16 },
+                themeVariables: {
+                    fontFamily: "'Microsoft YaHei', 'PingFang SC', sans-serif",
+                    fontSize: "15px",
+                    primaryColor: "#eaf7f4",
+                    primaryTextColor: "#19313e",
+                    primaryBorderColor: "#5a9e91",
+                    lineColor: "#879ba3",
+                    secondaryColor: "#f1edfc",
+                    tertiaryColor: "#fff6e8",
+                    background: "#ffffff"
+                }
+            });
+
+            window.mermaid.run({ nodes: yl_diagrams }).then(function () {
+                yl_diagrams.forEach(function (yl_diagram) {
+                    var yl_svg = yl_diagram.querySelector("svg");
+                    var yl_viewBox = yl_svg && yl_svg.viewBox.baseVal;
+                    if (yl_viewBox && yl_viewBox.width && yl_viewBox.height) {
+                        yl_svg.style.width = Math.ceil(yl_viewBox.width) + "px";
+                        yl_svg.style.height = Math.ceil(yl_viewBox.height) + "px";
+                    }
+                });
+                yl_downloadButtons.forEach(function (yl_button) {
+                    yl_button.addEventListener("click", function () { yl_downloadSvg(yl_button); });
+                });
+                yl_status.textContent = "流程图和 ER 图已加载。可横向滚动查看并下载 SVG。";
+            }).catch(function (yl_error) {
+                yl_showError("Mermaid 图表渲染失败：" + yl_error.message);
+                throw yl_error;
+            });
+        }());
+    </script>
+</body>
+</html>

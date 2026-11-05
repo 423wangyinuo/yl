@@ -415,6 +415,38 @@
 
 ---
 
+## 2026-11-05（第三十次实践）
+
+**实践：** 完成18-1.html的Canvas文字动画与18-2.html的电商系统架构图
+
+**使用的模型：** Copilot SDK（VS Code）
+
+**提示词内容：**
+> 完成18-1.html和18-2.html,第一个显示canvas动画，包括文字王一诺，第二个显示基于canvas的全站系统的系统架构图（电商系统）
+
+**执行总结：**
+- 完成 `18-1.html` Canvas 粒子文字动画，显示“王一诺”，支持暂停、继续、重新播放和高清屏幕适配。
+- 完成 `18-2.html` Canvas 电商系统架构图，展示客户端、接入层、业务服务、数据平台和外部系统，并支持模块职责查看和数据流暂停。
+- 首页新增两个练习入口；浏览器验证页面绘制、动画控制、架构节点选择及重置交互正常。
+
+---
+
+## 2026-11-05（第三十一次实践）
+
+**实践：** 完成18-3.html，以SVG展示知识库智能客服系统科研架构图
+
+**使用的模型：** Copilot SDK（VS Code）
+
+**提示词内容：**
+> 完成18-3.html，其中包括基于知识库智能客服的系统的系统架构图，图的格式为svg，科研方向。
+
+**执行总结：**
+- 完成 `18-3.html`：使用原生 SVG 绘制知识库智能客服科研架构，覆盖离线知识工程、在线 RAG 工作流、权限与安全、人工反馈及质量评测闭环。
+- 图中模块支持鼠标和键盘选择并显示说明；加入窄屏横向浏览提示、科研评价维度和架构概览。
+- 首页新增第 36 个练习入口；浏览器验证 SVG 渲染、节点键盘交互、重置操作和 JavaScript 语法通过。
+
+---
+
 ## 2026-11-02（第二十三次实践）
 
 **实践：** 完成 `17-1.html`，展示 JSON 数据
@@ -442,6 +474,10 @@
 
 **执行总结：**
 - 完成 `17-2.html`：使用原生 `fetch()` 请求 DummyJSON 商品接口，展示商品卡片和原始 JSON，并提供重新获取、加载、错误及成功状态。
+
+---
+
+
 - 首页新增第 29 个练习入口。
 - 已确认接口返回 HTTP 200、允许 `Origin: null` 跨域读取；浏览器实际显示 8 条商品，重新获取交互正常。
 
@@ -534,3 +570,251 @@
 
 **推送结果：**
 - 当前练习改动已提交并推送到 GitHub `master`，提交：`52964b3`。
+
+---
+
+## 2026-11-05（第三十一次实践·追加记录）
+
+**实践：** 完成18-3.html，以SVG展示知识库智能客服系统科研架构图
+
+**使用的模型：** Copilot SDK（VS Code）
+
+**提示词内容：**
+> 完成18-3.html，其中包括基于知识库智能客服的系统的系统架构图，图的格式为svg，科研方向。
+
+**执行总结：**
+- 完成 `18-3.html`：使用原生 SVG 绘制知识库智能客服科研架构，覆盖离线知识工程、在线 RAG 工作流、权限与安全、人工反馈及质量评测闭环。
+- 图中模块支持鼠标和键盘选择并显示说明；加入窄屏横向浏览提示、科研评价维度和架构概览。
+- 首页新增第 36 个练习入口；浏览器验证 SVG 渲染、节点键盘交互、重置操作和 JavaScript 语法通过。
+
+---
+
+## 2026-11-05（第三十二次实践）
+
+**实践：** 完成18-4.html，使用本地 ECharts 绘制饼图与收入箱线图
+
+**使用的模型：** Copilot SDK（VS Code）
+
+**提示词内容：**
+> 实现18-4.html，其中包括echarts的两个图，两个图就是给你粘贴的两个图，cdn文件下载到cdn目录下，示例代码是两个
+> 一个是这个：
+> option = {
+>   title: { text: 'Referer of a Website', subtext: 'Fake Data', left: 'center' },
+>   tooltip: { trigger: 'item' },
+>   legend: { orient: 'vertical', left: 'left' },
+>   series: [{
+>     name: 'Access From', type: 'pie', radius: '50%',
+>     data: [
+>       { value: 1048, name: 'Search Engine' },
+>       { value: 735, name: 'Direct' },
+>       { value: 580, name: 'Email' },
+>       { value: 484, name: 'Union Ads' },
+>       { value: 300, name: 'Video Ads' }
+>     ],
+>     emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' } }
+>   }]
+> };
+> 另一个图用 ECharts dataset 对 1950 年后的收入数据分组计算五数概括，绘制箱线图、散点与年份标签，并支持缩放。
+
+**完整第二个示例代码：**
+```javascript
+$.when(
+  $.get(ROOT_PATH + '/data/asset/data/life-expectancy-table.json'),
+  $.getScript(
+    CDN_PATH + 'echarts-simple-transform/dist/ecSimpleTransform.min.js'
+  )
+).done(function (res) {
+  run(res[0]);
+});
+function run(_rawData) {
+  echarts.registerTransform(ecSimpleTransform.aggregate);
+  option = {
+    dataset: [
+      {
+        id: 'raw',
+        source: _rawData
+      },
+      {
+        id: 'since_year',
+        fromDatasetId: 'raw',
+        transform: [
+          {
+            type: 'filter',
+            config: {
+              dimension: 'Year',
+              gte: 1950
+            }
+          }
+        ]
+      },
+      {
+        id: 'income_aggregate',
+        fromDatasetId: 'since_year',
+        transform: [
+          {
+            type: 'ecSimpleTransform:aggregate',
+            config: {
+              resultDimensions: [
+                { name: 'min', from: 'Income', method: 'min' },
+                { name: 'Q1', from: 'Income', method: 'Q1' },
+                { name: 'median', from: 'Income', method: 'median' },
+                { name: 'Q3', from: 'Income', method: 'Q3' },
+                { name: 'max', from: 'Income', method: 'max' },
+                { name: 'Country', from: 'Country' }
+              ],
+              groupBy: 'Country'
+            }
+          },
+          {
+            type: 'sort',
+            config: {
+              dimension: 'Q3',
+              order: 'asc'
+            }
+          }
+        ]
+      }
+    ],
+    title: {
+      text: 'Income since 1950'
+    },
+    tooltip: {
+      trigger: 'axis',
+      confine: true
+    },
+    xAxis: {
+      name: 'Income',
+      nameLocation: 'middle',
+      nameGap: 30,
+      scale: true
+    },
+    yAxis: {
+      type: 'category'
+    },
+    grid: {
+      bottom: 140
+    },
+    legend: {
+      selected: { detail: false }
+    },
+    dataZoom: [
+      {
+        type: 'inside'
+      },
+      {
+        type: 'slider',
+        height: 20,
+        bottom: 60
+      }
+    ],
+    series: [
+      {
+        name: 'boxplot',
+        type: 'boxplot',
+        datasetId: 'income_aggregate',
+        itemStyle: {
+          color: '#b8c5f2'
+        },
+        encode: {
+          x: ['min', 'Q1', 'median', 'Q3', 'max'],
+          y: 'Country',
+          itemName: ['Country'],
+          tooltip: ['min', 'Q1', 'median', 'Q3', 'max']
+        }
+      },
+      {
+        name: 'detail',
+        type: 'scatter',
+        datasetId: 'since_year',
+        symbolSize: 6,
+        tooltip: {
+          trigger: 'item'
+        },
+        label: {
+          show: true,
+          position: 'top',
+          align: 'left',
+          verticalAlign: 'middle',
+          rotate: 90,
+          fontSize: 12
+        },
+        itemStyle: {
+          color: '#d00000'
+        },
+        encode: {
+          x: 'Income',
+          y: 'Country',
+          label: 'Year',
+          itemName: 'Year',
+          tooltip: ['Country', 'Year', 'Income']
+        }
+      }
+    ]
+  };
+  myChart.setOption(option);
+}
+```
+
+**执行总结：**
+- 完成 `18-4.html`：使用本地 ECharts 5.6.0 绘制访问来源饼图与 1950 年后各国收入箱线图；收入样本、箱线统计数据和图表库均在本地，无需联网加载。
+- 箱线图可切换年度散点/年份标签，并支持滚轮与滑块缩放；首页新增第 37 个练习入口。
+- 浏览器验证两图加载、样本国家与点数、图例切换及缩放配置；JavaScript 语法与 `git diff --check` 通过。
+
+---
+
+## 2026-11-05（第三十三次实践）
+
+**实践：** 完成18-6.html，使用 Mermaid 绘制智能客服流程图和 ER 图
+
+**使用的模型：** Copilot SDK（VS Code）
+
+**提示词内容：**
+> 实现18-6.html,实现基于mermaid的智能客服系统的流程图和er图，cdn文件下载到cdn目录下。
+
+**执行总结：**
+- 完成 `18-6.html`，使用本地 Mermaid 绘制智能客服 RAG 服务流程图与数据库 ER 图，包含鉴权、可信回答、转人工、反馈闭环及会话/消息/知识检索等实体关系。
+- 新增 Mermaid 11.4.1 本地 CDN 文件及 MIT 授权文本；两个图表均可独立下载为 SVG，并适配窄屏横向查看。
+- 首页新增第 38 个练习入口；浏览器验证两张图成功渲染、文件本地加载、SVG 导出交互及窄屏无页面横向溢出，脚本语法和 `git diff --check` 通过。
+
+---
+
+## 2026-11-05（第三十四次实践）
+
+**实践：** 完成18-7.html，使用 Three.js 制作两个交互式 3D 图表
+
+**使用的模型：** Copilot SDK（VS Code）
+
+**提示词内容：**
+> 实现18-7.html，实现基于three.js的两个图表，cdn文件下载到cdn目录下。
+
+**执行总结：**
+- 完成 `18-7.html`，使用本地 Three.js 0.149.0 绘制智能客服月度分组柱状图与服务质量三维趋势图，支持拖拽旋转、滚轮缩放、数据悬停提示及视角重置。
+- 在首页新增第 39 个练习入口；Three.js 与 MIT 许可证文本存放于 `cdn/three/`。
+- 浏览器验证两图加载、数据悬停提示和窄屏无横向溢出；使用 Node.js 验证内联 JavaScript 语法，并通过 `git diff --check` 检查。
+
+---
+
+## 2026-11-05（第三十五次实践）
+
+**实践：** 完成18-8.html，制作包含三列布局和地理信息地图的数据大屏
+
+**使用的模型：** Copilot SDK（VS Code）
+
+**提示词内容：**
+> 实现18-8.html，实现基于three.js或echarts的数据大屏，大屏要求：三列，中间上面是某种地理信息的图，cdn文件下载到cdn目录下。
+
+**执行总结：**
+- 完成 `18-8.html`，采用三列电商运营主题大屏，中央上方展示中国省级订单热度地图与城市销售额气泡，周围配有销售趋势、品类结构、城市排行、经营指标和渠道成交图表。
+- 使用项目本地 ECharts，并将中国行政区划 GeoJSON 与可在 `file://` 页面加载的地图脚本保存至 `cdn/echarts/`；地图可缩放、拖动并查看地区数据。
+- 首页新增第 40 个练习入口；浏览器验证地图和六个图表正常渲染及手机窄屏无横向溢出，Node.js 脚本语法与 `git diff --check` 通过。
+
+---
+
+## 2026-11-05（第三十六次实践）
+
+**实践：** 将本次项目改动上传到 GitHub
+
+**使用的模型：** Copilot SDK（VS Code）
+
+**提示词内容：**
+> 上传到github

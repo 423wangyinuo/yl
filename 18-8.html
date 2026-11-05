@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-11-05 | 使用模型：Copilot SDK（VS Code） | 功能名称：电商运营数据大屏 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="基于本地 ECharts 和中国行政区划地图的电商运营数据大屏。">
+    <title>18-8 电商运营数据大屏</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            color: #d7e8f4;
+            background: #06111f;
+            font-synthesis: none;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            min-width: 320px;
+            min-height: 100vh;
+            margin: 0;
+            background:
+                radial-gradient(ellipse at 50% 0, rgba(20, 92, 130, .26), transparent 44rem),
+                linear-gradient(145deg, #071522, #06101c 58%, #071727);
+        }
+
+        .yl_dashboard {
+            width: min(1740px, 100%);
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 18px 24px 24px;
+        }
+
+        .yl_header {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            min-height: 68px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(76, 158, 194, .28);
+        }
+
+        .yl_header::after {
+            position: absolute;
+            right: 12%;
+            bottom: -1px;
+            left: 12%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #39d9ed, transparent);
+            content: "";
+        }
+
+        .yl_back {
+            justify-self: start;
+            color: #85b7ce;
+            font-size: 12px;
+            text-decoration: none;
+        }
+        .yl_back:hover { color: #62e6f4; }
+
+        .yl_title { text-align: center; }
+        .yl_title h1 {
+            margin: 0;
+            color: #e8f7ff;
+            font-size: clamp(20px, 2.4vw, 30px);
+            font-weight: 650;
+            letter-spacing: .16em;
+            text-shadow: 0 0 22px rgba(48, 194, 230, .32);
+        }
+        .yl_title p {
+            margin: 5px 0 0;
+            color: #70a3bb;
+            font-size: 9px;
+            letter-spacing: .28em;
+        }
+
+        .yl_header_meta {
+            justify-self: end;
+            color: #8ab3c6;
+            font-size: 11px;
+            text-align: right;
+        }
+        .yl_live { color: #62e6c1; }
+        .yl_live::before {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            margin-right: 7px;
+            border-radius: 50%;
+            background: #48dfb2;
+            box-shadow: 0 0 10px rgba(72, 223, 178, .8);
+            content: "";
+        }
+
+        .yl_grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.52fr) minmax(0, 1fr);
+            align-items: stretch;
+            gap: 14px;
+        }
+
+        .yl_column {
+            display: grid;
+            min-width: 0;
+            min-height: 0;
+            gap: 14px;
+        }
+        .yl_column-left, .yl_column-right { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+        .yl_column-center { grid-template-rows: minmax(0, 1.65fr) minmax(190px, .75fr); }
+
+        .yl_panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+            border: 1px solid rgba(62, 134, 168, .31);
+            border-radius: 7px;
+            background: linear-gradient(145deg, rgba(12, 35, 54, .94), rgba(8, 24, 40, .9));
+            box-shadow: inset 0 0 28px rgba(28, 99, 132, .08), 0 8px 26px rgba(0, 0, 0, .13);
+        }
+
+        .yl_panel::before, .yl_panel::after {
+            position: absolute;
+            z-index: 1;
+            width: 16px;
+            height: 16px;
+            border-color: #31c9df;
+            border-style: solid;
+            content: "";
+            pointer-events: none;
+        }
+        .yl_panel::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+        .yl_panel::after { right: -1px; bottom: -1px; border-width: 0 1px 1px 0; }
+
+        .yl_panel-head {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex: 0 0 48px;
+            min-height: 48px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 12px 15px 7px;
+        }
+        .yl_panel-head h2 {
+            margin: 0;
+            color: #c8e5f1;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: .05em;
+        }
+        .yl_panel-head h2::before {
+            display: inline-block;
+            width: 3px;
+            height: 12px;
+            margin-right: 8px;
+            background: #34d1df;
+            vertical-align: -2px;
+            content: "";
+        }
+        .yl_panel-tag { color: #6f9bb2; font-size: 9px; white-space: nowrap; }
+
+        .yl_chart { flex: 1 1 0; width: 100%; height: auto; min-height: 0; }
+        .yl_map-panel { border-color: rgba(53, 169, 203, .45); }
+        .yl_map-panel .yl_chart { flex: 1 1 0; min-height: 320px; }
+        .yl_map-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 18px;
+            padding: 0 15px 12px;
+            color: #739eb5;
+            font-size: 9px;
+        }
+        .yl_map-stats b { margin-left: 4px; color: #52d9e7; font-weight: 600; }
+        .yl_map-caption {
+            position: absolute;
+            right: 14px;
+            bottom: 9px;
+            color: #4e7890;
+            font-size: 8px;
+        }
+
+        .yl_kpis {
+            display: grid;
+            flex: 0 0 auto;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 9px;
+            padding: 4px 13px 10px;
+        }
+        .yl_kpi {
+            min-width: 0;
+            padding: 10px 11px 9px;
+            border: 1px solid rgba(56, 128, 160, .22);
+            border-radius: 4px;
+            background: rgba(20, 54, 74, .44);
+        }
+        .yl_kpi-label { color: #7fa8bd; font-size: 10px; }
+        .yl_kpi-value {
+            margin-top: 5px;
+            color: #e1f7ff;
+            font-size: clamp(18px, 1.9vw, 25px);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: .02em;
+        }
+        .yl_kpi-value em { margin-left: 3px; color: #8db4c6; font-size: 9px; font-style: normal; }
+        .yl_kpi-change { margin-top: 3px; color: #54d6b3; font-size: 9px; }
+        .yl_kpi-change.yl_down { color: #ff9a76; }
+
+        .yl_status {
+            min-height: 19px;
+            margin: 10px 2px 0;
+            color: #7195a9;
+            font-size: 10px;
+            text-align: right;
+        }
+        .yl_status.yl_error { color: #ff9b8e; }
+
+        @media (min-width: 1450px) {
+            .yl_dashboard { padding-right: 30px; padding-left: 30px; }
+            .yl_grid { min-height: min(800px, calc(100vh - 170px)); }
+        }
+
+        @media (max-width: 980px) {
+            .yl_dashboard { padding: 14px 14px 24px; }
+            .yl_grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); }
+            .yl_column-center { grid-column: 2; grid-row: 1; grid-template-rows: minmax(420px, 1.35fr) minmax(210px, .7fr); }
+            .yl_column-left { grid-column: 1; grid-row: 1; grid-template-rows: minmax(280px, 1fr) minmax(280px, 1fr); }
+            .yl_column-right { grid-column: 1 / -1; grid-row: 2; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: 300px; }
+        }
+
+        @media (max-width: 620px) {
+            .yl_dashboard { padding: 10px 10px 20px; }
+            .yl_header { grid-template-columns: auto 1fr auto; min-height: 58px; margin-bottom: 10px; }
+            .yl_back { max-width: 45px; font-size: 10px; }
+            .yl_title h1 { font-size: 17px; letter-spacing: .08em; }
+            .yl_title p { font-size: 7px; letter-spacing: .16em; }
+            .yl_header_meta { max-width: 75px; font-size: 9px; }
+            .yl_grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+            .yl_column-left, .yl_column-center, .yl_column-right {
+                grid-column: 1;
+                grid-row: auto;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 10px;
+            }
+            .yl_column-center { grid-template-rows: 390px 225px; }
+            .yl_column-left, .yl_column-right { grid-template-rows: 260px 260px; }
+            .yl_column-right { grid-template-rows: 260px 260px; }
+            .yl_map-panel .yl_chart { min-height: 275px; }
+            .yl_panel-head { padding-right: 12px; padding-left: 12px; }
+            .yl_kpis { padding-right: 10px; padding-left: 10px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <main class="yl_dashboard">
+        <header class="yl_header">
+            <a class="yl_back" href="index.html">← 返回首页</a>
+            <div class="yl_title">
+                <h1>电商运营数据大屏</h1>
+                <p>OMNICHANNEL COMMERCE · OPERATIONS OVERVIEW</p>
+            </div>
+            <div class="yl_header_meta"><span class="yl_live">数据演示</span><br><span id="yl_clock">--</span></div>
+        </header>
+
+        <div class="yl_grid">
+            <div class="yl_column yl_column-left">
+                <section class="yl_panel" aria-labelledby="yl_sales-title">
+                    <div class="yl_panel-head">
+                        <h2 id="yl_sales-title">近 7 日销售趋势</h2>
+                        <span class="yl_panel-tag">销售额 / 订单量</span>
+                    </div>
+                    <div class="yl_chart" id="yl_sales_chart" role="img" aria-label="近七日销售额和订单量趋势图"></div>
+                </section>
+                <section class="yl_panel" aria-labelledby="yl_category-title">
+                    <div class="yl_panel-head">
+                        <h2 id="yl_category-title">商品销售结构</h2>
+                        <span class="yl_panel-tag">品类销售占比</span>
+                    </div>
+                    <div class="yl_chart" id="yl_category_chart" role="img" aria-label="商品品类销售结构环形图"></div>
+                </section>
+            </div>
+
+            <div class="yl_column yl_column-center">
+                <section class="yl_panel yl_map-panel" aria-labelledby="yl_map-title">
+                    <div class="yl_panel-head">
+                        <h2 id="yl_map-title">全国订单分布</h2>
+                        <span class="yl_panel-tag">省级订单热度 · 城市销售额</span>
+                    </div>
+                    <div class="yl_chart" id="yl_map_chart" role="img" aria-label="中国各省订单分布地图与主要城市销售额"></div>
+                    <div class="yl_map-stats">
+                        <span>覆盖省区<b>34</b></span>
+                        <span>活跃城市<b>126</b></span>
+                        <span>订单热区<b>华东 · 华南</b></span>
+                    </div>
+                    <span class="yl_map-caption">行政区划数据：DataV · 演示订单数据</span>
+                </section>
+                <section class="yl_panel" aria-labelledby="yl_ranking-title">
+                    <div class="yl_panel-head">
+                        <h2 id="yl_ranking-title">城市销售额 TOP 8</h2>
+                        <span class="yl_panel-tag">单位：万元</span>
+                    </div>
+                    <div class="yl_chart" id="yl_ranking_chart" role="img" aria-label="销售额排名前八的城市横向柱状图"></div>
+                </section>
+            </div>
+
+            <div class="yl_column yl_column-right">
+                <section class="yl_panel" aria-labelledby="yl_kpi-title">
+                    <div class="yl_panel-head">
+                        <h2 id="yl_kpi-title">今日经营概览</h2>
+                        <span class="yl_panel-tag">实时指标</span>
+                    </div>
+                    <div class="yl_kpis">
+                        <div class="yl_kpi">
+                            <div class="yl_kpi-label">今日销售额</div>
+                            <div class="yl_kpi-value">¥ 286.4<em>万</em></div>
+                            <div class="yl_kpi-change">↑ 12.8% 较昨日</div>
+                        </div>
+                        <div class="yl_kpi">
+                            <div class="yl_kpi-label">支付订单</div>
+                            <div class="yl_kpi-value">18,642<em>单</em></div>
+                            <div class="yl_kpi-change">↑ 8.6% 较昨日</div>
+                        </div>
+                        <div class="yl_kpi">
+                            <div class="yl_kpi-label">访客人数</div>
+                            <div class="yl_kpi-value">92,581<em>人</em></div>
+                            <div class="yl_kpi-change">↑ 5.2% 较昨日</div>
+                        </div>
+                        <div class="yl_kpi">
+                            <div class="yl_kpi-label">退款金额</div>
+                            <div class="yl_kpi-value">12.8<em>万</em></div>
+                            <div class="yl_kpi-change yl_down">↓ 2.1% 较昨日</div>
+                        </div>
+                    </div>
+                    <div class="yl_chart" id="yl_order_chart" role="img" aria-label="待支付、已支付、已发货和已完成订单状态图"></div>
+                </section>
+                <section class="yl_panel" aria-labelledby="yl_channel-title">
+                    <div class="yl_panel-head">
+                        <h2 id="yl_channel-title">渠道成交表现</h2>
+                        <span class="yl_panel-tag">访客转化率</span>
+                    </div>
+                    <div class="yl_chart" id="yl_channel_chart" role="img" aria-label="各电商渠道访客量和成交转化率对比图"></div>
+                </section>
+            </div>
+        </div>
+        <div class="yl_status" id="yl_status" role="status" aria-live="polite">本地地图与图表资源加载中…</div>
+    </main>
+
+    <script src="cdn/echarts/echarts.min.js"></script>
+    <script src="cdn/echarts/china-map.js"></script>
+    <script>
+        (function () {
+            "use strict";
+
+            var yl_status = document.getElementById("yl_status");
+            var yl_charts = [];
+
+            function yl_setStatus(yl_message, yl_isError) {
+                yl_status.textContent = yl_message;
+                yl_status.classList.toggle("yl_error", Boolean(yl_isError));
+            }
+
+            function yl_initChart(yl_id, yl_option) {
+                var yl_element = document.getElementById(yl_id);
+                if (!yl_element) throw new Error("图表容器不存在：" + yl_id);
+                var yl_chart = echarts.init(yl_element, null, { renderer: "canvas" });
+                yl_chart.setOption(yl_option);
+                yl_charts.push(yl_chart);
+                return yl_chart;
+            }
+
+            function yl_baseOption() {
+                return {
+                    animationDuration: 850,
+                    textStyle: { color: "#89aabd", fontFamily: "Microsoft YaHei, sans-serif", fontSize: 10 },
+                    tooltip: {
+                        trigger: "axis",
+                        backgroundColor: "rgba(5, 20, 34, .96)",
+                        borderColor: "rgba(63, 180, 203, .5)",
+                        textStyle: { color: "#d8edf6", fontSize: 10 },
+                        axisPointer: { lineStyle: { color: "rgba(67, 207, 220, .45)" } }
+                    }
+                };
+            }
+
+            function yl_salesOption() {
+                var yl_option = yl_baseOption();
+                yl_option.color = ["#39d8df", "#758bff"];
+                yl_option.grid = { left: 46, right: 14, top: 35, bottom: 28 };
+                yl_option.legend = { top: 2, right: 12, itemWidth: 9, itemHeight: 8, textStyle: { color: "#83a8ba", fontSize: 9 } };
+                yl_option.xAxis = {
+                    type: "category",
+                    boundaryGap: false,
+                    data: ["10/30", "10/31", "11/01", "11/02", "11/03", "11/04", "11/05"],
+                    axisLine: { lineStyle: { color: "#29475a" } },
+                    axisTick: { show: false },
+                    axisLabel: { color: "#789caf", fontSize: 9 }
+                };
+                yl_option.yAxis = [
+                    { type: "value", name: "销售额（万）", nameTextStyle: { color: "#7197ab", fontSize: 9 }, splitLine: { lineStyle: { color: "rgba(73, 113, 136, .16)" } }, axisLabel: { color: "#789caf", fontSize: 9 } },
+                    { type: "value", name: "订单（千）", nameTextStyle: { color: "#7197ab", fontSize: 9 }, splitLine: { show: false }, axisLabel: { color: "#789caf", fontSize: 9 } }
+                ];
+                yl_option.series = [
+                    { name: "销售额", type: "line", smooth: true, symbol: "circle", symbolSize: 5, yAxisIndex: 0, areaStyle: { opacity: .14 }, lineStyle: { width: 2 }, data: [198, 226, 211, 248, 239, 265, 286] },
+                    { name: "订单量", type: "line", smooth: true, symbol: "none", yAxisIndex: 1, lineStyle: { width: 2, type: "dashed" }, data: [12.4, 14.1, 13.2, 15.6, 15.1, 17.2, 18.6] }
+                ];
+                return yl_option;
+            }
+
+            function yl_categoryOption() {
+                var yl_option = yl_baseOption();
+                yl_option.tooltip.trigger = "item";
+                yl_option.tooltip.formatter = "{b}<br/>销售额：{c} 万元（{d}%）";
+                yl_option.color = ["#35d6dc", "#5987ff", "#9d7cff", "#ffae58", "#45c8a4"];
+                yl_option.legend = { orient: "vertical", right: "5%", top: "middle", itemWidth: 9, itemHeight: 8, itemGap: 12, textStyle: { color: "#9bb9c8", fontSize: 10 } };
+                yl_option.series = [{
+                    type: "pie",
+                    radius: ["43%", "68%"],
+                    center: ["36%", "54%"],
+                    avoidLabelOverlap: true,
+                    itemStyle: { borderColor: "#0b1c2b", borderWidth: 3 },
+                    label: { show: false },
+                    emphasis: { label: { show: true, color: "#e5f8ff", fontSize: 12, formatter: "{d}%" }, scaleSize: 6 },
+                    data: [
+                        { name: "数码家电", value: 31 },
+                        { name: "服饰鞋包", value: 24 },
+                        { name: "家居生活", value: 19 },
+                        { name: "美妆个护", value: 16 },
+                        { name: "食品生鲜", value: 10 }
+                    ]
+                }];
+                yl_option.graphic = [{
+                    type: "text",
+                    left: "24%",
+                    top: "43%",
+                    style: { text: "100\n品类销售", textAlign: "center", fill: "#d7f0f8", fontSize: 12, lineHeight: 20, fontFamily: "Microsoft YaHei, sans-serif" }
+                }];
+                return yl_option;
+            }
+
+            function yl_mapOption() {
+                var yl_option = yl_baseOption();
+                var yl_provinces = [
+                    ["北京市", 92], ["天津市", 52], ["河北省", 68], ["山西省", 34], ["内蒙古自治区", 28],
+                    ["辽宁省", 55], ["吉林省", 30], ["黑龙江省", 29], ["上海市", 96], ["江苏省", 98],
+                    ["浙江省", 95], ["安徽省", 71], ["福建省", 76], ["江西省", 48], ["山东省", 88],
+                    ["河南省", 73], ["湖北省", 72], ["湖南省", 65], ["广东省", 100], ["广西壮族自治区", 46],
+                    ["海南省", 26], ["重庆市", 57], ["四川省", 79], ["贵州省", 37], ["云南省", 41],
+                    ["西藏自治区", 12], ["陕西省", 51], ["甘肃省", 25], ["青海省", 14], ["宁夏回族自治区", 19],
+                    ["新疆维吾尔自治区", 23], ["台湾省", 39], ["香港特别行政区", 58], ["澳门特别行政区", 21]
+                ].map(function (yl_item) {
+                    return { name: yl_item[0], value: yl_item[1] };
+                });
+                var yl_cities = [
+                    { name: "北京", value: 26.8, coord: [116.405285, 39.904989] },
+                    { name: "上海", value: 32.6, coord: [121.472644, 31.231706] },
+                    { name: "广州", value: 28.4, coord: [113.280637, 23.125178] },
+                    { name: "深圳", value: 25.9, coord: [114.085947, 22.547] },
+                    { name: "杭州", value: 23.1, coord: [120.153576, 30.287459] },
+                    { name: "成都", value: 19.7, coord: [104.065735, 30.659462] },
+                    { name: "武汉", value: 17.2, coord: [114.298572, 30.584355] },
+                    { name: "南京", value: 16.8, coord: [118.767413, 32.041544] },
+                    { name: "重庆", value: 15.6, coord: [106.504962, 29.533155] },
+                    { name: "西安", value: 13.2, coord: [108.948024, 34.263161] },
+                    { name: "郑州", value: 12.5, coord: [113.665412, 34.757975] },
+                    { name: "厦门", value: 11.6, coord: [118.11022, 24.490474] }
+                ];
+                yl_option.tooltip.trigger = "item";
+                yl_option.tooltip.formatter = function (yl_params) {
+                    if (yl_params.seriesType === "effectScatter") {
+                        return yl_params.name + "<br/>销售额：" + yl_params.value[2] + " 万元";
+                    }
+                    return yl_params.name + (yl_params.value == null ? "" : "<br/>订单热度指数：" + yl_params.value);
+                };
+                yl_option.visualMap = {
+                    min: 10, max: 100, calculable: false, orient: "horizontal", left: "center", bottom: 3,
+                    itemWidth: 100, itemHeight: 7, text: ["高", "低"], textStyle: { color: "#8baebf", fontSize: 9 },
+                    inRange: { color: ["#102d48", "#14557a", "#168b9c", "#42d5d3"] },
+                    seriesIndex: 0
+                };
+                yl_option.geo = {
+                    map: "yl_china",
+                    roam: true,
+                    zoom: 1.12,
+                    layoutCenter: ["50%", "48%"],
+                    layoutSize: "112%",
+                    itemStyle: { areaColor: "#102e48", borderColor: "#3d8eaa", borderWidth: .8 },
+                    emphasis: { label: { show: true, color: "#e1fbff", fontSize: 9 }, itemStyle: { areaColor: "#197d92" } },
+                    select: { itemStyle: { areaColor: "#23aeb5" } },
+                    label: { show: false, color: "#a6c8d7", fontSize: 8 }
+                };
+                yl_option.series = [
+                    {
+                        name: "省份订单热度",
+                        type: "map",
+                        map: "yl_china",
+                        geoIndex: 0,
+                        data: yl_provinces,
+                        emphasis: { label: { show: true } }
+                    },
+                    {
+                        name: "城市销售额",
+                        type: "effectScatter",
+                        coordinateSystem: "geo",
+                        data: yl_cities.map(function (yl_city) {
+                            return { name: yl_city.name, value: yl_city.coord.concat(yl_city.value) };
+                        }),
+                        symbolSize: function (yl_value) { return Math.max(6, Math.min(15, yl_value[2] * .33)); },
+                        showEffectOn: "render",
+                        rippleEffect: { brushType: "stroke", scale: 2.3, period: 4.2 },
+                        itemStyle: { color: "#ffe38a", shadowBlur: 9, shadowColor: "rgba(255, 197, 81, .75)" },
+                        zlevel: 2
+                    }
+                ];
+                return yl_option;
+            }
+
+            function yl_rankingOption() {
+                var yl_option = yl_baseOption();
+                yl_option.grid = { left: 56, right: 35, top: 8, bottom: 18 };
+                yl_option.xAxis = { type: "value", axisLabel: { color: "#7398aa", fontSize: 9 }, splitLine: { lineStyle: { color: "rgba(73, 113, 136, .15)" } }, axisLine: { show: false } };
+                yl_option.yAxis = {
+                    type: "category",
+                    inverse: true,
+                    data: ["上海", "北京", "广州", "深圳", "杭州", "成都", "南京", "武汉"],
+                    axisLabel: { color: "#a6c2d0", fontSize: 10 },
+                    axisTick: { show: false },
+                    axisLine: { show: false }
+                };
+                yl_option.tooltip.formatter = "{b}<br/>销售额：{c} 万元";
+                yl_option.series = [{
+                    type: "bar",
+                    data: [326, 268, 284, 259, 231, 197, 168, 172],
+                    barWidth: 9,
+                    showBackground: true,
+                    backgroundStyle: { color: "rgba(62, 117, 145, .12)", borderRadius: 5 },
+                    itemStyle: { borderRadius: [0, 5, 5, 0], color: function (yl_params) {
+                        var yl_colors = ["#35d6dc", "#39c5d6", "#3bb1d5", "#428fdb", "#5b83df", "#6a77dd", "#7d71d7", "#8c70ce"];
+                        return yl_colors[yl_params.dataIndex];
+                    } },
+                    label: { show: true, position: "right", color: "#a9c7d5", fontSize: 9, formatter: "{c}" }
+                }];
+                return yl_option;
+            }
+
+            function yl_orderOption() {
+                var yl_option = yl_baseOption();
+                yl_option.tooltip.trigger = "item";
+                yl_option.tooltip.formatter = "{b}<br/>订单量：{c} 单（{d}%）";
+                yl_option.legend = { bottom: 3, left: "center", itemWidth: 8, itemHeight: 8, itemGap: 9, textStyle: { color: "#88aabd", fontSize: 9 } };
+                yl_option.color = ["#41c7db", "#4d8dff", "#9875e8", "#3cbd9b"];
+                yl_option.series = [{
+                    type: "pie",
+                    radius: ["45%", "68%"],
+                    center: ["50%", "45%"],
+                    label: { show: false },
+                    itemStyle: { borderColor: "#0b1c2b", borderWidth: 2 },
+                    emphasis: { label: { show: true, color: "#e4f8ff", fontSize: 10, formatter: "{b}\n{d}%" } },
+                    data: [
+                        { name: "待支付", value: 2840 },
+                        { name: "已支付", value: 18642 },
+                        { name: "已发货", value: 12560 },
+                        { name: "已完成", value: 28310 }
+                    ]
+                }];
+                return yl_option;
+            }
+
+            function yl_channelOption() {
+                var yl_option = yl_baseOption();
+                yl_option.color = ["#36c8d7", "#f7b85b"];
+                yl_option.grid = { left: 46, right: 42, top: 35, bottom: 25 };
+                yl_option.legend = { top: 1, right: 9, itemWidth: 9, itemHeight: 8, textStyle: { color: "#83a8ba", fontSize: 9 } };
+                yl_option.xAxis = {
+                    type: "category",
+                    data: ["商城", "天猫", "抖音", "京东", "拼多多"],
+                    axisLabel: { color: "#8caabc", fontSize: 9, interval: 0 },
+                    axisLine: { lineStyle: { color: "#29475a" } },
+                    axisTick: { show: false }
+                };
+                yl_option.yAxis = [
+                    { type: "value", name: "访客（千）", nameTextStyle: { color: "#7197ab", fontSize: 9 }, splitLine: { lineStyle: { color: "rgba(73, 113, 136, .15)" } }, axisLabel: { color: "#789caf", fontSize: 9 } },
+                    { type: "value", name: "转化率（%）", min: 0, max: 10, nameTextStyle: { color: "#7197ab", fontSize: 9 }, splitLine: { show: false }, axisLabel: { color: "#789caf", fontSize: 9, formatter: "{value}%" } }
+                ];
+                yl_option.tooltip = Object.assign(yl_option.tooltip, { trigger: "axis" });
+                yl_option.series = [
+                    { name: "访客", type: "bar", barWidth: 12, itemStyle: { borderRadius: [3, 3, 0, 0], opacity: .85 }, data: [32, 27, 24, 19, 16] },
+                    { name: "转化率", type: "line", yAxisIndex: 1, smooth: true, symbol: "circle", symbolSize: 5, lineStyle: { width: 2 }, data: [6.8, 5.9, 8.1, 5.2, 4.6] }
+                ];
+                return yl_option;
+            }
+
+            function yl_updateClock() {
+                var yl_now = new Date();
+                var yl_date = yl_now.toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" });
+                var yl_time = yl_now.toLocaleTimeString("zh-CN", { hour12: false });
+                document.getElementById("yl_clock").textContent = yl_date + "  " + yl_time;
+            }
+
+            if (!window.echarts || !window.yl_chinaGeoJSON) {
+                yl_setStatus("图表库或本地地图数据未能加载，请确认 cdn/echarts/ 下的文件完整。", true);
+                return;
+            }
+
+            try {
+                echarts.registerMap("yl_china", window.yl_chinaGeoJSON);
+                yl_initChart("yl_sales_chart", yl_salesOption());
+                yl_initChart("yl_category_chart", yl_categoryOption());
+                yl_initChart("yl_map_chart", yl_mapOption());
+                yl_initChart("yl_ranking_chart", yl_rankingOption());
+                yl_initChart("yl_order_chart", yl_orderOption());
+                yl_initChart("yl_channel_chart", yl_channelOption());
+            } catch (yl_error) {
+                yl_setStatus("数据大屏初始化失败：" + yl_error.message, true);
+                console.error("ECharts dashboard initialization failed:", yl_error);
+                return;
+            }
+
+            window.addEventListener("resize", function () {
+                yl_charts.forEach(function (yl_chart) { yl_chart.resize(); });
+            });
+            yl_updateClock();
+            window.setInterval(yl_updateClock, 1000);
+            yl_setStatus("本地演示数据 · 地图支持缩放与拖拽，悬停省份或城市查看详情。");
+        }());
+    </script>
+</body>
+</html>

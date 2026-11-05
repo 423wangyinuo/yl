@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-11-05 | 使用模型：Copilot SDK（VS Code） | 功能名称：知识库智能客服 SVG 科研架构图 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="以 SVG 展示知识库智能客服的离线知识工程、在线 RAG 问答、安全治理和科研评测闭环。">
+    <title>18-3 知识库智能客服系统架构</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            --yl_ink: #19313e;
+            --yl_muted: #657b87;
+            --yl_line: #dce7e9;
+            --yl_teal: #087f78;
+        }
+        * { box-sizing: border-box; }
+        body {
+            min-height: 100vh; margin: 0; padding: 26px 18px 52px; color: var(--yl_ink);
+            background:
+                radial-gradient(circle at 8% 0, rgba(89, 190, 173, .16), transparent 30rem),
+                radial-gradient(circle at 95% 16%, rgba(103, 140, 202, .10), transparent 28rem),
+                #f4f7f7;
+        }
+        .yl_page { width: min(1280px, 100%); margin: 0 auto; }
+        .yl_back { color: #557181; font-size: 13px; text-decoration: none; }
+        .yl_back:hover { color: var(--yl_teal); }
+        .yl_heading { margin: 26px 0 20px; }
+        .yl_kicker { color: var(--yl_teal); font-size: 11px; font-weight: 800; letter-spacing: .2em; }
+        h1 { margin: 7px 0; font-size: clamp(26px, 4vw, 38px); }
+        .yl_heading p { max-width: 760px; margin: 0; color: var(--yl_muted); font-size: 14px; line-height: 1.8; }
+        .yl_panel {
+            overflow: hidden; border: 1px solid var(--yl_line); border-radius: 18px;
+            background: rgba(255,255,255,.94); box-shadow: 0 16px 44px rgba(34,66,78,.08);
+        }
+        .yl_toolbar {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+            padding: 14px 17px; border-bottom: 1px solid #e6edef;
+        }
+        .yl_button {
+            padding: 9px 14px; border: 1px solid #cfe0e0; border-radius: 9px; color: #155d5c;
+            background: #f3faf9; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+        }
+        .yl_button:hover { border-color: #79b8b2; background: #e8f6f3; }
+        .yl_button:focus-visible { outline: 3px solid rgba(8,127,120,.25); outline-offset: 2px; }
+        .yl_status { margin-left: auto; color: #71838d; font-size: 12px; }
+        .yl_diagram-scroll { overflow: auto; overscroll-behavior-x: contain; }
+        .yl_diagram { display: block; width: 100%; min-width: 1120px; height: auto; }
+        .yl_diagram-hint { padding: 10px 17px; border-top: 1px solid #e6edef; color: #73848e; font-size: 11px; }
+        .yl_diagram text { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+        .yl_lane-title { fill: #54717c; font-size: 12px; font-weight: 800; letter-spacing: .08em; }
+        .yl_lane-subtitle { fill: #84969d; font-size: 10px; }
+        .yl_node { cursor: pointer; outline: none; }
+        .yl_node rect:first-of-type {
+            fill: #fff; stroke: #d8e4e6; stroke-width: 1.2;
+            transition: stroke .16s ease, fill .16s ease, filter .16s ease;
+        }
+        .yl_node rect:nth-of-type(2) { fill: #4d9d91; stroke: none; }
+        .yl_node[aria-label^="用户入口"] rect:nth-of-type(2),
+        .yl_node[aria-label^="接入与身份鉴权"] rect:nth-of-type(2),
+        .yl_node[aria-label^="对话编排"] rect:nth-of-type(2),
+        .yl_node[aria-label^="查询理解"] rect:nth-of-type(2),
+        .yl_node[aria-label^="混合检索"] rect:nth-of-type(2),
+        .yl_node[aria-label^="重排与上下文"] rect:nth-of-type(2),
+        .yl_node[aria-label^="大语言模型"] rect:nth-of-type(2),
+        .yl_node[aria-label^="输出安全"] rect:nth-of-type(2) { fill: #4a80bb; }
+        .yl_node[aria-label^="对话日志"] rect:nth-of-type(2),
+        .yl_node[aria-label^="用户反馈"] rect:nth-of-type(2),
+        .yl_node[aria-label^="科研评测"] rect:nth-of-type(2) { fill: #c18a45; }
+        .yl_node:hover rect:first-of-type, .yl_node:focus rect:first-of-type, .yl_node.yl_selected rect:first-of-type {
+            fill: #f3fbfa; stroke: #168b83; stroke-width: 2;
+            filter: drop-shadow(0 3px 5px rgba(31,90,95,.12));
+        }
+        .yl_node:focus-visible rect:first-of-type { stroke: #087f78; stroke-width: 3; }
+        .yl_node-title { fill: #203b48; font-size: 13px; font-weight: 800; }
+        .yl_node-copy { fill: #72858f; font-size: 10px; }
+        .yl_node-tag { fill: #16877f; font-size: 9px; font-weight: 700; }
+        .yl_edge { fill: none; stroke: #90a8ad; stroke-width: 1.5; marker-end: url(#yl_arrow); }
+        .yl_edge.yl_knowledge-edge { stroke: #759d9a; marker-end: url(#yl_arrow-knowledge); }
+        .yl_edge.yl_feedback-edge { stroke: #b48b55; stroke-dasharray: 5 5; marker-end: url(#yl_arrow-feedback); }
+        .yl_edge-label { fill: #71858e; font-size: 9px; }
+        .yl_edge-label.yl_feedback-label { fill: #a17438; }
+        .yl_section {
+            padding: 20px; border-top: 1px solid #e6edef;
+        }
+        .yl_section h2 { margin: 0 0 12px; font-size: 15px; }
+        .yl_detail {
+            min-height: 74px; padding: 15px 17px; border: 1px solid #dce7e9; border-radius: 12px;
+            background: #fbfdfd;
+        }
+        .yl_detail strong { display: block; margin-bottom: 4px; color: #174b55; font-size: 13px; }
+        .yl_detail p { margin: 0; color: #647984; font-size: 12px; line-height: 1.7; }
+        .yl_legend { display: flex; flex-wrap: wrap; gap: 10px 19px; margin: 16px 2px 20px; color: #617680; font-size: 11px; }
+        .yl_legend-item { display: inline-flex; align-items: center; gap: 7px; }
+        .yl_swatch { width: 10px; height: 10px; border-radius: 3px; background: var(--yl_swatch); }
+        .yl_research-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .yl_research-card {
+            min-height: 116px; padding: 15px; border: 1px solid #e0e9eb; border-radius: 12px;
+            background: rgba(255,255,255,.84);
+        }
+        .yl_research-card h3 { margin: 0 0 7px; color: #28525b; font-size: 13px; }
+        .yl_research-card p { margin: 0; color: #6d818b; font-size: 11px; line-height: 1.75; }
+        .yl_note { margin: 14px 2px 0; color: #85959c; font-size: 10px; line-height: 1.7; }
+        @media (max-width: 700px) {
+            body { padding: 19px 12px 36px; }
+            .yl_heading { margin-top: 22px; }
+            .yl_panel { border-radius: 14px; }
+            .yl_status { width: 100%; margin-left: 0; }
+            .yl_research-grid { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <main class="yl_page">
+        <a class="yl_back" href="index.html">← 返回练习首页</a>
+        <header class="yl_heading">
+            <div class="yl_kicker">SVG · KNOWLEDGE-ENHANCED AI</div>
+            <h1>知识库智能客服系统架构</h1>
+            <p>面向可追溯、可评测与安全可控的科研原型：离线知识工程构建可信索引，在线 RAG 工作流结合检索、生成、校验和人工协同。</p>
+        </header>
+
+        <section class="yl_panel" aria-label="知识库智能客服系统架构图">
+            <div class="yl_toolbar">
+                <button class="yl_button" id="yl_reset_button" type="button">重置说明</button>
+                <span class="yl_status" id="yl_diagram_status" aria-live="polite">点击或聚焦架构节点查看说明</span>
+            </div>
+            <div class="yl_diagram-scroll">
+                <svg class="yl_diagram" viewBox="0 0 1600 890" role="group" aria-labelledby="yl_svg-title yl_svg-description">
+                    <title id="yl_svg-title">知识库智能客服系统科研架构</title>
+                    <desc id="yl_svg-description">架构包含离线知识采集、清洗、切分、向量化和索引构建；在线用户请求经过鉴权、对话编排、混合检索、重排、语言模型生成和安全校验；反馈、人工复核和评测用于持续改进。</desc>
+                    <defs>
+                        <marker id="yl_arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+                            <path d="M0,0 L8,4 L0,8 Z" fill="#90a8ad"></path>
+                        </marker>
+                        <marker id="yl_arrow-knowledge" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+                            <path d="M0,0 L8,4 L0,8 Z" fill="#759d9a"></path>
+                        </marker>
+                        <marker id="yl_arrow-feedback" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+                            <path d="M0,0 L8,4 L0,8 Z" fill="#b48b55"></path>
+                        </marker>
+                    </defs>
+                    <rect x="0" y="0" width="1600" height="890" fill="#fbfdfd"></rect>
+
+                    <text class="yl_lane-title" x="30" y="37">A  离线知识工程 · OFFLINE KNOWLEDGE PIPELINE</text>
+                    <text class="yl_lane-subtitle" x="30" y="56">多源资料治理、版本化索引与可复现知识更新</text>
+                    <rect x="20" y="70" width="1560" height="220" rx="16" fill="#f3f8f7" stroke="#e1ecea"></rect>
+
+                    <text class="yl_lane-title" x="30" y="334">B  在线问答与检索增强生成 · ONLINE RAG WORKFLOW</text>
+                    <text class="yl_lane-subtitle" x="30" y="353">请求上下文、证据检索、生成与响应校验形成可观测的处理链</text>
+                    <rect x="20" y="367" width="1560" height="264" rx="16" fill="#f6f8fb" stroke="#e4e9ef"></rect>
+
+                    <text class="yl_lane-title" x="30" y="676">C  反馈、治理与科研评测 · HUMAN-IN-THE-LOOP &amp; EVALUATION</text>
+                    <text class="yl_lane-subtitle" x="30" y="695">将线上证据与用户反馈转化为离线改进信号，支持实验对照和风险追踪</text>
+                    <rect x="20" y="708" width="1560" height="150" rx="16" fill="#fbf8f2" stroke="#efe6d8"></rect>
+
+                    <path class="yl_edge yl_knowledge-edge" d="M210 168 H248"></path>
+                    <path class="yl_edge yl_knowledge-edge" d="M435 168 H473"></path>
+                    <path class="yl_edge yl_knowledge-edge" d="M660 168 H698"></path>
+                    <path class="yl_edge yl_knowledge-edge" d="M885 168 H923"></path>
+                    <path class="yl_edge yl_knowledge-edge" d="M1110 168 H1148"></path>
+                    <text class="yl_edge-label" x="215" y="155">采集</text>
+                    <text class="yl_edge-label" x="440" y="155">解析</text>
+                    <text class="yl_edge-label" x="665" y="155">治理</text>
+                    <text class="yl_edge-label" x="890" y="155">切分 / 向量化</text>
+                    <text class="yl_edge-label" x="1115" y="155">索引评测</text>
+
+                    <path class="yl_edge yl_knowledge-edge" d="M1016 224 V310 H812 V416"></path>
+                    <text class="yl_edge-label" x="848" y="302">知识检索接口 / 版本快照</text>
+
+                    <path class="yl_edge" d="M200 495 H236"></path>
+                    <path class="yl_edge" d="M401 495 H437"></path>
+                    <path class="yl_edge" d="M602 495 H638"></path>
+                    <path class="yl_edge" d="M803 495 H839"></path>
+                    <path class="yl_edge" d="M1004 495 H1040"></path>
+                    <path class="yl_edge" d="M1205 495 H1241"></path>
+                    <path class="yl_edge" d="M1406 495 H1442"></path>
+                    <text class="yl_edge-label" x="204" y="482">提问</text>
+                    <text class="yl_edge-label" x="405" y="482">鉴权 / 路由</text>
+                    <text class="yl_edge-label" x="606" y="482">改写 / 意图</text>
+                    <text class="yl_edge-label" x="808" y="482">候选证据</text>
+                    <text class="yl_edge-label" x="1008" y="482">证据上下文</text>
+                    <text class="yl_edge-label" x="1208" y="482">生成结果</text>
+                    <text class="yl_edge-label" x="1409" y="482">校验通过</text>
+
+                    <path class="yl_edge" d="M319 551 V588 H520 V551"></path>
+                    <text class="yl_edge-label" x="365" y="605">会话状态 / 用户授权</text>
+                    <path class="yl_edge" d="M722 551 V604 H1122 V551"></path>
+                    <text class="yl_edge-label" x="829" y="621">检索证据与提示模板</text>
+                    <path class="yl_edge yl_feedback-edge" d="M1505 551 V736 H1084"></path>
+                    <text class="yl_edge-label yl_feedback-label" x="1324" y="695">低置信 / 未命中</text>
+                    <path class="yl_edge yl_feedback-edge" d="M1285 776 H1244"></path>
+                    <path class="yl_edge yl_feedback-edge" d="M1025 776 H984"></path>
+                    <path class="yl_edge yl_feedback-edge" d="M765 776 H724"></path>
+                    <path class="yl_edge yl_feedback-edge" d="M1134 816 V840 H12 V248 H566 V224"></path>
+                    <text class="yl_edge-label yl_feedback-label" x="26" y="832">人工复核后的知识修订回流</text>
+                    <text class="yl_edge-label yl_feedback-label" x="1067" y="763">人工标注 / 修订建议</text>
+
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="知识源：制度文档、FAQ、产品手册、工单和网页资料" data-title="知识源" data-detail="汇集制度文档、FAQ、产品手册、历史工单和经过授权的网页内容。保留来源、所有者、更新时间和访问范围等元数据，作为可追溯的知识资产。">
+                        <rect x="35" y="112" width="175" height="112" rx="12"></rect>
+                        <rect x="35" y="112" width="5" height="112" rx="3" fill="#4d9d91" stroke="none"></rect>
+                        <text class="yl_node-title" x="53" y="143">知识源</text>
+                        <text class="yl_node-copy" x="53" y="165">制度 · FAQ · 产品手册</text>
+                        <text class="yl_node-copy" x="53" y="182">工单 · 授权网页 · 多格式</text>
+                        <text class="yl_node-tag" x="53" y="207">SOURCE CATALOG</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="采集与解析：连接器、OCR、版面结构恢复" data-title="采集与解析" data-detail="通过定时或事件驱动的连接器摄取多格式资料；解析文档结构，必要时执行 OCR、表格抽取与版面恢复，并记录解析质量和失败原因。">
+                        <rect x="248" y="112" width="187" height="112" rx="12"></rect>
+                        <rect x="248" y="112" width="5" height="112" rx="3" fill="#4d9d91" stroke="none"></rect>
+                        <text class="yl_node-title" x="266" y="143">采集与解析</text>
+                        <text class="yl_node-copy" x="266" y="165">连接器 · OCR · 结构恢复</text>
+                        <text class="yl_node-copy" x="266" y="182">抽取文本、表格与元数据</text>
+                        <text class="yl_node-tag" x="266" y="207">INGEST / PARSE</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="清洗与访问治理：去重、脱敏、权限继承、质量审查" data-title="清洗与访问治理" data-detail="清理重复或过时内容，对敏感信息进行识别与脱敏，继承来源权限并实施访问控制；通过人工审核或规则校验控制知识质量和发布范围。">
+                        <rect x="473" y="112" width="187" height="112" rx="12"></rect>
+                        <rect x="473" y="112" width="5" height="112" rx="3" fill="#4d9d91" stroke="none"></rect>
+                        <text class="yl_node-title" x="491" y="143">清洗与访问治理</text>
+                        <text class="yl_node-copy" x="491" y="165">去重 · 脱敏 · 权限继承</text>
+                        <text class="yl_node-copy" x="491" y="182">质量审核 · 生命周期管理</text>
+                        <text class="yl_node-tag" x="491" y="207">QUALITY / ACL</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="知识处理：语义切分、元数据补全、嵌入向量生成" data-title="知识处理与嵌入" data-detail="根据标题层级、段落语义和目标任务制定切分策略，为片段补充来源、时间、权限和主题元数据；调用嵌入模型生成向量，记录模型版本以保证实验可复现。">
+                        <rect x="698" y="112" width="187" height="112" rx="12"></rect>
+                        <rect x="698" y="112" width="5" height="112" rx="3" fill="#4d9d91" stroke="none"></rect>
+                        <text class="yl_node-title" x="716" y="143">知识处理与嵌入</text>
+                        <text class="yl_node-copy" x="716" y="165">语义切分 · 元数据补全</text>
+                        <text class="yl_node-copy" x="716" y="182">嵌入模型 / 版本记录</text>
+                        <text class="yl_node-tag" x="716" y="207">CHUNK / EMBED</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="知识索引：向量索引、关键词索引、文档存储和版本快照" data-title="知识索引与版本" data-detail="分别维护向量索引、关键词索引和原文存储，通过文档版本、索引快照和模型标识关联可回滚状态。检索结果携带来源片段及权限元数据供在线服务校验。">
+                        <rect x="923" y="112" width="187" height="112" rx="12"></rect>
+                        <rect x="923" y="112" width="5" height="112" rx="3" fill="#4d9d91" stroke="none"></rect>
+                        <text class="yl_node-title" x="941" y="143">知识索引与版本</text>
+                        <text class="yl_node-copy" x="941" y="165">向量 / 关键词 / 原文存储</text>
+                        <text class="yl_node-copy" x="941" y="182">ACL 元数据 · 快照回滚</text>
+                        <text class="yl_node-tag" x="941" y="207">INDEX / VERSION</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="离线质量评估：基准问集、检索评估、版本对比" data-title="离线质量评估" data-detail="维护具有代表性的基准问集，评估知识覆盖、检索命中、答案依据和安全表现；对切分策略、嵌入模型、索引版本和重排器进行受控对照。">
+                        <rect x="1148" y="112" width="187" height="112" rx="12"></rect>
+                        <rect x="1148" y="112" width="5" height="112" rx="3" fill="#4d9d91" stroke="none"></rect>
+                        <text class="yl_node-title" x="1166" y="143">离线质量评估</text>
+                        <text class="yl_node-copy" x="1166" y="165">基准问集 · 版本对照</text>
+                        <text class="yl_node-copy" x="1166" y="182">覆盖率 · 检索 · 依据性</text>
+                        <text class="yl_node-tag" x="1166" y="207">OFFLINE EVALUATION</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="知识发布治理：审批、索引切换、版本回滚和审计" data-title="知识发布治理" data-detail="设置草稿、审核、发布和下线状态；索引通过版本切换发布，保留审计记录并支持回滚。评测未达到预设门槛的知识变更不应自动覆盖线上版本。">
+                        <rect x="1373" y="112" width="187" height="112" rx="12"></rect>
+                        <rect x="1373" y="112" width="5" height="112" rx="3" fill="#4d9d91" stroke="none"></rect>
+                        <text class="yl_node-title" x="1391" y="143">知识发布治理</text>
+                        <text class="yl_node-copy" x="1391" y="165">审批 · 灰度 · 版本回滚</text>
+                        <text class="yl_node-copy" x="1391" y="182">变更审计 · 生效范围</text>
+                        <text class="yl_node-tag" x="1391" y="207">RELEASE CONTROL</text>
+                    </g>
+
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="用户入口：网页、移动端和坐席工作台" data-title="用户与坐席入口" data-detail="用户可通过网页、移动端等渠道发起咨询；坐席工作台接收转人工会话，并查看经权限控制的对话上下文和知识引用。">
+                        <rect x="35" y="444" width="165" height="107" rx="12"></rect>
+                        <rect x="35" y="444" width="5" height="107" rx="3" fill="#4a80bb" stroke="none"></rect>
+                        <text class="yl_node-title" x="53" y="476">用户 / 坐席入口</text>
+                        <text class="yl_node-copy" x="53" y="499">网页 · 移动端</text>
+                        <text class="yl_node-copy" x="53" y="516">坐席工作台</text>
+                        <text class="yl_node-tag" x="53" y="539">WEB / APP / AGENT</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="接入与身份鉴权：API 网关、限流、租户和用户权限" data-title="接入与身份鉴权" data-detail="API 网关处理路由、限流和请求追踪；认证与授权服务解析用户、租户和知识访问范围，确保检索与生成环节不泄露越权内容。">
+                        <rect x="236" y="444" width="165" height="107" rx="12"></rect>
+                        <rect x="236" y="444" width="5" height="107" rx="3" fill="#4a80bb" stroke="none"></rect>
+                        <text class="yl_node-title" x="254" y="476">接入与身份鉴权</text>
+                        <text class="yl_node-copy" x="254" y="499">API 网关 · 限流 · 路由</text>
+                        <text class="yl_node-copy" x="254" y="516">用户 / 租户 / 知识 ACL</text>
+                        <text class="yl_node-tag" x="254" y="539">GATEWAY / AUTH</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="对话编排：会话状态、意图识别、策略路由和工具调用" data-title="对话编排与会话" data-detail="管理会话状态和上下文窗口，识别意图并决定检索、澄清、直接答复或转人工；通过策略控制模型、工具和提示模板的选择。">
+                        <rect x="437" y="444" width="165" height="107" rx="12"></rect>
+                        <rect x="437" y="444" width="5" height="107" rx="3" fill="#4a80bb" stroke="none"></rect>
+                        <text class="yl_node-title" x="455" y="476">对话编排</text>
+                        <text class="yl_node-copy" x="455" y="499">意图识别 · 会话状态</text>
+                        <text class="yl_node-copy" x="455" y="516">澄清 · 路由 · 工具策略</text>
+                        <text class="yl_node-tag" x="455" y="539">ORCHESTRATION</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="查询理解：上下文补全、查询改写和多查询扩展" data-title="查询理解与改写" data-detail="结合有限的会话上下文补全省略信息，对口语化提问进行规范化和改写；必要时生成多个检索查询，并保留原始问题以便结果融合与审计。">
+                        <rect x="638" y="444" width="165" height="107" rx="12"></rect>
+                        <rect x="638" y="444" width="5" height="107" rx="3" fill="#4a80bb" stroke="none"></rect>
+                        <text class="yl_node-title" x="656" y="476">查询理解与改写</text>
+                        <text class="yl_node-copy" x="656" y="499">上下文补全 · 多查询</text>
+                        <text class="yl_node-copy" x="656" y="516">意图路由 · 问题规范化</text>
+                        <text class="yl_node-tag" x="656" y="539">QUERY PROCESSING</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="混合检索：向量召回、关键词检索、元数据和权限过滤" data-title="混合检索与权限过滤" data-detail="融合向量语义召回与关键词检索结果，结合元数据过滤和用户权限校验；通过消融和对照实验评估不同召回策略对覆盖率、相关性和延迟的影响。">
+                        <rect x="839" y="444" width="165" height="107" rx="12"></rect>
+                        <rect x="839" y="444" width="5" height="107" rx="3" fill="#4a80bb" stroke="none"></rect>
+                        <text class="yl_node-title" x="857" y="476">混合检索</text>
+                        <text class="yl_node-copy" x="857" y="499">向量召回 + 关键词检索</text>
+                        <text class="yl_node-copy" x="857" y="516">权限 / 元数据过滤</text>
+                        <text class="yl_node-tag" x="857" y="539">RETRIEVAL / ACL</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="重排与上下文构建：候选排序、去冗余、证据打包" data-title="重排与上下文构建" data-detail="使用重排模型对候选片段按查询相关性排序，去重并控制上下文长度；保留片段 ID、来源位置和版本，使生成答案能够引用可核验的原始证据。">
+                        <rect x="1040" y="444" width="165" height="107" rx="12"></rect>
+                        <rect x="1040" y="444" width="5" height="107" rx="3" fill="#4a80bb" stroke="none"></rect>
+                        <text class="yl_node-title" x="1058" y="476">重排与上下文</text>
+                        <text class="yl_node-copy" x="1058" y="499">重排 · 去重 · 长度控制</text>
+                        <text class="yl_node-copy" x="1058" y="516">证据片段 / 来源定位</text>
+                        <text class="yl_node-tag" x="1058" y="539">RERANK / CONTEXT</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="大语言模型：基于证据生成带引用的答复" data-title="受控生成模型" data-detail="将用户问题与筛选后的知识证据一并提供给模型，要求在证据不足时说明不确定性或请求澄清。模型部署形态可按科研原型的隐私、延迟和资源约束选择。">
+                        <rect x="1241" y="444" width="165" height="107" rx="12"></rect>
+                        <rect x="1241" y="444" width="5" height="107" rx="3" fill="#4a80bb" stroke="none"></rect>
+                        <text class="yl_node-title" x="1259" y="476">受控生成模型</text>
+                        <text class="yl_node-copy" x="1259" y="499">问题 + 知识证据</text>
+                        <text class="yl_node-copy" x="1259" y="516">生成带引用的候选答复</text>
+                        <text class="yl_node-tag" x="1259" y="539">LLM / INFERENCE</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="输出安全与依据校验：拒答策略、引用核验、转人工" data-title="输出安全与依据校验" data-detail="检查答案是否具有证据支持、引用是否指向已检索来源，并执行内容安全与敏感信息策略。低置信、知识未命中或高风险问题可转人工处理，避免将模型输出当作已验证事实。">
+                        <rect x="1442" y="444" width="126" height="107" rx="12"></rect>
+                        <rect x="1442" y="444" width="5" height="107" rx="3" fill="#4a80bb" stroke="none"></rect>
+                        <text class="yl_node-title" x="1458" y="476">安全 / 校验</text>
+                        <text class="yl_node-copy" x="1458" y="499">依据 · 引用 · 策略</text>
+                        <text class="yl_node-copy" x="1458" y="516">低置信转人工</text>
+                        <text class="yl_node-tag" x="1458" y="539">GUARDRAIL</text>
+                    </g>
+
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="对话日志与追踪：请求链路、版本、延迟和脱敏日志" data-title="对话日志与可观测性" data-detail="记录可追踪的请求链路、模型与知识库版本、检索片段标识、时延和错误状态。日志需按隐私策略脱敏和限权访问，为线上诊断和复现实验提供依据。">
+                        <rect x="765" y="736" width="219" height="80" rx="12"></rect>
+                        <rect x="765" y="736" width="5" height="80" rx="3" fill="#c18a45" stroke="none"></rect>
+                        <text class="yl_node-title" x="784" y="766">日志与可观测性</text>
+                        <text class="yl_node-copy" x="784" y="789">链路追踪 · 延迟 · 版本 · 脱敏</text>
+                        <text class="yl_node-tag" x="784" y="807">TRACES / METRICS</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="用户反馈：有用性评价、纠错和未解决问题" data-title="用户反馈" data-detail="收集有用性评价、用户纠错和未解决问题，并与原始问题、知识版本和响应链路关联。反馈只作为待审查的改进信号，不应未经核验直接写入知识库。">
+                        <rect x="1025" y="736" width="219" height="80" rx="12"></rect>
+                        <rect x="1025" y="736" width="5" height="80" rx="3" fill="#c18a45" stroke="none"></rect>
+                        <text class="yl_node-title" x="1044" y="766">用户反馈 / 人工复核</text>
+                        <text class="yl_node-copy" x="1044" y="789">纠错 · 未命中 · 转人工记录</text>
+                        <text class="yl_node-tag" x="1044" y="807">HUMAN REVIEW</text>
+                    </g>
+                    <g class="yl_node" tabindex="0" role="button" aria-pressed="false" aria-label="科研评测：检索质量、答案依据性、安全性和响应性能" data-title="科研评测与误差分析" data-detail="在固定测试集和明确标注协议下对比检索与生成方案。关注 Hit@K、MRR 或 nDCG 等检索指标，以及答案依据性、引用准确率、安全风险、响应延迟和人工评价，并对失败案例分类分析。">
+                        <rect x="1285" y="736" width="219" height="80" rx="12"></rect>
+                        <rect x="1285" y="736" width="5" height="80" rx="3" fill="#c18a45" stroke="none"></rect>
+                        <text class="yl_node-title" x="1304" y="766">科研评测与误差分析</text>
+                        <text class="yl_node-copy" x="1304" y="789">检索 · 依据性 · 安全 · 延迟</text>
+                        <text class="yl_node-tag" x="1304" y="807">OFFLINE / ONLINE EVAL</text>
+                    </g>
+                    <text class="yl_edge-label yl_feedback-label" x="40" y="780">闭环目标：可追溯、可对照、可回滚；人工审核后再更新知识与策略</text>
+                </svg>
+            </div>
+            <div class="yl_diagram-hint">提示：窄屏设备可左右滑动查看完整架构；点击节点或用 Tab 聚焦后按 Enter 查看模块说明。</div>
+            <div class="yl_section">
+                <div class="yl_detail" aria-live="polite">
+                    <strong id="yl_detail_title">架构概览</strong>
+                    <p id="yl_detail_text">知识库智能客服采用离线知识工程与在线 RAG 解耦的设计。点击图中任一模块，可查看其职责、研究关注点与治理要求。</p>
+                </div>
+                <div class="yl_legend" aria-label="架构图图例">
+                    <span class="yl_legend-item"><i class="yl_swatch" style="--yl_swatch:#4d9d91"></i>离线知识工程</span>
+                    <span class="yl_legend-item"><i class="yl_swatch" style="--yl_swatch:#4a80bb"></i>在线问答链路</span>
+                    <span class="yl_legend-item"><i class="yl_swatch" style="--yl_swatch:#c18a45"></i>反馈与评测闭环</span>
+                    <span class="yl_legend-item">实线：主要数据流</span>
+                    <span class="yl_legend-item">虚线：人工反馈 / 评估回流</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="yl_section" aria-labelledby="yl_research-title">
+            <h2 id="yl_research-title">科研问题与评价维度</h2>
+            <div class="yl_research-grid">
+                <article class="yl_research-card">
+                    <h3>检索策略对比</h3>
+                    <p>在相同基准问集上比较稠密检索、关键词检索与混合检索；通过 Hit@K、MRR / nDCG 及消融实验分析切分、查询改写和重排的贡献。</p>
+                </article>
+                <article class="yl_research-card">
+                    <h3>答案可信与可追溯</h3>
+                    <p>评估答案依据性、引用准确率、知识覆盖与拒答质量；对知识版本、模型配置和来源片段进行追踪，定位检索错误与生成错误。</p>
+                </article>
+                <article class="yl_research-card">
+                    <h3>安全、隐私与服务质量</h3>
+                    <p>测试权限过滤、敏感信息保护和高风险问题转人工策略，同时观察响应延迟、可用性及人工复核成本，明确系统适用边界。</p>
+                </article>
+            </div>
+            <p class="yl_note">说明：该图为科研与教学用途的参考架构，具体模型、索引组件、指标阈值及部署方案应通过目标场景的实验与安全评审确定。</p>
+        </section>
+    </main>
+    <script>
+        (function () {
+            var yl_nodes = Array.prototype.slice.call(document.querySelectorAll(".yl_node"));
+            var yl_status = document.getElementById("yl_diagram_status");
+            var yl_title = document.getElementById("yl_detail_title");
+            var yl_detail = document.getElementById("yl_detail_text");
+            var yl_resetButton = document.getElementById("yl_reset_button");
+
+            function yl_selectNode(yl_node) {
+                var yl_index;
+                for (yl_index = 0; yl_index < yl_nodes.length; yl_index += 1) {
+                    yl_nodes[yl_index].classList.remove("yl_selected");
+                    yl_nodes[yl_index].setAttribute("aria-pressed", "false");
+                }
+                yl_node.classList.add("yl_selected");
+                yl_node.setAttribute("aria-pressed", "true");
+                yl_title.textContent = yl_node.getAttribute("data-title");
+                yl_detail.textContent = yl_node.getAttribute("data-detail");
+                yl_status.textContent = "已选中：" + yl_node.getAttribute("data-title");
+            }
+
+            yl_nodes.forEach(function (yl_node) {
+                yl_node.addEventListener("click", function () {
+                    yl_selectNode(yl_node);
+                });
+                yl_node.addEventListener("keydown", function (yl_event) {
+                    if (yl_event.key === "Enter" || yl_event.key === " ") {
+                        yl_event.preventDefault();
+                        yl_selectNode(yl_node);
+                    }
+                });
+            });
+
+            yl_resetButton.addEventListener("click", function () {
+                yl_nodes.forEach(function (yl_node) {
+                    yl_node.classList.remove("yl_selected");
+                    yl_node.setAttribute("aria-pressed", "false");
+                });
+                yl_title.textContent = "架构概览";
+                yl_detail.textContent = "知识库智能客服采用离线知识工程与在线 RAG 解耦的设计。点击图中任一模块，可查看其职责、研究关注点与治理要求。";
+                yl_status.textContent = "点击或聚焦架构节点查看说明";
+            });
+        }());
+    </script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-11-05 | 使用模型：Copilot SDK（VS Code） | 功能名称：Canvas 粒子文字动画 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="使用原生 Canvas 绘制王一诺文字与流动粒子动画。">
+    <title>18-1 Canvas 粒子文字动画</title>
+    <style>
+        :root { color-scheme: dark; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+        * { box-sizing: border-box; }
+        body {
+            min-height: 100vh; margin: 0; padding: 28px 18px 48px; color: #e8f4ff;
+            background: radial-gradient(ellipse at 50% 30%, #142b48 0, #091323 48%, #060b14 100%);
+        }
+        .yl_page { width: min(100%, 1120px); margin: 0 auto; }
+        .yl_back { color: #9ab8d5; font-size: 13px; text-decoration: none; }
+        .yl_back:hover { color: #fff; }
+        .yl_heading { margin: 42px 0 22px; text-align: center; }
+        .yl_kicker { color: #74dfdd; font-size: 11px; font-weight: 800; letter-spacing: .24em; }
+        h1 { margin: 10px 0 8px; font-size: clamp(26px, 5vw, 42px); letter-spacing: .04em; }
+        .yl_heading p { margin: 0; color: #9db1c7; font-size: 14px; }
+        .yl_stage {
+            position: relative; overflow: hidden; min-height: 390px; border: 1px solid rgba(133, 188, 220, .2);
+            border-radius: 22px; background: linear-gradient(145deg, rgba(20, 42, 68, .84), rgba(7, 16, 29, .95));
+            box-shadow: 0 24px 70px rgba(0, 0, 0, .35), inset 0 1px rgba(255,255,255,.04);
+        }
+        .yl_stage::before, .yl_stage::after {
+            position: absolute; width: 280px; height: 280px; border: 1px solid rgba(89, 205, 217, .12);
+            border-radius: 50%; content: ""; pointer-events: none;
+        }
+        .yl_stage::before { top: -180px; left: -100px; }
+        .yl_stage::after { right: -120px; bottom: -200px; width: 390px; height: 390px; }
+        .yl_canvas { display: block; width: 100%; height: 390px; }
+        .yl_controls {
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px;
+            padding: 20px 12px 4px;
+        }
+        .yl_button {
+            min-width: 116px; padding: 11px 18px; border: 1px solid rgba(116, 223, 221, .45);
+            border-radius: 999px; color: #eafcff; background: rgba(36, 98, 119, .34);
+            font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+            transition: background .2s ease, transform .2s ease;
+        }
+        .yl_button:hover { transform: translateY(-2px); background: rgba(45, 136, 151, .48); }
+        .yl_button:focus-visible { outline: 3px solid #74dfdd; outline-offset: 3px; }
+        .yl_status { min-width: 72px; color: #91a8bf; font-size: 12px; text-align: center; }
+        .yl_note { margin: 19px 0 0; color: #8096ad; font-size: 12px; text-align: center; }
+        @media (max-width: 560px) {
+            body { padding: 20px 12px 36px; }
+            .yl_heading { margin-top: 32px; }
+            .yl_stage { min-height: 290px; border-radius: 16px; }
+            .yl_canvas { height: 290px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; }
+        }
+    </style>
+</head>
+<body>
+    <main class="yl_page">
+        <a class="yl_back" href="index.html">← 返回练习首页</a>
+        <header class="yl_heading">
+            <div class="yl_kicker">CANVAS · MOTION STUDY</div>
+            <h1>让名字，在光里流动</h1>
+            <p>粒子聚合成文字，再随着光轨缓缓散开</p>
+        </header>
+        <section class="yl_stage" aria-label="Canvas 动画展示区">
+            <canvas class="yl_canvas" id="yl_animation_canvas" role="img" aria-label="由流动光点组成的王一诺三个字">
+                Canvas 动画内容：王一诺
+            </canvas>
+        </section>
+        <div class="yl_controls">
+            <button class="yl_button" id="yl_toggle_button" type="button" aria-pressed="false">暂停动画</button>
+            <button class="yl_button" id="yl_replay_button" type="button">重新播放</button>
+            <span class="yl_status" id="yl_animation_status" aria-live="polite">动画播放中</span>
+        </div>
+        <p class="yl_note">Canvas 2D · requestAnimationFrame · 自适应高清屏幕</p>
+    </main>
+    <script>
+        (function () {
+            var yl_canvas = document.getElementById("yl_animation_canvas");
+            var yl_context = yl_canvas.getContext("2d");
+            var yl_toggleButton = document.getElementById("yl_toggle_button");
+            var yl_replayButton = document.getElementById("yl_replay_button");
+            var yl_status = document.getElementById("yl_animation_status");
+            var yl_width = 0;
+            var yl_height = 0;
+            var yl_particles = [];
+            var yl_animationId = 0;
+            var yl_paused = false;
+            var yl_reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+            function yl_resizeCanvas() {
+                var yl_rect = yl_canvas.getBoundingClientRect();
+                var yl_ratio = Math.min(window.devicePixelRatio || 1, 2);
+                yl_width = yl_rect.width;
+                yl_height = yl_rect.height;
+                yl_canvas.width = Math.round(yl_width * yl_ratio);
+                yl_canvas.height = Math.round(yl_height * yl_ratio);
+                yl_context.setTransform(yl_ratio, 0, 0, yl_ratio, 0, 0);
+                yl_createParticles();
+                yl_drawFrame(0);
+            }
+
+            function yl_createParticles() {
+                var yl_offscreen = document.createElement("canvas");
+                var yl_offscreenContext = yl_offscreen.getContext("2d", { willReadFrequently: true });
+                var yl_fontSize = Math.min(yl_width * 0.19, yl_height * 0.48, 190);
+                var yl_gap = Math.max(4, Math.round(yl_fontSize / 34));
+                var yl_x;
+                var yl_y;
+                yl_offscreen.width = Math.round(yl_width);
+                yl_offscreen.height = Math.round(yl_height);
+                yl_offscreenContext.clearRect(0, 0, yl_width, yl_height);
+                yl_offscreenContext.textAlign = "center";
+                yl_offscreenContext.textBaseline = "middle";
+                yl_offscreenContext.font = "900 " + yl_fontSize + "px 'Microsoft YaHei', 'PingFang SC', sans-serif";
+                yl_offscreenContext.fillStyle = "#ffffff";
+                yl_offscreenContext.fillText("王一诺", yl_width / 2, yl_height / 2 - 2);
+                var yl_pixels = yl_offscreenContext.getImageData(0, 0, yl_offscreen.width, yl_offscreen.height).data;
+                yl_particles = [];
+                for (yl_y = 0; yl_y < yl_height; yl_y += yl_gap) {
+                    for (yl_x = 0; yl_x < yl_width; yl_x += yl_gap) {
+                        if (yl_pixels[(yl_y * yl_offscreen.width + yl_x) * 4 + 3] > 110) {
+                            yl_particles.push({
+                                x: yl_x,
+                                y: yl_y,
+                                offset: Math.random() * Math.PI * 2,
+                                size: 0.65 + Math.random() * 1.15
+                            });
+                        }
+                    }
+                }
+            }
+
+            function yl_drawFrame(yl_time) {
+                var yl_centerX = yl_width / 2;
+                var yl_centerY = yl_height / 2;
+                var yl_phase = yl_time * 0.001;
+                var yl_gradient;
+                var yl_i;
+                var yl_particle;
+                var yl_wave;
+                var yl_alpha;
+                yl_context.clearRect(0, 0, yl_width, yl_height);
+                yl_gradient = yl_context.createRadialGradient(yl_centerX, yl_centerY, 8, yl_centerX, yl_centerY, yl_width * 0.48);
+                yl_gradient.addColorStop(0, "rgba(45, 151, 174, 0.13)");
+                yl_gradient.addColorStop(1, "rgba(8, 18, 33, 0)");
+                yl_context.fillStyle = yl_gradient;
+                yl_context.fillRect(0, 0, yl_width, yl_height);
+
+                for (yl_i = 0; yl_i < yl_particles.length; yl_i += 1) {
+                    yl_particle = yl_particles[yl_i];
+                    yl_wave = Math.sin(yl_phase * 1.5 + yl_particle.offset);
+                    yl_alpha = 0.62 + (yl_wave + 1) * 0.19;
+                    yl_context.beginPath();
+                    yl_context.arc(
+                        yl_particle.x + Math.sin(yl_phase + yl_particle.offset) * 1.15,
+                        yl_particle.y + Math.cos(yl_phase * 1.2 + yl_particle.offset) * 1.15,
+                        yl_particle.size * (0.9 + (yl_wave + 1) * 0.16),
+                        0,
+                        Math.PI * 2
+                    );
+                    yl_context.fillStyle = "rgba(" + Math.round(113 + (yl_wave + 1) * 42) + ", " +
+                        Math.round(221 + (yl_wave + 1) * 16) + ", 235, " + yl_alpha + ")";
+                    yl_context.fill();
+                }
+
+                yl_context.save();
+                yl_context.globalCompositeOperation = "screen";
+                yl_context.lineWidth = 1;
+                yl_context.strokeStyle = "rgba(90, 211, 231, 0.18)";
+                yl_context.beginPath();
+                yl_context.ellipse(yl_centerX, yl_centerY, yl_width * 0.34, yl_height * 0.29, -0.08, yl_phase, yl_phase + Math.PI * 1.62);
+                yl_context.stroke();
+                yl_context.restore();
+
+                if (!yl_paused && !yl_reducedMotion) {
+                    yl_animationId = window.requestAnimationFrame(yl_drawFrame);
+                }
+            }
+
+            yl_toggleButton.addEventListener("click", function () {
+                yl_paused = !yl_paused;
+                yl_toggleButton.setAttribute("aria-pressed", String(yl_paused));
+                yl_toggleButton.textContent = yl_paused ? "继续动画" : "暂停动画";
+                yl_status.textContent = yl_paused ? "动画已暂停" : "动画播放中";
+                if (yl_paused) {
+                    window.cancelAnimationFrame(yl_animationId);
+                } else {
+                    yl_animationId = window.requestAnimationFrame(yl_drawFrame);
+                }
+            });
+
+            yl_replayButton.addEventListener("click", function () {
+                yl_paused = false;
+                yl_toggleButton.setAttribute("aria-pressed", "false");
+                yl_toggleButton.textContent = yl_reducedMotion ? "静态展示" : "暂停动画";
+                yl_status.textContent = yl_reducedMotion ? "静态展示（系统减少动态效果）" : "动画已重新播放";
+                window.cancelAnimationFrame(yl_animationId);
+                yl_drawFrame(0);
+                if (!yl_reducedMotion) {
+                    yl_animationId = window.requestAnimationFrame(yl_drawFrame);
+                }
+            });
+
+            window.addEventListener("resize", yl_resizeCanvas);
+            yl_resizeCanvas();
+            if (yl_reducedMotion) {
+                yl_toggleButton.disabled = true;
+                yl_toggleButton.textContent = "静态展示";
+                yl_status.textContent = "静态展示（系统减少动态效果）";
+            } else {
+                yl_animationId = window.requestAnimationFrame(yl_drawFrame);
+            }
+        }());
+    </script>
+</body>
+</html>

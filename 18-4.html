@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-11-05 | 使用模型：Copilot SDK（VS Code） | 功能名称：ECharts 饼图与箱线图 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="使用本地 ECharts 绘制网站来源饼图，以及 1950 年后各国收入分布箱线图与年度散点。">
+    <title>18-4 ECharts 饼图与箱线图</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            --yl_ink: #19313e;
+            --yl_muted: #657b87;
+            --yl_line: #dce7e9;
+            --yl_teal: #087f78;
+        }
+        * { box-sizing: border-box; }
+        body {
+            min-height: 100vh; margin: 0; padding: 26px 18px 48px; color: var(--yl_ink);
+            background:
+                radial-gradient(circle at 8% 0, rgba(89, 190, 173, .16), transparent 30rem),
+                radial-gradient(circle at 95% 16%, rgba(103, 140, 202, .10), transparent 28rem),
+                #f4f7f7;
+        }
+        .yl_page { width: min(1120px, 100%); margin: 0 auto; }
+        .yl_back { color: #557181; font-size: 13px; text-decoration: none; }
+        .yl_back:hover { color: var(--yl_teal); }
+        .yl_heading { margin: 26px 0 20px; }
+        .yl_kicker { color: var(--yl_teal); font-size: 11px; font-weight: 800; letter-spacing: .2em; }
+        h1 { margin: 7px 0; font-size: clamp(26px, 4vw, 38px); }
+        .yl_heading p { max-width: 760px; margin: 0; color: var(--yl_muted); font-size: 14px; line-height: 1.8; }
+        .yl_charts { display: grid; gap: 20px; }
+        .yl_card {
+            overflow: hidden; border: 1px solid var(--yl_line); border-radius: 17px;
+            background: rgba(255,255,255,.94); box-shadow: 0 14px 38px rgba(34,66,78,.075);
+        }
+        .yl_card-head {
+            display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
+            gap: 8px 18px; padding: 18px 21px 0;
+        }
+        .yl_card-head h2 { margin: 0; font-size: 16px; }
+        .yl_card-head p { margin: 4px 0 0; color: var(--yl_muted); font-size: 11px; line-height: 1.65; }
+        .yl_badge {
+            flex: 0 0 auto; padding: 4px 9px; border: 1px solid #d9eae5; border-radius: 999px;
+            color: #27736b; background: #f0f8f6; font-size: 10px; font-weight: 700;
+        }
+        .yl_chart { width: 100%; }
+        .yl_pie-chart { height: 380px; }
+        .yl_box-chart { height: 570px; }
+        .yl_caption {
+            padding: 11px 20px; border-top: 1px solid #edf1f2; color: #788991;
+            font-size: 10px; line-height: 1.7;
+        }
+        .yl_status {
+            min-height: 20px; margin: 14px 2px 0; color: #6d818b; font-size: 12px;
+        }
+        .yl_status.yl_error { color: #a33a38; }
+        .yl_note { margin: 12px 2px 0; color: #8a989e; font-size: 10px; line-height: 1.7; }
+        .yl_sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+        }
+        @media (max-width: 620px) {
+            body { padding: 19px 12px 36px; }
+            .yl_heading { margin-top: 22px; }
+            .yl_card { border-radius: 13px; }
+            .yl_card-head { padding-right: 15px; padding-left: 15px; }
+            .yl_pie-chart { height: 350px; }
+            .yl_box-chart { height: 500px; }
+            .yl_caption { padding-right: 15px; padding-left: 15px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; }
+        }
+    </style>
+</head>
+<body>
+    <main class="yl_page">
+        <a class="yl_back" href="index.html">← 返回练习首页</a>
+        <header class="yl_heading">
+            <div class="yl_kicker">DATA VISUALIZATION · ECHARTS</div>
+            <h1>交互式数据图表</h1>
+            <p>使用本地 ECharts 绘制网站访问来源占比，以及 1950 年以来不同国家收入分布的箱线图和年度观测值。</p>
+        </header>
+
+        <div class="yl_charts">
+            <section class="yl_card" aria-labelledby="yl_pie-heading">
+                <div class="yl_card-head">
+                    <div>
+                        <h2 id="yl_pie-heading">网站访问来源</h2>
+                        <p>悬停查看各来源的访问量与占比。</p>
+                    </div>
+                    <span class="yl_badge">饼图 · PIE</span>
+                </div>
+                <div class="yl_chart yl_pie-chart" id="yl_pie_chart" role="img" aria-label="网站访问来源饼图，包含 Search Engine、Direct、Email、Union Ads 和 Video Ads"></div>
+                <p class="yl_sr-only">数据：Search Engine 1048，Direct 735，Email 580，Union Ads 484，Video Ads 300。</p>
+                <div class="yl_caption">示例数据：Search Engine、Direct、Email、Union Ads、Video Ads。悬停扇区可查看具体数值。</div>
+            </section>
+
+            <section class="yl_card" aria-labelledby="yl_box-heading">
+                <div class="yl_card-head">
+                    <div>
+                        <h2 id="yl_box-heading">各国家收入分布</h2>
+                        <p>箱体表示四分位区间，中线为中位数；点击图例 detail 可显示红色年度散点和年份，拖动滑块或滚轮缩放收入区间。</p>
+                    </div>
+                    <span class="yl_badge">箱线图 + 散点 · BOXPLOT</span>
+                </div>
+                <div class="yl_chart yl_box-chart" id="yl_box_chart" role="img" aria-label="1950 年以来各国家收入分布箱线图与年份散点"></div>
+                <div class="yl_caption">收入样本来自 Apache ECharts 官方 life-expectancy-table 示例数据；在本地按年份筛选和计算五数概括，打开页面无需联网。</div>
+            </section>
+        </div>
+        <div class="yl_status" id="yl_chart_status" role="status" aria-live="polite">图表加载中…</div>
+        <p class="yl_note">ECharts 5.6.0 本地资源；箱线图四分位数由原始样本插值计算。示例数据仅用于图表学习与演示。</p>
+    </main>
+    <script src="cdn/echarts/echarts.min.js"></script>
+    <script src="cdn/echarts/data/life-expectancy-table.js"></script>
+    <script>
+        (function () {
+            var yl_pieElement = document.getElementById("yl_pie_chart");
+            var yl_boxElement = document.getElementById("yl_box_chart");
+            var yl_status = document.getElementById("yl_chart_status");
+            var yl_pieChart;
+            var yl_boxChart;
+
+            function yl_createPieOption() {
+                return {
+                    aria: { enabled: true },
+                    color: ["#5470c6", "#a9d631", "#4d536e", "#ff9848", "#12a8d5"],
+                    title: {
+                        text: "Referer of a Website",
+                        subtext: "Fake Data",
+                        left: "center",
+                        top: 4,
+                        textStyle: { fontSize: 14, color: "#3d4652" },
+                        subtextStyle: { fontSize: 10, color: "#7a838e" }
+                    },
+                    tooltip: {
+                        trigger: "item",
+                        formatter: function (yl_params) {
+                            return yl_params.marker + yl_params.name + "<br>" +
+                                "访问量：" + yl_params.value.toLocaleString("en-US") + "<br>" +
+                                "占比：" + yl_params.percent + "%";
+                        }
+                    },
+                    legend: {
+                        orient: "vertical",
+                        left: 10,
+                        bottom: 8,
+                        itemWidth: 12,
+                        itemHeight: 9,
+                        itemGap: 4,
+                        textStyle: { fontSize: 10, color: "#5c6570" },
+                        data: ["Search Engine", "Direct", "Email", "Union Ads", "Video Ads"]
+                    },
+                    series: [{
+                        name: "Access From",
+                        type: "pie",
+                        radius: "49%",
+                        center: ["56%", "54%"],
+                        data: [
+                            { value: 1048, name: "Search Engine" },
+                            { value: 735, name: "Direct" },
+                            { value: 580, name: "Email" },
+                            { value: 484, name: "Union Ads" },
+                            { value: 300, name: "Video Ads" }
+                        ],
+                        label: {
+                            color: "#34424c",
+                            fontSize: 10,
+                            formatter: "{b}"
+                        },
+                        labelLine: { length: 10, length2: 8 },
+                        emphasis: {
+                            scale: true,
+                            scaleSize: 7,
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: "rgba(0, 0, 0, 0.35)"
+                            }
+                        }
+                    }]
+                };
+            }
+
+            function yl_quantile(yl_sortedValues, yl_probability) {
+                var yl_position = (yl_sortedValues.length - 1) * yl_probability;
+                var yl_lowerIndex = Math.floor(yl_position);
+                var yl_upperIndex = Math.ceil(yl_position);
+                var yl_fraction = yl_position - yl_lowerIndex;
+                return yl_sortedValues[yl_lowerIndex] * (1 - yl_fraction) +
+                    yl_sortedValues[yl_upperIndex] * yl_fraction;
+            }
+
+            function yl_prepareIncomeData() {
+                var yl_source = window.yl_lifeExpectancyRaw;
+                var yl_groups = Object.create(null);
+                var yl_rows = [];
+                var yl_index;
+                var yl_row;
+                var yl_country;
+                var yl_values;
+                var yl_countries;
+                if (!Array.isArray(yl_source) || yl_source.length === 0) {
+                    throw new Error("收入示例数据未能加载。请确认 cdn/echarts/data/life-expectancy-table.js 文件存在。");
+                }
+                for (yl_index = 0; yl_index < yl_source.length; yl_index += 1) {
+                    yl_row = yl_source[yl_index];
+                    if (Number(yl_row[4]) < 1950) {
+                        continue;
+                    }
+                    yl_country = yl_row[3];
+                    if (!Object.prototype.hasOwnProperty.call(yl_groups, yl_country)) {
+                        yl_groups[yl_country] = [];
+                    }
+                    yl_groups[yl_country].push(Number(yl_row[0]));
+                    yl_rows.push({
+                        Income: Number(yl_row[0]),
+                        Country: yl_country,
+                        Year: Number(yl_row[4])
+                    });
+                }
+                yl_countries = Object.keys(yl_groups).map(function (yl_name) {
+                    yl_values = yl_groups[yl_name].sort(function (yl_a, yl_b) { return yl_a - yl_b; });
+                    return {
+                        name: yl_name,
+                        values: [
+                            yl_values[0],
+                            yl_quantile(yl_values, 0.25),
+                            yl_quantile(yl_values, 0.5),
+                            yl_quantile(yl_values, 0.75),
+                            yl_values[yl_values.length - 1]
+                        ]
+                    };
+                });
+                yl_countries.sort(function (yl_a, yl_b) {
+                    return yl_a.values[3] - yl_b.values[3];
+                });
+                return {
+                    countries: yl_countries.map(function (yl_country) {
+                        return {
+                            min: yl_country.values[0],
+                            Q1: yl_country.values[1],
+                            median: yl_country.values[2],
+                            Q3: yl_country.values[3],
+                            max: yl_country.values[4],
+                            Country: yl_country.name
+                        };
+                    }),
+                    rows: yl_rows
+                };
+            }
+
+            function yl_createBoxOption(yl_incomeData) {
+                return {
+                    aria: { enabled: true },
+                    title: {
+                        text: "Income since 1950",
+                        left: "center",
+                        top: 4,
+                        textStyle: { fontSize: 14, color: "#3d4652" }
+                    },
+                    tooltip: {
+                        trigger: "item",
+                        confine: true,
+                        formatter: function (yl_params) {
+                            if (yl_params.seriesType === "scatter") {
+                                return yl_params.value.Country + " · " + yl_params.value.Year +
+                                    "<br>Income: " + Number(yl_params.value.Income).toLocaleString("en-US");
+                            }
+                            var yl_boxValues = yl_params.value;
+                            return yl_params.name + "<br>" +
+                                "min: " + Math.round(yl_boxValues.min).toLocaleString("en-US") + "<br>" +
+                                "Q1: " + Math.round(yl_boxValues.Q1).toLocaleString("en-US") + "<br>" +
+                                "median: " + Math.round(yl_boxValues.median).toLocaleString("en-US") + "<br>" +
+                                "Q3: " + Math.round(yl_boxValues.Q3).toLocaleString("en-US") + "<br>" +
+                                "max: " + Math.round(yl_boxValues.max).toLocaleString("en-US");
+                        }
+                    },
+                    dataset: [
+                        { id: "income_aggregate", source: yl_incomeData.countries },
+                        { id: "since_year", source: yl_incomeData.rows }
+                    ],
+                    legend: {
+                        bottom: 42,
+                        selected: { detail: false },
+                        textStyle: { fontSize: 10 }
+                    },
+                    grid: {
+                        left: 112,
+                        right: 38,
+                        top: 54,
+                        bottom: 110,
+                        containLabel: false
+                    },
+                    xAxis: {
+                        name: "Income",
+                        nameLocation: "middle",
+                        nameGap: 30,
+                        scale: true,
+                        axisLabel: {
+                            fontSize: 10,
+                            formatter: function (yl_value) {
+                                return Number(yl_value).toLocaleString("en-US");
+                            }
+                        },
+                        splitLine: { lineStyle: { color: "#edf0f3" } }
+                    },
+                    yAxis: {
+                        type: "category",
+                        data: yl_incomeData.countries.map(function (yl_country) { return yl_country.Country; }),
+                        axisLabel: { fontSize: 10, color: "#505b66" },
+                        axisTick: { alignWithLabel: true }
+                    },
+                    dataZoom: [
+                        { type: "inside", filterMode: "none", zoomOnMouseWheel: true },
+                        {
+                            type: "slider",
+                            height: 18,
+                            bottom: 9,
+                            brushSelect: false,
+                            borderColor: "#d9e1eb",
+                            fillerColor: "rgba(84, 112, 198, .18)",
+                            handleStyle: { color: "#5470c6" },
+                            textStyle: { fontSize: 9 }
+                        }
+                    ],
+                    series: [
+                        {
+                            name: "boxplot",
+                            type: "boxplot",
+                            datasetId: "income_aggregate",
+                            itemStyle: { color: "#b8c5f2", borderColor: "#7890df" },
+                            boxWidth: [8, 18],
+                            encode: {
+                                x: ["min", "Q1", "median", "Q3", "max"],
+                                y: "Country",
+                                itemName: "Country",
+                                tooltip: ["min", "Q1", "median", "Q3", "max"]
+                            }
+                        },
+                        {
+                            name: "detail",
+                            type: "scatter",
+                            datasetId: "since_year",
+                            symbolSize: 5,
+                            itemStyle: { color: "#d00000", opacity: 0.55 },
+                            label: {
+                                show: true,
+                                position: "top",
+                                align: "left",
+                                verticalAlign: "middle",
+                                rotate: 90,
+                                distance: 2,
+                                color: "#bd3434",
+                                fontSize: 8,
+                                formatter: function (yl_params) { return String(yl_params.value.Year); }
+                            },
+                            encode: {
+                                x: "Income",
+                                y: "Country",
+                                label: "Year",
+                                itemName: "Year",
+                                tooltip: ["Country", "Year", "Income"]
+                            }
+                        }
+                    ]
+                };
+            }
+
+            function yl_showError(yl_message) {
+                yl_status.classList.add("yl_error");
+                yl_status.textContent = yl_message;
+            }
+
+            if (!window.echarts) {
+                yl_showError("ECharts 未能加载。请确认 cdn/echarts/echarts.min.js 文件存在，并通过 HTTP(S) 或本地浏览器打开页面。");
+                return;
+            }
+
+            try {
+                yl_pieChart = window.echarts.init(yl_pieElement);
+                yl_pieChart.setOption(yl_createPieOption());
+                yl_boxChart = window.echarts.init(yl_boxElement);
+                yl_boxChart.setOption(yl_createBoxOption(yl_prepareIncomeData()));
+                window.addEventListener("resize", function () {
+                    yl_pieChart.resize();
+                    yl_boxChart.resize();
+                });
+                yl_status.textContent = "两个图表已加载。可悬停查看数据，或在箱线图上缩放收入区间。";
+            } catch (yl_error) {
+                yl_showError("图表初始化失败：" + yl_error.message);
+                throw yl_error;
+            }
+        }());
+    </script>
+</body>
+</html>

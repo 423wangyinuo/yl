@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 作者：王一诺 | 建立时间：2026-11-05 | 使用模型：Copilot SDK（VS Code） | 功能名称：Canvas 电商全站系统架构图 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="基于 Canvas 绘制的电商全站系统架构图，展示用户端、接入层、业务服务、数据平台和外部系统。">
+    <title>18-2 Canvas 电商系统架构图</title>
+    <style>
+        :root { color-scheme: light; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh; padding: 26px 18px 48px; color: #172b3a;
+            background: radial-gradient(circle at 8% 0, #e6f4f1, transparent 30rem), #f3f6f7;
+        }
+        .yl_page { width: min(1240px, 100%); margin: 0 auto; }
+        .yl_back { color: #557181; font-size: 13px; text-decoration: none; }
+        .yl_back:hover { color: #087f78; }
+        .yl_heading { margin: 26px 0 20px; }
+        .yl_kicker { color: #087f78; font-size: 11px; font-weight: 800; letter-spacing: .2em; }
+        h1 { margin: 7px 0; font-size: clamp(26px, 4vw, 38px); }
+        .yl_heading p { margin: 0; color: #617582; font-size: 14px; }
+        .yl_panel {
+            overflow: hidden; border: 1px solid #dce5e7; border-radius: 18px;
+            background: rgba(255,255,255,.92); box-shadow: 0 16px 44px rgba(34, 66, 78, .09);
+        }
+        .yl_toolbar {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+            padding: 14px 17px; border-bottom: 1px solid #e6edef;
+        }
+        .yl_button {
+            padding: 9px 14px; border: 1px solid #cfe0e0; border-radius: 9px; color: #155d5c;
+            background: #f3faf9; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+        }
+        .yl_button:hover { border-color: #79b8b2; background: #e8f6f3; }
+        .yl_button:focus-visible { outline: 3px solid rgba(8,127,120,.25); outline-offset: 2px; }
+        .yl_status { margin-left: auto; color: #71838d; font-size: 12px; }
+        .yl_chart-scroll { overflow: auto; overscroll-behavior-x: contain; }
+        .yl_canvas { display: block; width: 1360px; height: 800px; }
+        .yl_hint { padding: 11px 17px; border-top: 1px solid #e6edef; color: #73848e; font-size: 12px; }
+        .yl_legend { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 17px 2px; color: #5e727d; font-size: 12px; }
+        .yl_legend-item { display: inline-flex; align-items: center; gap: 7px; }
+        .yl_dot { width: 9px; height: 9px; border-radius: 50%; background: var(--yl_dot-color); }
+        .yl_detail {
+            min-height: 74px; padding: 16px 18px; border: 1px solid #dce5e7; border-radius: 13px;
+            background: #fff;
+        }
+        .yl_detail strong { display: block; margin-bottom: 4px; color: #174b55; font-size: 14px; }
+        .yl_detail p { margin: 0; color: #647984; font-size: 12px; line-height: 1.7; }
+        .yl_accessible { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+        @media (max-width: 620px) {
+            body { padding: 19px 12px 34px; }
+            .yl_heading { margin-top: 22px; }
+            .yl_panel { border-radius: 14px; }
+            .yl_status { width: 100%; margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <main class="yl_page">
+        <a class="yl_back" href="index.html">← 返回练习首页</a>
+        <header class="yl_heading">
+            <div class="yl_kicker">CANVAS · SYSTEM BLUEPRINT</div>
+            <h1>电商全站系统架构图</h1>
+            <p>从用户访问到业务服务、数据存储与第三方平台的完整链路</p>
+        </header>
+        <section class="yl_panel" aria-label="电商全站系统架构图">
+            <div class="yl_toolbar">
+                <button class="yl_button" id="yl_flow_button" type="button" aria-pressed="false">暂停数据流</button>
+                <button class="yl_button" id="yl_reset_button" type="button">重置视图</button>
+                <span class="yl_status" id="yl_chart_status" aria-live="polite">点击任一模块查看职责说明</span>
+            </div>
+            <div class="yl_chart-scroll">
+                <canvas class="yl_canvas" id="yl_architecture_canvas" role="img" aria-label="电商系统架构图，包含用户端、接入层、业务服务层、数据与基础设施以及外部系统">
+                    电商系统架构：用户端 → 接入层 → 业务服务层 → 数据与基础设施，并连接外部平台。
+                </canvas>
+            </div>
+            <div class="yl_hint">提示：在窄屏设备上可左右滑动查看完整架构；点击图中模块可查看该模块的职责。</div>
+        </section>
+        <div class="yl_legend" aria-label="系统分层图例">
+            <span class="yl_legend-item"><i class="yl_dot" style="--yl_dot-color:#3177b8"></i>用户端</span>
+            <span class="yl_legend-item"><i class="yl_dot" style="--yl_dot-color:#138b86"></i>接入与业务服务</span>
+            <span class="yl_legend-item"><i class="yl_dot" style="--yl_dot-color:#8063bf"></i>数据与基础设施</span>
+            <span class="yl_legend-item"><i class="yl_dot" style="--yl_dot-color:#dc8b3c"></i>外部系统</span>
+        </div>
+        <section class="yl_detail" aria-live="polite">
+            <strong id="yl_detail_title">系统概览</strong>
+            <p id="yl_detail_text">典型电商平台由多端应用、统一接入、领域服务、数据平台和外部合作系统组成。模块通过清晰的接口交换请求与业务数据。</p>
+        </section>
+        <ul class="yl_accessible">
+            <li>用户端：PC 商城、移动商城、运营管理台。</li>
+            <li>接入层：API 网关、身份认证与权限。</li>
+            <li>业务服务：用户、商品、搜索、购物车、订单、支付、库存与物流。</li>
+            <li>数据平台：业务数据库、缓存、搜索索引、对象存储与消息队列。</li>
+            <li>外部系统：支付平台、物流平台、短信邮件服务。</li>
+        </ul>
+    </main>
+    <script>
+        (function () {
+            var yl_canvas = document.getElementById("yl_architecture_canvas");
+            var yl_context = yl_canvas.getContext("2d");
+            var yl_status = document.getElementById("yl_chart_status");
+            var yl_flowButton = document.getElementById("yl_flow_button");
+            var yl_resetButton = document.getElementById("yl_reset_button");
+            var yl_detailTitle = document.getElementById("yl_detail_title");
+            var yl_detailText = document.getElementById("yl_detail_text");
+            var yl_width = 1360;
+            var yl_height = 800;
+            var yl_ratio = Math.min(window.devicePixelRatio || 1, 2);
+            var yl_flowPaused = false;
+            var yl_hoveredId = "";
+            var yl_selectedId = "";
+            var yl_frameId = 0;
+            var yl_nodes = [
+                { id: "pc", x: 48, y: 174, w: 170, h: 78, title: "PC 商城", subtitle: "网页 / H5", color: "#3177b8", detail: "面向桌面用户的商城入口，承载商品浏览、下单和账户管理等功能。" },
+                { id: "mobile", x: 48, y: 296, w: 170, h: 78, title: "移动商城", subtitle: "iOS / Android / 小程序", color: "#3177b8", detail: "移动端应用提供随时随地的选购、支付、订单查询与售后体验。" },
+                { id: "admin", x: 48, y: 418, w: 170, h: 78, title: "运营管理台", subtitle: "商家 / 客服 / 运营", color: "#3177b8", detail: "供运营和客服人员管理商品、订单、促销活动与用户服务。" },
+                { id: "gateway", x: 278, y: 244, w: 196, h: 82, title: "API 网关", subtitle: "路由 · 限流 · 监控", color: "#138b86", detail: "统一接收客户端请求，负责路由转发、流量控制、日志和可观测性。" },
+                { id: "auth", x: 278, y: 376, w: 196, h: 82, title: "身份与权限", subtitle: "登录 · 令牌 · RBAC", color: "#138b86", detail: "验证用户身份与访问权限，为各业务服务提供统一的认证能力。" },
+                { id: "user", x: 538, y: 132, w: 292, h: 68, title: "用户服务", subtitle: "会员 · 账户 · 地址", color: "#138b86", detail: "管理会员资料、账户状态、收货地址和用户等级等信息。" },
+                { id: "product", x: 538, y: 224, w: 292, h: 68, title: "商品服务", subtitle: "SPU / SKU · 类目 · 价格", color: "#138b86", detail: "维护商品目录、规格库存单位、价格和商品上下架状态。" },
+                { id: "search", x: 538, y: 316, w: 292, h: 68, title: "搜索与推荐", subtitle: "检索 · 排序 · 个性化", color: "#138b86", detail: "提供商品关键词检索、排序筛选与推荐结果编排。" },
+                { id: "cart", x: 538, y: 408, w: 292, h: 68, title: "购物车服务", subtitle: "选品 · 数量 · 促销试算", color: "#138b86", detail: "维护用户待购买商品，并在结算前试算优惠和商品数量。" },
+                { id: "order", x: 538, y: 500, w: 292, h: 68, title: "订单服务", subtitle: "创建 · 履约 · 售后", color: "#138b86", detail: "编排下单、订单状态流转、发货履约及售后处理流程。" },
+                { id: "payment", x: 538, y: 592, w: 292, h: 68, title: "支付与库存服务", subtitle: "收款 · 扣减 · 库存预占", color: "#138b86", detail: "协调支付请求、库存锁定与扣减，并处理支付结果通知。" },
+                { id: "database", x: 886, y: 158, w: 194, h: 70, title: "业务数据库", subtitle: "用户 / 商品 / 订单", color: "#8063bf", detail: "关系型数据库保存用户、商品和订单等核心业务数据。" },
+                { id: "cache", x: 886, y: 262, w: 194, h: 70, title: "缓存集群", subtitle: "热点数据 · 会话", color: "#8063bf", detail: "缓存热点商品和会话等高频数据，降低核心数据库读取压力。" },
+                { id: "index", x: 886, y: 366, w: 194, h: 70, title: "搜索索引", subtitle: "商品全文检索", color: "#8063bf", detail: "保存可检索的商品索引，支持关键词搜索与筛选。" },
+                { id: "storage", x: 886, y: 470, w: 194, h: 70, title: "对象存储", subtitle: "图片 · 视频 · 文件", color: "#8063bf", detail: "存储商品图片、视频和其他非结构化文件资源。" },
+                { id: "queue", x: 886, y: 574, w: 194, h: 70, title: "消息队列", subtitle: "异步事件 · 削峰", color: "#8063bf", detail: "用于订单通知、异步任务和服务间事件传递，缓冲流量峰值。" },
+                { id: "pay-partner", x: 1130, y: 224, w: 180, h: 76, title: "支付平台", subtitle: "支付 / 退款回调", color: "#dc8b3c", detail: "通过标准化接口对接外部支付机构，接收支付和退款结果。" },
+                { id: "delivery", x: 1130, y: 364, w: 180, h: 76, title: "物流平台", subtitle: "运单 / 轨迹查询", color: "#dc8b3c", detail: "连接物流合作方，创建运单并同步包裹配送状态。" },
+                { id: "message", x: 1130, y: 504, w: 180, h: 76, title: "消息服务商", subtitle: "短信 / 邮件通知", color: "#dc8b3c", detail: "通过短信或邮件服务商发送验证码、订单提醒与服务通知。" }
+            ];
+            var yl_edges = [
+                ["pc", "gateway"], ["mobile", "gateway"], ["admin", "gateway"],
+                ["auth", "user"], ["auth", "product"], ["auth", "search"],
+                ["auth", "cart"], ["auth", "order"], ["auth", "payment"],
+                ["user", "database"], ["product", "database"], ["product", "storage"],
+                ["product", "cache"], ["search", "index"], ["search", "cache"],
+                ["cart", "cache"], ["cart", "database"], ["order", "database"],
+                ["order", "queue"], ["payment", "database"], ["payment", "queue"],
+                ["payment", "pay-partner"], ["order", "delivery"], ["order", "message"]
+            ];
+
+            function yl_findNode(yl_id) {
+                var yl_index;
+                for (yl_index = 0; yl_index < yl_nodes.length; yl_index += 1) {
+                    if (yl_nodes[yl_index].id === yl_id) {
+                        return yl_nodes[yl_index];
+                    }
+                }
+                return null;
+            }
+
+            function yl_drawArrow(yl_startX, yl_startY, yl_endX, yl_endY, yl_color, yl_offset, yl_active) {
+                var yl_curve = Math.max(28, Math.abs(yl_endX - yl_startX) * 0.42);
+                var yl_direction = yl_endX >= yl_startX ? 1 : -1;
+                yl_context.beginPath();
+                yl_context.moveTo(yl_startX, yl_startY);
+                yl_context.bezierCurveTo(
+                    yl_startX + yl_curve * yl_direction, yl_startY,
+                    yl_endX - yl_curve * yl_direction, yl_endY,
+                    yl_endX, yl_endY
+                );
+                yl_context.strokeStyle = yl_active ? "#159d9a" : yl_color;
+                yl_context.lineWidth = yl_active ? 2 : 1.25;
+                yl_context.setLineDash([5, 6]);
+                yl_context.lineDashOffset = yl_offset;
+                yl_context.stroke();
+                yl_context.setLineDash([]);
+                var yl_angle = Math.atan2(yl_endY - yl_startY, yl_endX - yl_startX);
+                yl_context.beginPath();
+                yl_context.moveTo(yl_endX, yl_endY);
+                yl_context.lineTo(yl_endX - 7 * Math.cos(yl_angle - Math.PI / 6), yl_endY - 7 * Math.sin(yl_angle - Math.PI / 6));
+                yl_context.lineTo(yl_endX - 7 * Math.cos(yl_angle + Math.PI / 6), yl_endY - 7 * Math.sin(yl_angle + Math.PI / 6));
+                yl_context.closePath();
+                yl_context.fillStyle = yl_active ? "#159d9a" : yl_color;
+                yl_context.fill();
+            }
+
+            function yl_drawNode(yl_node) {
+                var yl_selected = yl_node.id === yl_selectedId;
+                var yl_hovered = yl_node.id === yl_hoveredId;
+                var yl_centerY = yl_node.y + yl_node.h / 2;
+                yl_context.save();
+                yl_context.shadowColor = yl_selected ? "rgba(20, 143, 137, .22)" : "rgba(24, 55, 74, .08)";
+                yl_context.shadowBlur = yl_selected || yl_hovered ? 16 : 9;
+                yl_context.shadowOffsetY = 3;
+                yl_context.beginPath();
+                yl_context.roundRect(yl_node.x, yl_node.y, yl_node.w, yl_node.h, 12);
+                yl_context.fillStyle = yl_selected ? "#f0fbf9" : "#ffffff";
+                yl_context.fill();
+                yl_context.shadowColor = "transparent";
+                yl_context.lineWidth = yl_selected || yl_hovered ? 2 : 1;
+                yl_context.strokeStyle = yl_selected || yl_hovered ? yl_node.color : "#e0e8eb";
+                yl_context.stroke();
+                yl_context.beginPath();
+                yl_context.roundRect(yl_node.x, yl_node.y, 5, yl_node.h, [12, 0, 0, 12]);
+                yl_context.fillStyle = yl_node.color;
+                yl_context.fill();
+                yl_context.textAlign = "left";
+                yl_context.textBaseline = "middle";
+                yl_context.fillStyle = "#1d3441";
+                yl_context.font = "700 14px 'Microsoft YaHei', sans-serif";
+                yl_context.fillText(yl_node.title, yl_node.x + 17, yl_centerY - 8);
+                yl_context.fillStyle = "#7a8c96";
+                yl_context.font = "11px 'Microsoft YaHei', sans-serif";
+                yl_context.fillText(yl_node.subtitle, yl_node.x + 17, yl_centerY + 13, yl_node.w - 28);
+                yl_context.restore();
+            }
+
+            function yl_drawFrame(yl_timestamp) {
+                var yl_edgeIndex;
+                var yl_edge;
+                var yl_from;
+                var yl_to;
+                var yl_isActive;
+                var yl_nodeIndex;
+                var yl_offset = yl_flowPaused ? 0 : -(yl_timestamp * 0.025);
+                yl_context.clearRect(0, 0, yl_width, yl_height);
+                yl_context.fillStyle = "#f8fbfc";
+                yl_context.fillRect(0, 0, yl_width, yl_height);
+
+                yl_context.fillStyle = "#718893";
+                yl_context.font = "800 11px 'Microsoft YaHei', sans-serif";
+                yl_context.textAlign = "left";
+                yl_context.textBaseline = "alphabetic";
+                yl_context.fillText("01  用户端", 48, 73);
+                yl_context.fillText("02  接入层", 278, 73);
+                yl_context.fillText("03  业务服务层", 538, 73);
+                yl_context.fillText("04  数据与基础设施", 886, 73);
+                yl_context.fillText("05  外部系统", 1130, 73);
+                yl_context.strokeStyle = "#e7eef0";
+                yl_context.setLineDash([3, 5]);
+                yl_context.beginPath();
+                yl_context.moveTo(250, 92); yl_context.lineTo(250, 705);
+                yl_context.moveTo(508, 92); yl_context.lineTo(508, 705);
+                yl_context.moveTo(860, 92); yl_context.lineTo(860, 705);
+                yl_context.moveTo(1104, 92); yl_context.lineTo(1104, 705);
+                yl_context.stroke();
+                yl_context.setLineDash([]);
+
+                yl_context.beginPath();
+                yl_context.moveTo(376, 326);
+                yl_context.lineTo(376, 369);
+                yl_context.strokeStyle = "rgba(119,148,160,.45)";
+                yl_context.lineWidth = 1.25;
+                yl_context.setLineDash([5, 6]);
+                yl_context.lineDashOffset = yl_offset;
+                yl_context.stroke();
+                yl_context.setLineDash([]);
+                yl_context.beginPath();
+                yl_context.moveTo(376, 376);
+                yl_context.lineTo(372, 369);
+                yl_context.lineTo(380, 369);
+                yl_context.closePath();
+                yl_context.fillStyle = "rgba(119,148,160,.65)";
+                yl_context.fill();
+
+                for (yl_edgeIndex = 0; yl_edgeIndex < yl_edges.length; yl_edgeIndex += 1) {
+                    yl_edge = yl_edges[yl_edgeIndex];
+                    yl_from = yl_findNode(yl_edge[0]);
+                    yl_to = yl_findNode(yl_edge[1]);
+                    yl_isActive = (yl_hoveredId === yl_from.id || yl_hoveredId === yl_to.id ||
+                        yl_selectedId === yl_from.id || yl_selectedId === yl_to.id);
+                    yl_drawArrow(yl_from.x + yl_from.w, yl_from.y + yl_from.h / 2,
+                        yl_to.x, yl_to.y + yl_to.h / 2,
+                        yl_isActive ? "rgba(19,139,134,.55)" : "rgba(119,148,160,.28)",
+                        yl_offset, yl_isActive);
+                }
+                for (yl_nodeIndex = 0; yl_nodeIndex < yl_nodes.length; yl_nodeIndex += 1) {
+                    yl_drawNode(yl_nodes[yl_nodeIndex]);
+                }
+                yl_context.fillStyle = "#9aaab1";
+                yl_context.font = "11px 'Microsoft YaHei', sans-serif";
+                yl_context.textAlign = "right";
+                yl_context.fillText("业务请求与事件流向 →", 1310, 746);
+
+                if (!yl_flowPaused) {
+                    yl_frameId = window.requestAnimationFrame(yl_drawFrame);
+                }
+            }
+
+            function yl_resizeCanvas() {
+                yl_ratio = Math.min(window.devicePixelRatio || 1, 2);
+                yl_canvas.width = yl_width * yl_ratio;
+                yl_canvas.height = yl_height * yl_ratio;
+                yl_context.setTransform(yl_ratio, 0, 0, yl_ratio, 0, 0);
+                window.cancelAnimationFrame(yl_frameId);
+                yl_drawFrame(0);
+            }
+
+            function yl_getNodeAt(yl_x, yl_y) {
+                var yl_index;
+                for (yl_index = yl_nodes.length - 1; yl_index >= 0; yl_index -= 1) {
+                    if (yl_x >= yl_nodes[yl_index].x && yl_x <= yl_nodes[yl_index].x + yl_nodes[yl_index].w &&
+                        yl_y >= yl_nodes[yl_index].y && yl_y <= yl_nodes[yl_index].y + yl_nodes[yl_index].h) {
+                        return yl_nodes[yl_index];
+                    }
+                }
+                return null;
+            }
+
+            function yl_updatePointer(yl_event) {
+                var yl_rect = yl_canvas.getBoundingClientRect();
+                var yl_scaleX = yl_width / yl_rect.width;
+                var yl_scaleY = yl_height / yl_rect.height;
+                var yl_node = yl_getNodeAt((yl_event.clientX - yl_rect.left) * yl_scaleX, (yl_event.clientY - yl_rect.top) * yl_scaleY);
+                yl_hoveredId = yl_node ? yl_node.id : "";
+                yl_canvas.style.cursor = yl_node ? "pointer" : "default";
+                if (yl_flowPaused) {
+                    yl_drawFrame(0);
+                }
+            }
+
+            yl_canvas.addEventListener("pointermove", yl_updatePointer);
+            yl_canvas.addEventListener("pointerleave", function () {
+                yl_hoveredId = "";
+                yl_canvas.style.cursor = "default";
+                if (yl_flowPaused) {
+                    yl_drawFrame(0);
+                }
+            });
+            yl_canvas.addEventListener("click", function (yl_event) {
+                var yl_rect = yl_canvas.getBoundingClientRect();
+                var yl_node = yl_getNodeAt(
+                    (yl_event.clientX - yl_rect.left) * yl_width / yl_rect.width,
+                    (yl_event.clientY - yl_rect.top) * yl_height / yl_rect.height
+                );
+                if (yl_node) {
+                    yl_selectedId = yl_node.id;
+                    yl_detailTitle.textContent = yl_node.title;
+                    yl_detailText.textContent = yl_node.detail;
+                    yl_status.textContent = "已选中：" + yl_node.title;
+                    if (yl_flowPaused) {
+                        yl_drawFrame(0);
+                    }
+                }
+            });
+            yl_flowButton.addEventListener("click", function () {
+                yl_flowPaused = !yl_flowPaused;
+                yl_flowButton.setAttribute("aria-pressed", String(yl_flowPaused));
+                yl_flowButton.textContent = yl_flowPaused ? "继续数据流" : "暂停数据流";
+                if (yl_flowPaused) {
+                    window.cancelAnimationFrame(yl_frameId);
+                    yl_status.textContent = "数据流动画已暂停";
+                } else {
+                    yl_status.textContent = yl_selectedId ? "已选中：" + yl_findNode(yl_selectedId).title : "数据流动画播放中";
+                    yl_frameId = window.requestAnimationFrame(yl_drawFrame);
+                }
+            });
+            yl_resetButton.addEventListener("click", function () {
+                yl_selectedId = "";
+                yl_hoveredId = "";
+                yl_detailTitle.textContent = "系统概览";
+                yl_detailText.textContent = "典型电商平台由多端应用、统一接入、领域服务、数据平台和外部合作系统组成。模块通过清晰的接口交换请求与业务数据。";
+                yl_status.textContent = "点击任一模块查看职责说明";
+                if (yl_flowPaused) {
+                    yl_flowPaused = false;
+                    yl_flowButton.setAttribute("aria-pressed", "false");
+                    yl_flowButton.textContent = "暂停数据流";
+                    yl_frameId = window.requestAnimationFrame(yl_drawFrame);
+                }
+            });
+
+            window.addEventListener("resize", yl_resizeCanvas);
+            yl_resizeCanvas();
+        }());
+    </script>
+</body>
+</html>
